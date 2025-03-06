@@ -83,6 +83,8 @@ const logout = async () => {
 // Liste des liens de navigation
 const navigation = ref([
   { name: 'Dashboard', href: '/', current: false },
+  { name: 'Prestations', href: '/prestations', current: false },
+
 ]);
 
 // Met à jour l'état 'current' en fonction du chemin actif
