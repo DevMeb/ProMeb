@@ -8,4 +8,6 @@ export default [
   { path: '/prestations/create', name: 'PrestationCreate', component: loadView('PrestationForm'), meta: { requiresAuth: true } },
   { path: '/prestations/:id', name: 'PrestationDetail', component: loadView('PrestationDetail'), meta: { requiresAuth: true } },
   { path: '/prestations/:id/edit', name: 'PrestationEdit', component: loadView('PrestationForm'), meta: { requiresAuth: true } },
+  { path: '/factures', name: 'Facture', component: loadView('FactureCreate'), meta: { requiresAuth: true } },
+
 ];

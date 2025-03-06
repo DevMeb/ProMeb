@@ -84,6 +84,7 @@ const logout = async () => {
 const navigation = ref([
   { name: 'Dashboard', href: '/', current: false },
   { name: 'Prestations', href: '/prestations', current: false },
+  { name: 'Factures', href: '/factures', current: false },
 
 ]);
 
