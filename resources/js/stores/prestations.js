@@ -34,7 +34,6 @@ export const usePrestationsStore = defineStore('prestations', () => {
     filteredPrestations.value = prestations.value.filter(prestation => {
       const { date_prestation, adresse, min_hours, max_hours } = activeFilters.value;
 
-      console.log(prestation.date_prestation, date_prestation, dayjs(prestation.date_prestation).format('YYYY-MM-DD'));
       if (date_prestation && dayjs(prestation.date_prestation).format('YYYY-MM-DD') !== date_prestation) return false;
       if (adresse && !prestation.adresse.toLowerCase().includes(adresse.toLowerCase())) return false;
       if (min_hours && parseFloat(prestation.nombre_heures) < parseFloat(min_hours)) return false;
@@ -82,7 +81,7 @@ export const usePrestationsStore = defineStore('prestations', () => {
       request: () => axios.get('/api/prestations'),
       onSuccess: (response) => {
         // Si l'API renvoie les données dans une clé data, ajustez ici
-        prestations.value = response.data.data || response.data;
+        prestations.value = response.data;
       },
     });
   }
@@ -92,7 +91,7 @@ export const usePrestationsStore = defineStore('prestations', () => {
       operation: 'add',
       request: () => axios.post('/api/prestations', prestation),
       onSuccess: (response) => {
-        prestations.value.push(response.data.data || response.data);
+        prestations.value.push(response.data);
         notify('success', response.data.message || 'Prestation ajoutée avec succès.');
       },
     });

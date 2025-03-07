@@ -1,80 +1,122 @@
+// src/stores/invoices.js
 import { defineStore } from 'pinia';
-import { ref } from 'vue';
+import { computed, ref, watch } from 'vue';
 import axios from 'axios';
+import { notify } from '@/utils';
+import { useStorage } from '@vueuse/core';
 
-export const useInvoiceStore = defineStore('invoices', () => {
-  // Stocke la liste des factures
+export const useInvoicesStore = defineStore('invoices', () => {
+  // Liste des factures
   const invoices = ref([]);
-  // Gère l'état de chargement et d'erreur
-  const loading = ref(false);
-  const error = ref(null);
+  // Erreurs pour chaque opération
+  const errors = ref({});
+  // États de chargement par opération
+  const loading = ref({});
 
-  /**
-   * Récupère la liste des factures
-   */
-  async function fetchInvoices() {
-    loading.value = true;
-    error.value = null;
-    try {
-      const response = await axios.get('/api/factures', { withCredentials: true });
-      invoices.value = response.data;
-    } catch (e) {
-      error.value = e.response?.data?.error || e.message;
-    } finally {
-      loading.value = false;
+  function clearErrors(operation) {
+    if (operation) {
+      errors.value[operation] = null;
+    } else {
+      errors.value = {};
     }
   }
 
-  /**
-   * Supprime une facture par son ID et met à jour la liste
-   * @param {number} id - ID de la facture à supprimer
-   */
-  async function deleteInvoice(id) {
-    loading.value = true;
-    error.value = null;
-    try {
-      await axios.delete(`/api/factures/${id}`, { withCredentials: true });
-      invoices.value = invoices.value.filter(invoice => invoice.id !== id);
-    } catch (e) {
-      error.value = e.response?.data?.error || e.message;
-      throw e;
-    } finally {
-      loading.value = false;
-    }
+  function setLoading(operation, state) {
+    loading.value[operation] = state;
   }
 
-  /**
-   * Crée une facture à partir des données fournies.
-   * Ici, l'API renvoie un PDF pour téléchargement. 
-   * Après la création, on actualise la liste des factures.
-   * @param {Object} payload - Données de la facture (prestations, total_heures, total_ht)
-   * @returns {Blob} Le PDF généré (en réponse)
-   */
-  async function createInvoice(payload) {
-    loading.value = true;
-    error.value = null;
+  async function apiCall({ operation, request, onSuccess }) {
+    clearErrors(operation);
+    setLoading(operation, true);
     try {
-      const response = await axios.post('/api/factures', payload, {
-        withCredentials: true,
-        responseType: 'blob'  // Pour récupérer le PDF en blob
-      });
-      // Actualiser la liste des factures après création
-      await fetchInvoices();
+      const response = await request();
+      if (onSuccess) onSuccess(response);
       return response;
-    } catch (e) {
-      error.value = e.response?.data?.error || e.message;
-      throw e;
+    } catch (err) {
+      if (err.response?.status === 422) {
+        errors.value.validationErrors = err.response.data.errors;
+      } else {
+        errors.value[operation] = err.response?.data?.message || "Une erreur est survenue.";
+        notify('error', errors.value[operation]);
+      }
+      console.error(err);
+      throw err;
     } finally {
-      loading.value = false;
+      setLoading(operation, false);
     }
   }
 
-  return {
-    invoices,
-    loading,
-    error,
+  // Récupère la liste des factures via l'API
+  async function fetchInvoices() {
+    return apiCall({
+      operation: 'fetch',
+      request: () => axios.get('/api/factures', { withCredentials: true }),
+      onSuccess: (response) => {
+        invoices.value = response.data;
+      },
+    });
+  }
+
+  // Ajoute une facture (si vous avez besoin de créer une facture sans PDF, sinon on utilise la méthode store de l'InvoiceController)
+  async function addInvoice(invoice) {
+    return apiCall({
+      operation: 'add',
+      request: () => axios.post('/api/factures', invoice),
+      onSuccess: (response) => {
+        invoices.value.push(response.data.data || response.data);
+        notify('success', response.data.message || 'Facture ajoutée avec succès.');
+      },
+    });
+  }
+
+  // Supprime une facture
+  async function deleteInvoice(invoiceId) {
+    return apiCall({
+      operation: 'delete',
+      request: () => axios.delete(`/api/factures/${invoiceId}`),
+      onSuccess: (response) => {
+        invoices.value = invoices.value.filter(i => i.id !== invoiceId);
+        notify('success', response.data.message || 'Facture supprimée avec succès.');
+      },
+    });
+  }
+
+  // Cache pour les URLs Blob des PDFs
+  const pdfCache = new Map();
+
+  // Récupère le PDF d'une facture
+  async function getInvoicePdf(invoiceId) {
+    if (pdfCache.has(invoiceId)) {
+      return pdfCache.get(invoiceId);
+    }
+    try {
+      const response = await apiCall({
+        operation: 'pdf',
+        request: () => axios.get(`/api/factures/${invoiceId}/pdf`, { 
+          withCredentials: true,
+          responseType: 'blob' 
+        }),
+      });
+      if (!response || !response.data) {
+        throw new Error("Réponse invalide lors de la récupération du PDF.");
+      }
+      const blobUrl = URL.createObjectURL(new Blob([response.data], { type: 'application/pdf' }));
+      pdfCache.set(invoiceId, blobUrl);
+      return blobUrl;
+    } catch (err) {
+      console.error(`Erreur lors de la récupération du PDF de la facture ${invoiceId} :`, err);
+      throw new Error("Impossible de récupérer le PDF.");
+    }
+  }
+
+  return { 
+    invoices, 
+    errors, 
+    loading, 
     fetchInvoices,
-    deleteInvoice,
-    createInvoice,
+    addInvoice, 
+    deleteInvoice, 
+    getInvoicePdf, 
+    clearErrors,
   };
 });

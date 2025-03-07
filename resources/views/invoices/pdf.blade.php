@@ -4,53 +4,56 @@
     <meta charset="UTF-8">
     <title>Facture N°{{ $facture->id }}</title>
     <style>
-        body {
+        /* Réinitialisation de base */
+        *, *::before, *::after {
+            box-sizing: border-box;
+        }
+        html, body {
+            margin: 0;
+            padding: 0;
             font-family: DejaVu Sans, sans-serif;
             font-size: 12px;
             color: #333;
-            margin: 0;
-            padding: 0;
         }
-        .container {
-            width: 100%;
+
+        /* Conteneur principal */
+        .page {
             padding: 20px;
         }
-        /* Header */
-        .header {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
+
+        /* Header en tableau pour un alignement fiable */
+        table.header {
+            width: 100%;
             border-bottom: 2px solid #ccc;
-            padding-bottom: 10px;
             margin-bottom: 20px;
         }
-        .header-left {
-            width: 48%;
+        .header-left, .header-right {
             font-size: 11px;
             line-height: 1.4;
+            vertical-align: top;
+        }
+        .header-left {
+            width: 50%;
         }
         .header-right {
-            width: 48%;
+            width: 50%;
             text-align: right;
         }
-        .header-right .recap {
-            margin-bottom: 10px;
-        }
-        .header-right .recap table {
+
+        /* Tableau récap dans le bloc de droite */
+        .recap table {
             width: 100%;
             border-collapse: collapse;
             font-size: 11px;
+            margin-bottom: 10px;
         }
-        .header-right .recap th,
-        .header-right .recap td {
+        .recap th,
+        .recap td {
             border: 1px solid #ccc;
             padding: 4px;
-            text-align: left;
-        }
-        .header-right .receiver {
             text-align: right;
-            line-height: 1.4;
         }
+
         /* Table des prestations */
         .services {
             margin-top: 20px;
@@ -66,73 +69,80 @@
         }
         .services th {
             background-color: #f0f0f0;
+            text-align: center;
         }
+
         /* Totaux */
         .totals {
             text-align: right;
             margin-top: 20px;
             font-size: 11px;
         }
+
         /* Coordonnées bancaires */
         .bank-details {
             margin-top: 20px;
             font-size: 10px;
             line-height: 1.4;
         }
+
         /* Informations de règlement */
         .reglement {
             margin-top: 20px;
             font-size: 11px;
             line-height: 1.4;
         }
+
         /* Footer */
         .footer {
-            margin-top: 30px;
             text-align: center;
             font-size: 9px;
             color: #777;
             border-top: 1px solid #ccc;
             padding-top: 10px;
+            margin-top: 20px; /* on peut ajuster selon la place */
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <!-- Header -->
-        <div class="header">
-            <!-- Informations du détenteur (gauche) -->
-            <div class="header-left">
-                <strong>MEBARKI Younes</strong><br>
-                90 route de gournay<br>
-                93160 Noisy-le-grand<br>
-                Email: mebarki.younes93@gmail.com<br>
-                Téléphone: 0750258791<br>
-                SIREN: 940150691
-            </div>
-            <!-- Bloc droit regroupant le récapitulatif et le réceptionneur -->
-            <div class="header-right">
-                <div class="recap">
-                    <table>
-                        <tr>
-                            <th>N° Facture</th>
-                            <th>Date de création</th>
-                            <th>Lieu de création</th>
-                        </tr>
-                        <tr>
-                            <td>{{ $facture->id }}</td>
-                            <td>{{ $facture->created_at->format('d/m/Y') }}</td>
-                            <td>Noisy-le-grand</td>
-                        </tr>
-                    </table>
-                </div>
-                <div class="receiver">
-                    <strong>EBS</strong><br>
-                    21 rue de Fecamp<br>
-                    75012 Paris, France<br>
-                    SIREN: 92042893500018
-                </div>
-            </div>
-        </div>
+    <div class="page">
+        <!-- Header sous forme de tableau -->
+        <table class="header">
+            <tr>
+                <!-- Bloc gauche : Informations du détenteur -->
+                <td class="header-left">
+                    <strong>MEBARKI Younes</strong><br>
+                    90 route de gournay<br>
+                    93160 Noisy-le-grand<br>
+                    Email: mebarki.younes93@gmail.com<br>
+                    Téléphone: 0750258791<br>
+                    SIREN: 940150691
+                </td>
+                <!-- Bloc droit : Récapitulatif et réceptionneur -->
+                <td class="header-right">
+                    <div class="recap">
+                        <table>
+                            <tr>
+                                <th>N° Facture</th>
+                                <th>Date de création</th>
+                                <th>Lieu de création</th>
+                            </tr>
+                            <tr>
+                                <td>{{ $facture->id }}</td>
+                                <td>{{ $facture->created_at->format('d/m/Y') }}</td>
+                                <td>Noisy-le-grand</td>
+                            </tr>
+                        </table>
+                    </div>
+                    <div class="receiver">
+                        <strong>EBS</strong><br>
+                        21 rue de Fecamp<br>
+                        75012 Paris, France<br>
+                        SIREN: 92042893500018
+                    </div>
+                </td>
+            </tr>
+        </table>
 
         <!-- Table des prestations de services -->
         <div class="services">
