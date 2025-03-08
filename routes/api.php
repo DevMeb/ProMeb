@@ -23,4 +23,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/factures', [FactureController::class, 'store'])->name('factures.store');
     Route::delete('/factures/{id}', [FactureController::class, 'destroy'])->name('factures.destroy');
     Route::get('/factures/{id}/pdf', [FactureController::class, 'generatePdf'])->name('factures.generatePdf');
+    Route::post('/factures/{id}/send-email', [FactureController::class, 'sendEmail'])->name('factures.sendEmail');
+    Route::patch('/factures/{id}/paid', [FactureController::class, 'markAsPaid'])->name('factures.markAsPaid');
+
 });

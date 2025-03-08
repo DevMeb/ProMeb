@@ -10,17 +10,10 @@ export const usePrestationsStore = defineStore('prestations', () => {
   const errors = ref({});
   const loading = ref({});
 
-  const defaultMonthYear = dayjs().format('YYYY-MM');
-
   // Filtres pour les prestations (par exemple, filtrer par date et adresse)
   const activeFilters = useStorage("prestation-filters", {
-    month_year: defaultMonthYear,
+    month_year: '',
   });
-
-  // Si la valeur est vide, on la met à jour
-  if (!activeFilters.value.month_year) {
-    activeFilters.value.month_year = defaultMonthYear;
-  }
 
   // Mise à jour des filtres
   function updateFilters(filters) {
@@ -49,6 +42,10 @@ export const usePrestationsStore = defineStore('prestations', () => {
   const totalHours = computed(() => {
     return filteredPrestations.value
       .reduce((acc, prestation) => acc + prestation.heures, 0)
+  });
+
+  const unbilledPrestations = computed(() => {
+    return prestations.value.filter((prestation) => !prestation.facture_id);
   });
 
   function clearErrors(operation) {
@@ -145,5 +142,6 @@ export const usePrestationsStore = defineStore('prestations', () => {
     clearErrors,
     prestationCount,
     totalHours,
+    unbilledPrestations,
   };
 });

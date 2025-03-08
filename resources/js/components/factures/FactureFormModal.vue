@@ -33,10 +33,10 @@
               />
               <div>
                 <p class="text-gray-700 font-medium">
-                  📅 {{ formatDate(prestation.date_prestation) }}
+                  📅 {{ formatDate(prestation.date) }}
                 </p>
                 <p class="text-gray-600">
-                  ⏱️ <span class="font-semibold">{{ prestation.nombre_heures }}</span> h - 📍 {{ prestation.adresse }}
+                  ⏱️ <span class="font-semibold">{{ prestation.heures }}</span> h - 📍 {{ prestation.adresse }}
                 </p>
               </div>
             </li>
@@ -92,7 +92,7 @@
   // Props et événements
   const emit = defineEmits(["close"]);
   const prestationsStore = usePrestationsStore();
-  const { prestations } = storeToRefs(prestationsStore);
+  const { unbilledPrestations } = storeToRefs(prestationsStore);
   const { fetchPrestations } = prestationsStore;
 
   const invoicesStore = useInvoicesStore();
@@ -103,9 +103,7 @@
   });
   
   // Filtrer les prestations non facturées
-  const unbilledPrestations = computed(() => {
-    return prestations.value.filter((prestation) => !prestation.facture_id);
-  });
+  
   
   // Sélection des prestations
   const selectedPrestations = ref([]);
@@ -113,13 +111,12 @@
   // Calcul du total des heures et du montant HT
   const totalHeures = computed(() => {
     return selectedPrestations.value
-      .reduce((sum, prestation) => sum + parseFloat(prestation.nombre_heures), 0)
-      .toFixed(2);
+      .reduce((sum, prestation) => sum + parseFloat(prestation.heures), 0);
   });
   
   const tauxHoraire = 20;
   const totalHT = computed(() => {
-    return (totalHeures.value * tauxHoraire).toFixed(2);
+    return (totalHeures.value * tauxHoraire);
   });
   
   // Formater la date
@@ -131,8 +128,6 @@
   
     const payload = {
       prestations: selectedPrestations.value.map((p) => p.id),
-      total_heures: parseFloat(totalHeures.value),
-      total_ht: parseFloat(totalHT.value),
     };
   
     try {

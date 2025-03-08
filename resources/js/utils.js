@@ -18,3 +18,8 @@ import dayjs from "dayjs";
 export function formatDate(date) {
   return dayjs(date).format('DD/MM/YYYY'); // format dd/mm/yyyy
 }
+
+export function validateEmail(email) {
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  return emailRegex.test(email);
+}

@@ -109,6 +109,44 @@ export const useInvoicesStore = defineStore('invoices', () => {
     }
   }
 
+  async function sendEmail(invoiceId, emails) {
+    return apiCall({
+      operation: 'sendEmail',
+      request: () => axios.post(`/api/factures/${invoiceId}/send-email`, { emails }),
+      onSuccess: (response) => {
+        const updatedInvoice = response.data.data;
+        const index = invoices.value.findIndex(i => i.id === invoiceId);
+
+        if (index !== -1) {
+          invoices.value[index] = updatedInvoice;
+        } else {
+          console.warn(`⚠️ Facture ${invoiceId} non trouvée dans le store invoices.`);
+        }
+
+        notify('success', response.data.message | 'Facture envoyée avec succès.');
+      },
+    });
+  }
+
+  async function invoicePaid(invoice) {
+    return apiCall({
+      operation: 'paid',
+      request: () => axios.patch(`/api/factures/${invoice.id}/paid`),
+      onSuccess: (response) => {
+        const updatedInvoice = response.data.data;
+        const index = invoices.value.findIndex(i => i.id === invoice.id);
+
+        if (index !== -1) {
+          invoices.value[index] = updatedInvoice;
+        } else {
+          console.warn(`⚠️ Facture ${invoice.id} non trouvée dans le store invoices.`);
+        }
+
+        notify('success', response.data.message | 'Facture marquée comme payée.');
+      },
+    });
+  }
+
   return { 
     invoices, 
     errors, 
@@ -118,5 +156,7 @@ export const useInvoicesStore = defineStore('invoices', () => {
     deleteInvoice, 
     getInvoicePdf, 
     clearErrors,
+    sendEmail,
+    invoicePaid,
   };
 });

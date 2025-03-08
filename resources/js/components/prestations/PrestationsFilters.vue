@@ -6,7 +6,7 @@
         Utilisez ce filtre pour afficher les prestations par mois et année.
       </p>
     </div>
-    <!-- 🔍 Filtrer par mois & année -->
+    <!-- Filtrer par mois & année -->
     <div>
       <label class="text-sm text-gray-300 font-semibold">Mois & Année :</label>
       <input type="month" v-model="activeFilters.month_year" class="filter-input" />
@@ -34,6 +34,7 @@ watch(activeFilters, (newFilters) => {
 const resetFilters = () => {
   updateFilters({
     month_year: "",
+    avec_facture: false,
   });
 };
 </script>

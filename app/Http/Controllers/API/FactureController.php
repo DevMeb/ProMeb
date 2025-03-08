@@ -4,11 +4,13 @@ namespace App\Http\Controllers\API;
 
 use App\Enums\FactureStatut;
 use App\Http\Controllers\Controller;
+use App\Mail\FactureMail;
 use App\Models\Facture;
 use App\Models\Prestation;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Barryvdh\DomPDF\Facade\Pdf;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
 
 class FactureController extends Controller
@@ -51,7 +53,7 @@ class FactureController extends Controller
         try {
             $prestations = Prestation::whereIn('id', $validated['prestations'])->get();
 
-            $heuresTotal = $prestations->sum('nombre_heures');
+            $heuresTotal = $prestations->sum('heures');
 
             $tauxHoraire = env('TAUX_HORAIRE');
             $montantTotal = $heuresTotal * $tauxHoraire;
@@ -83,9 +85,9 @@ class FactureController extends Controller
      * Génère et retourne le PDF d'une facture.
      *
      * @param int $id L'ID de la facture
-     * @return \Symfony\Component\HttpFoundation\StreamedJsonResponse|\Illuminate\Http\JsonResponse
+     * @return \Symfony\Component\HttpFoundation\StreamedResponse|\Illuminate\Http\JsonResponse
      */
-    public function generatePdf($id): \Symfony\Component\HttpFoundation\StreamedJsonResponse|\Illuminate\Http\JsonResponse
+    public function generatePdf(int $id): \Symfony\Component\HttpFoundation\StreamedResponse|\Illuminate\Http\JsonResponse
     {
         try {
             $facture = $this->getFactureWithPrestations($id);
@@ -109,7 +111,7 @@ class FactureController extends Controller
      * @param int $id
      * @return \Illuminate\Http\JsonResponse
      */
-    public function destroy($id): \Illuminate\Http\JsonResponse
+    public function destroy(int $id): \Illuminate\Http\JsonResponse
     {
         try {
             $facture = Facture::findOrFail($id);
@@ -138,7 +140,7 @@ class FactureController extends Controller
      * @param int $id
      * @return Facture
      */
-    private function getFactureWithPrestations($id): Facture
+    private function getFactureWithPrestations(int $id): Facture
     {
         return Facture::with('prestations')->findOrFail($id);
     }
@@ -151,7 +153,7 @@ class FactureController extends Controller
      * @param string $pdfPath
      * @return string
      */
-    private function getOrGeneratePdf(Facture $facture, $pdfPath): string
+    private function getOrGeneratePdf(Facture $facture, string $pdfPath): string
     {
         if (Storage::disk('factures')->exists($pdfPath)) {
             return Storage::disk('factures')->get($pdfPath);
@@ -176,10 +178,67 @@ class FactureController extends Controller
      * @param \Exception $e
      * @return \Illuminate\Http\JsonResponse
      */
-    private function errorResponse($message, \Exception $e): \Illuminate\Http\JsonResponse
+    private function errorResponse(string $message, \Exception $e): \Illuminate\Http\JsonResponse
     {
         return response()->json([
             'error' => $message . ' : ' . $e->getMessage()
         ], 500);
+    }
+
+    /**
+     * Envoie la facture par email.
+     *
+     *
+     * @param \Illuminate\Http\Request $request
+     * @param int $id L'ID de la facture
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function sendEmail(Request $request, $id)
+    {
+        $validated = $request->validate([
+            'emails' => 'required|array',
+            'emails.*' => 'email'
+        ], [
+            'emails.required' => 'Vous devez fournir au moins une adresse email.',
+            'emails.*.email'  => 'Chaque adresse email doit être valide.'
+        ]);
+
+        try {
+            $facture = $this->getFactureWithPrestations($id);
+
+            // Envoyer l'email en attachant le PDF
+            Mail::to($validated['emails'])->send(new FactureMail($facture));
+
+            $facture->update([
+                'envoye_le' => now(),
+                'statut' => FactureStatut::EnAttentePaiement
+            ]);
+
+            return response()->json([
+                'data' => $facture,
+                'message' => 'La facture a été envoyée par email avec succès.'
+            ]);
+        } catch (\Exception $e) {
+            return $this->errorResponse("Erreur lors de l'envoi de la facture", $e);
+        }
+    }
+
+    function markAsPaid(int $id) 
+    {
+        try {
+            $facture = Facture::findOrFail($id);
+
+            $facture->update([
+                'statut' => FactureStatut::Paye,
+                'paye_le' => now(),
+            ]);
+
+            return response()->json([
+                'data' => $facture,
+                'message' => 'La facture a été payée avec succès'
+            ]);
+        } catch (\Exception $e) {
+            return $this->errorResponse("Erreur lors de la modification en payé de la facture", $e);
+        }
     }
 }

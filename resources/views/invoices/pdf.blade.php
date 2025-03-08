@@ -129,7 +129,7 @@
                             </tr>
                             <tr>
                                 <td>{{ $facture->id }}</td>
-                                <td>{{ $facture->created_at->format('d/m/Y') }}</td>
+                                <td>{{ $facture->created_at }}</td>
                                 <td>Noisy-le-grand</td>
                             </tr>
                         </table>
@@ -152,6 +152,7 @@
                     <tr>
                         <th>Réf.</th>
                         <th>Date</th>
+                        <th>Horaires</th>
                         <th>Qté</th>
                         <th>PU HT</th>
                         <th>Total HT</th>
@@ -161,10 +162,11 @@
                     @foreach ($prestations as $prestation)
                     <tr>
                         <td>{{ $prestation->id }}</td>
-                        <td>{{ \Carbon\Carbon::parse($prestation->date_prestation)->format('d/m/Y') }}</td>
-                        <td>{{ $prestation->nombre_heures }}</td>
+                        <td>{{ \Carbon\Carbon::parse($prestation->date)->format('d/m/Y') }}</td>
+                        <td>{{ $prestation->horaires }}</td>
+                        <td>{{ $prestation->heures }}</td>
                         <td>{{ number_format($facture->taux_horaire ?? 20, 2, ',', ' ') }} €</td>
-                        <td>{{ number_format($prestation->nombre_heures * ($facture->taux_horaire ?? 20), 2, ',', ' ') }} €</td>
+                        <td>{{ number_format($prestation->heures * ($facture->taux_horaire ?? 20), 2, ',', ' ') }} €</td>
                     </tr>
                     @endforeach
                 </tbody>
@@ -173,10 +175,10 @@
 
         <!-- Récapitulatif des montants -->
         <div class="totals">
-            <p><strong>Total HT :</strong> {{ number_format($facture->total_ht, 2, ',', ' ') }} €</p>
+            <p><strong>Total HT :</strong> {{ number_format($facture->montant_total, 2, ',', ' ') }} €</p>
             <p><strong>Montant TVA (0%) :</strong> 0,00 €</p>
-            <p><strong>Total TTC :</strong> {{ number_format($facture->total_ht, 2, ',', ' ') }} €</p>
-            <p><strong>À payer :</strong> {{ number_format($facture->total_ht, 2, ',', ' ') }} €</p>
+            <p><strong>Total TTC :</strong> {{ number_format($facture->montant_total, 2, ',', ' ') }} €</p>
+            <p><strong>À payer :</strong> {{ number_format($facture->montant_total, 2, ',', ' ') }} €</p>
         </div>
 
         <!-- Coordonnées bancaires -->
