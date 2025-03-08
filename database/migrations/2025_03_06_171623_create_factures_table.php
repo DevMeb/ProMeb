@@ -13,12 +13,11 @@ return new class extends Migration
     {
         Schema::create('factures', function (Blueprint $table) {
             $table->id();
-            // Quantité totale d'heures (calculée dynamiquement lors de la création de la facture)
-            $table->decimal('quantite_heures', 6, 2)->default(0);
-            // Total HT calculé
-            $table->decimal('total_ht', 10, 2)->default(0);
-            // Optionnel : statut de paiement, utile pour des rapports ultérieurs (ex : chiffre d'affaires)
-            $table->boolean('is_paid')->default(false);
+            $table->integer('heures_total')->default(0);
+            $table->integer('montant_total')->default(0);
+            $table->string('statut')->default('en_attente_envoi');
+            $table->timestamp('paye_le')->nullable();
+            $table->timestamp('envoye_le')->nullable();
             $table->timestamps();
         });
     }

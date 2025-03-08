@@ -30,18 +30,22 @@ class PrestationController extends Controller
     {
         try {
             $validated = $request->validate([
-                'date_prestation' => 'required|date',
-                'nombre_heures'   => 'required|numeric|min:0',
+                'date' => 'required|date',
+                'heures'   => 'required|numeric|min:0',
                 'adresse'         => 'required|string|max:255',
+                'horaires'        => 'required|string|max:255',
             ], [
-                'date_prestation.required' => 'La date de la prestation est obligatoire.',
-                'date_prestation.date'     => 'La date de la prestation doit être une date valide.',
-                'nombre_heures.required'   => "Le nombre d'heures est obligatoire.",
-                'nombre_heures.numeric'    => "Le nombre d'heures doit être un nombre.",
-                'nombre_heures.min'        => "Le nombre d'heures doit être supérieur ou égal à 0.",
+                'date.required' => 'La date de la prestation est obligatoire.',
+                'date.date'     => 'La date de la prestation doit être une date valide.',
+                'heures.required'   => "Le nombre d'heures est obligatoire.",
+                'heures.numeric'    => "Le nombre d'heures doit être un nombre.",
+                'heures.min'        => "Le nombre d'heures doit être supérieur ou égal à 0.",
                 'adresse.required'         => "L'adresse est obligatoire.",
                 'adresse.string'           => "L'adresse doit être une chaîne de caractères.",
                 'adresse.max'              => "L'adresse ne doit pas dépasser 255 caractères.",
+                'horaires.required'        => "Les horaires sont obligatoires.",
+                'horaires.string'          => "Les horaires doivent être une chaîne de caractères.",
+                'horaires.max'             => "Les horaires ne doivent pas dépasser 255 caractères.",
             ]);
 
             $prestation = Prestation::create($validated);
@@ -80,19 +84,23 @@ class PrestationController extends Controller
             $prestation = Prestation::findOrFail($id);
 
             $validated = $request->validate([
-                'date_prestation' => 'sometimes|required|date',
-                'nombre_heures'   => 'sometimes|required|numeric|min:0',
-                'adresse'         => 'sometimes|required|string|max:255',
+                'date' => 'required|date',
+                'heures'   => 'required|numeric|min:0',
+                'adresse'         => 'required|string|max:255',
+                'horaires'        => 'required|string|max:255',
             ], [
-                'date_prestation.required' => 'La date de la prestation est obligatoire.',
-                'date_prestation.date'     => 'La date de la prestation doit être une date valide.',
-                'nombre_heures.required'   => "Le nombre d'heures est obligatoire.",
-                'nombre_heures.numeric'    => "Le nombre d'heures doit être un nombre.",
-                'nombre_heures.min'        => "Le nombre d'heures doit être supérieur ou égal à 0.",
+                'date.required' => 'La date de la prestation est obligatoire.',
+                'date.date'     => 'La date de la prestation doit être une date valide.',
+                'heures.required'   => "Le nombre d'heures est obligatoire.",
+                'heures.numeric'    => "Le nombre d'heures doit être un nombre.",
+                'heures.min'        => "Le nombre d'heures doit être supérieur ou égal à 0.",
                 'adresse.required'         => "L'adresse est obligatoire.",
                 'adresse.string'           => "L'adresse doit être une chaîne de caractères.",
                 'adresse.max'              => "L'adresse ne doit pas dépasser 255 caractères.",
-            ]);            
+                'horaires.required'        => "Les horaires sont obligatoires.",
+                'horaires.string'          => "Les horaires doivent être une chaîne de caractères.",
+                'horaires.max'             => "Les horaires ne doivent pas dépasser 255 caractères.",
+            ]);      
 
             $prestation->update($validated);
             return response()->json($prestation);

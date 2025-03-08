@@ -16,33 +16,32 @@
         <form @submit.prevent="submitForm" class="mt-4 space-y-4">
           <!-- Date de prestation -->
           <div>
-            <label for="date_prestation" class="block text-sm font-medium text-gray-700">Date de prestation</label>
+            <label for="date" class="block text-sm font-medium text-gray-700">Date de prestation</label>
             <input
               ref="firstInput"
               type="date"
-              id="date_prestation"
-              v-model="prestationData.date_prestation"
+              id="date"
+              v-model="prestationData.date"
               class="w-full border p-2 rounded focus:outline-none focus:ring-2 focus:ring-indigo-500"
-              :class="{ 'border-red-500': errors.validationErrors?.date_prestation }"
+              :class="{ 'border-red-500': errors.validationErrors?.date }"
             />
-            <p v-if="errors.validationErrors?.date_prestation" class="text-red-500 text-xs mt-1">
-              {{ errors.validationErrors.date_prestation.join(', ') }}
+            <p v-if="errors.validationErrors?.date" class="text-red-500 text-xs mt-1">
+              {{ errors.validationErrors.date.join(', ') }}
             </p>
           </div>
   
           <!-- Nombre d'heures -->
           <div>
-            <label for="nombre_heures" class="block text-sm font-medium text-gray-700">Nombre d'heures</label>
+            <label for="heures" class="block text-sm font-medium text-gray-700">Nombre d'heures</label>
             <input
               type="number"
-              step="0.01"
-              id="nombre_heures"
-              v-model="prestationData.nombre_heures"
+              id="heures"
+              v-model="prestationData.heures"
               class="w-full border p-2 rounded focus:outline-none focus:ring-2 focus:ring-indigo-500"
-              :class="{ 'border-red-500': errors.validationErrors?.nombre_heures }"
+              :class="{ 'border-red-500': errors.validationErrors?.heures }"
             />
-            <p v-if="errors.validationErrors?.nombre_heures" class="text-red-500 text-xs mt-1">
-              {{ errors.validationErrors.nombre_heures.join(', ') }}
+            <p v-if="errors.validationErrors?.heures" class="text-red-500 text-xs mt-1">
+              {{ errors.validationErrors.heures.join(', ') }}
             </p>
           </div>
   
@@ -58,6 +57,21 @@
             />
             <p v-if="errors.validationErrors?.adresse" class="text-red-500 text-xs mt-1">
               {{ errors.validationErrors.adresse.join(', ') }}
+            </p>
+          </div>
+
+          <!-- Horaires -->
+          <div>
+            <label for="horaires" class="block text-sm font-medium text-gray-700">Horaires</label>
+            <input
+              type="text"
+              id="horaires"
+              v-model="prestationData.horaires"
+              class="w-full border p-2 rounded focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              :class="{ 'border-red-500': errors.validationErrors?.horaires }"
+            />
+            <p v-if="errors.validationErrors?.horaires" class="text-red-500 text-xs mt-1">
+              {{ errors.validationErrors.horaires.join(', ') }}
             </p>
           </div>
   
@@ -100,9 +114,10 @@
   // Données réactives pour le formulaire
   const prestationData = ref({
     id: null,
-    date_prestation: '',
-    nombre_heures: '',
+    date: '',
+    heures: '',
     adresse: '',
+    horaires: '',
   });
   
   // Initialiser les données avec les props si elles existent (édition) ou avec des valeurs par défaut

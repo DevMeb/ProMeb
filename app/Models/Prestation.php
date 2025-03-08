@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use DateTimeInterface;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -10,20 +11,18 @@ class Prestation extends Model
     use HasFactory;
 
     protected $fillable = [
-        'date_prestation',
-        'nombre_heures',
+        'date',
+        'heures',
         'adresse',
+        'horaires',
         'facture_id',
     ];
 
-    protected $casts = [
-        'date_prestation' => 'date',
-        'nombre_heures'  => 'decimal:2',
-    ];
+    protected function serializeDate(DateTimeInterface $date): string
+    {
+        return $date->format('d/m/Y');
+    }
 
-    /**
-     * Une prestation peut être rattachée à une facture.
-     */
     public function facture()
     {
         return $this->belongsTo(Facture::class);

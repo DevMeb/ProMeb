@@ -13,28 +13,33 @@
       <!-- Informations générales -->
       <div class="bg-gray-900 p-4 rounded-md space-y-3">
         <p class="text-gray-300 text-sm flex items-center">
-            📅 <span class="ml-2 font-semibold text-white">Date :</span>
-            <span class="text-indigo-400 ml-1">{{ formatDate(prestation.date_prestation) }}</span>
-          </p>
+          🗓 <span class="ml-2 font-semibold text-white">Date :</span>
+          <span class="text-indigo-400 ml-1">{{ formatDate(prestation.date) }}</span>
+        </p>
         <p class="text-gray-300 text-sm flex items-center">
-          ⏱️ <span class="ml-2 font-semibold text-white">Heures :</span>
-          <span class="text-indigo-400 ml-1">{{ prestation.nombre_heures }} h</span>
+          ⏰ <span class="ml-2 font-semibold text-white">Heures :</span>
+          <span class="text-indigo-400 ml-1">{{ prestation.heures }} h</span>
         </p>
         <p class="text-gray-300 text-sm flex items-center">
           📍 <span class="ml-2 font-semibold text-white">Adresse :</span>
           <span class="text-indigo-400 ml-1">{{ prestation.adresse }}</span>
         </p>
+        <p class="text-gray-300 text-sm flex items-center">
+          🕒 <span class="ml-2 font-semibold text-white">Horaires :</span>
+          <span class="text-indigo-400 ml-1">{{ prestation.horaires }}</span>
+        </p>
       </div>
+
   
       <!-- Dates clés -->
       <div class="bg-gray-900 p-4 rounded-lg flex flex-col space-y-2">
         <p class="text-gray-300 text-sm flex items-center">
           🕒 <span class="ml-2 font-semibold text-white">Créé le :</span>
-          <span class="ml-1 text-indigo-300">{{ formatDate(prestation.created_at) }}</span>
+          <span class="ml-1 text-indigo-300">{{ prestation.created_at }}</span>
         </p>
         <p class="text-gray-300 text-sm flex items-center">
           🔄 <span class="ml-2 font-semibold text-white">Mis à jour le :</span>
-          <span class="ml-1 text-indigo-300">{{ formatDate(prestation.updated_at) }}</span>
+          <span class="ml-1 text-indigo-300">{{ prestation.updated_at }}</span>
         </p>
       </div>
   
@@ -57,8 +62,8 @@
   <script setup>
   import { ref } from "vue";
   import { PrestationFormModal, PrestationDeleteModal } from "@/components/prestations/";
-  import dayjs from "dayjs";
-  
+  import { formatDate } from "@/utils";
+ 
   const props = defineProps({
     prestation: {
       type: Object,
@@ -88,8 +93,6 @@
   }
   
   // Fonction utilitaire pour formater les dates
-  function formatDate(date) {
-    return dayjs(date).format('DD/MM/YYYY'); // format dd/mm/yyyy
-  }
+  
   </script>
   

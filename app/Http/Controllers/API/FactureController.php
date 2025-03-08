@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\API;
 
+use App\Enums\FactureStatut;
 use App\Http\Controllers\Controller;
 use App\Models\Facture;
 use App\Models\Prestation;
@@ -13,61 +14,54 @@ use Illuminate\Support\Facades\Storage;
 class FactureController extends Controller
 {
     /**
-     * Liste toutes les factures.
+     * Liste toutes les factures avec leurs prestations associées.
      *
      * @return \Illuminate\Http\JsonResponse
      */
-    public function index()
+    public function index(): \Illuminate\Http\JsonResponse
     {
         try {
-            // Récupère les factures triées par date de création décroissante, avec leurs prestations associées.
             $factures = Facture::orderBy('created_at', 'desc')
                 ->with('prestations')
                 ->get();
 
             return response()->json($factures, 200);
         } catch (\Exception $e) {
-            return response()->json([
-                'error' => 'Erreur lors de la récupération des factures : ' . $e->getMessage()
-            ], 500);
+            return $this->errorResponse("Erreur lors de la récupération des factures", $e);
         }
     }
 
     /**
-     * Crée une facture à partir des prestations sélectionnées.
+     * Crée une facture à partir d'une liste de prestations.
      *
-     * Payload attendu :
-     * {
-     *    "prestations": [1, 2, 3],
-     *    "total_heures": 12.50,
-     *    "total_ht": 250.00
-     * }
-     *
-     * Cette méthode se contente de créer la facture en BDD et d'associer les prestations.
-     * Elle renvoie ensuite la facture créée au format JSON.
-     *
-     * @param  \Illuminate\Http\Request  $request
+     * @param Request $request
      * @return \Illuminate\Http\JsonResponse
      */
-    public function store(Request $request)
+    public function store(Request $request): \Illuminate\Http\JsonResponse
     {
         $validated = $request->validate([
             'prestations'  => 'required|array',
             'prestations.*'=> 'integer|exists:prestations,id',
-            'total_heures' => 'required|numeric|min:0',
-            'total_ht'     => 'required|numeric|min:0',
         ], [
             'prestations.required'  => 'La sélection de prestations est obligatoire.',
-            'total_heures.required' => 'Le total des heures est obligatoire.',
-            'total_ht.required'     => 'Le total HT est obligatoire.',
+            'prestations.*.exists'    => 'Une ou plusieurs prestations sélectionnées n\'existent pas.',
         ]);
 
         DB::beginTransaction();
         try {
+            $prestations = Prestation::whereIn('id', $validated['prestations'])->get();
+
+            $heuresTotal = $prestations->sum('nombre_heures');
+
+            $tauxHoraire = env('TAUX_HORAIRE');
+            $montantTotal = $heuresTotal * $tauxHoraire;
+
             $facture = Facture::create([
-                'quantite_heures' => $validated['total_heures'],
-                'total_ht'        => $validated['total_ht'],
-                'is_paid'         => false,
+                'heures_total'  => $heuresTotal,
+                'montant_total' => $montantTotal,
+                'statut'        => FactureStatut::EnAttenteEnvoi,
+                'paye_le'       => null,
+                'envoye_le'     => null,
             ]);
 
             Prestation::whereIn('id', $validated['prestations'])
@@ -81,55 +75,33 @@ class FactureController extends Controller
             ], 201);
         } catch (\Exception $e) {
             DB::rollBack();
-            return response()->json([
-                'error' => 'Erreur lors de la création de la facture : ' . $e->getMessage()
-            ], 500);
+            return $this->errorResponse("Erreur lors de la création de la facture", $e);
         }
     }
-
 
     /**
      * Génère et retourne le PDF d'une facture.
      *
-     * @param  int  $id  L'ID de la facture
-     * @return \Symfony\Component\HttpFoundation\BinaryFileResponse|\Illuminate\Http\JsonResponse
+     * @param int $id L'ID de la facture
+     * @return \Symfony\Component\HttpFoundation\StreamedJsonResponse|\Illuminate\Http\JsonResponse
      */
-    public function generatePdf($id)
+    public function generatePdf($id): \Symfony\Component\HttpFoundation\StreamedJsonResponse|\Illuminate\Http\JsonResponse
     {
         try {
-            $facture = Facture::findOrFail($id);
-            $prestations = Prestation::where('facture_id', $facture->id)->get();
-
+            $facture = $this->getFactureWithPrestations($id);
             $pdfPath = "facture_{$facture->id}.pdf";
 
-            // Vérifier si le fichier PDF existe déjà
-            if (Storage::disk('factures')->exists($pdfPath)) {
-                $pdfContent = Storage::disk('factures')->get($pdfPath);
-            } else {
-                // Générer le PDF à partir de la vue dédiée
-                $pdf = Pdf::loadView('invoices.pdf', [
-                    'facture' => $facture,
-                    'prestations' => $prestations,
-                ]);
+            $pdfContent = $this->getOrGeneratePdf($facture, $pdfPath);
 
-                $pdfContent = $pdf->output();
-                // Stocker le PDF sur le disque factures (en privé)
-                Storage::disk('factures')->put($pdfPath, $pdfContent);
-            }
-
-            // Retourner le PDF pour téléchargement
             return response()->streamDownload(function () use ($pdfContent) {
                 echo $pdfContent;
             }, "facture_{$facture->id}.pdf", [
                 'Content-Type' => 'application/pdf',
             ]);
         } catch (\Exception $e) {
-            return response()->json([
-                'error' => 'Erreur lors de la génération du PDF : ' . $e->getMessage()
-            ], 500);
+            return $this->errorResponse("Erreur lors de la génération du PDF", $e);
         }
     }
-
 
     /**
      * Supprime une facture et détache les prestations associées.
@@ -137,34 +109,77 @@ class FactureController extends Controller
      * @param int $id
      * @return \Illuminate\Http\JsonResponse
      */
-    public function destroy($id)
+    public function destroy($id): \Illuminate\Http\JsonResponse
     {
         try {
             $facture = Facture::findOrFail($id);
-
-            // Définir le chemin du fichier PDF
             $pdfPath = "facture_{$facture->id}.pdf";
 
-            // Supprimer le PDF s'il existe
             if (Storage::disk('factures')->exists($pdfPath)) {
                 Storage::disk('factures')->delete($pdfPath);
             }
 
-            // Détacher les prestations associées (optionnel : remettre facture_id à null)
             Prestation::where('facture_id', $facture->id)
                 ->update(['facture_id' => null]);
 
-            // Supprimer la facture
             $facture->delete();
 
             return response()->json(['message' => 'Facture supprimée avec succès.'], 200);
         } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
             return response()->json(['error' => 'Facture non trouvée.'], 404);
         } catch (\Exception $e) {
-            return response()->json([
-                'error' => 'Erreur lors de la suppression de la facture : ' . $e->getMessage()
-            ], 500);
+            return $this->errorResponse("Erreur lors de la suppression de la facture", $e);
         }
     }
 
+    /**
+     * Récupère une facture avec ses prestations associées.
+     *
+     * @param int $id
+     * @return Facture
+     */
+    private function getFactureWithPrestations($id): Facture
+    {
+        return Facture::with('prestations')->findOrFail($id);
+    }
+
+    /**
+     * Retourne le contenu PDF d'une facture.
+     * Si le PDF existe déjà sur le disque, il est récupéré, sinon il est généré et stocké.
+     *
+     * @param Facture $facture
+     * @param string $pdfPath
+     * @return string
+     */
+    private function getOrGeneratePdf(Facture $facture, $pdfPath): string
+    {
+        if (Storage::disk('factures')->exists($pdfPath)) {
+            return Storage::disk('factures')->get($pdfPath);
+        }
+
+        $prestations = Prestation::where('facture_id', $facture->id)->get();
+        $pdf = Pdf::loadView('invoices.pdf', [
+            'facture' => $facture,
+            'prestations' => $prestations,
+        ]);
+
+        $pdfContent = $pdf->output();
+        Storage::disk('factures')->put($pdfPath, $pdfContent);
+
+        return $pdfContent;
+    }
+
+    /**
+     * Génère une réponse JSON d'erreur centralisée.
+     *
+     * @param string $message
+     * @param \Exception $e
+     * @return \Illuminate\Http\JsonResponse
+     */
+    private function errorResponse($message, \Exception $e): \Illuminate\Http\JsonResponse
+    {
+        return response()->json([
+            'error' => $message . ' : ' . $e->getMessage()
+        ], 500);
+    }
 }

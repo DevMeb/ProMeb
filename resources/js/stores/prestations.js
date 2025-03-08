@@ -10,13 +10,17 @@ export const usePrestationsStore = defineStore('prestations', () => {
   const errors = ref({});
   const loading = ref({});
 
+  const defaultMonthYear = dayjs().format('YYYY-MM');
+
   // Filtres pour les prestations (par exemple, filtrer par date et adresse)
   const activeFilters = useStorage("prestation-filters", {
-    date_prestation: "",
-    adresse: "",
-    min_hours: "",
-    max_hours: "",
+    month_year: defaultMonthYear,
   });
+
+  // Si la valeur est vide, on la met à jour
+  if (!activeFilters.value.month_year) {
+    activeFilters.value.month_year = defaultMonthYear;
+  }
 
   // Mise à jour des filtres
   function updateFilters(filters) {
@@ -32,16 +36,20 @@ export const usePrestationsStore = defineStore('prestations', () => {
   const filteredPrestations = ref([]);
   watch([prestations, activeFilters], () => {
     filteredPrestations.value = prestations.value.filter(prestation => {
-      const { date_prestation, adresse, min_hours, max_hours } = activeFilters.value;
+      const { month_year } = activeFilters.value;
 
-      if (date_prestation && dayjs(prestation.date_prestation).format('YYYY-MM-DD') !== date_prestation) return false;
-      if (adresse && !prestation.adresse.toLowerCase().includes(adresse.toLowerCase())) return false;
-      if (min_hours && parseFloat(prestation.nombre_heures) < parseFloat(min_hours)) return false;
-      if (max_hours && parseFloat(prestation.nombre_heures) > parseFloat(max_hours)) return false;
-      
+      if (month_year && dayjs(prestation.date).format('YYYY-MM') !== month_year) return false;
+
       return true;
     });
   }, { deep: true, immediate: true });
+
+  const prestationCount = computed(() => filteredPrestations.value.length);
+
+  const totalHours = computed(() => {
+    return filteredPrestations.value
+      .reduce((acc, prestation) => acc + prestation.heures, 0)
+  });
 
   function clearErrors(operation) {
     if (operation) {
@@ -135,5 +143,7 @@ export const usePrestationsStore = defineStore('prestations', () => {
     updatePrestation,
     deletePrestation,
     clearErrors,
+    prestationCount,
+    totalHours,
   };
 });

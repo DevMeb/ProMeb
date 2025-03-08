@@ -2,6 +2,8 @@
     <div class="mt-6">
       <!-- Filtres -->
       <PrestationsFilters />
+
+      <PrestationSummary />
   
       <!-- État de chargement -->
       <div v-if="loading.fetch" class="flex justify-center my-6">
@@ -35,7 +37,7 @@
   import { onMounted } from 'vue';
   import { storeToRefs } from 'pinia';
   import { usePrestationsStore } from '@/stores/prestations';
-  import { PrestationListItem, PrestationsFilters } from '@/components/prestations/';
+  import { PrestationListItem, PrestationsFilters, PrestationSummary } from '@/components/prestations/';
   
   const prestationsStore = usePrestationsStore();
   const { fetchPrestations, clearErrors } = prestationsStore;

@@ -13,3 +13,8 @@ export function notify(type, message) {
     toast.warning(message);
   } 
 }
+import dayjs from "dayjs";
+
+export function formatDate(date) {
+  return dayjs(date).format('DD/MM/YYYY'); // format dd/mm/yyyy
+}
