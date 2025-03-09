@@ -1,0 +1,104 @@
+{
+  "_FactureMailModal-6nmfXeVr.js": {
+    "file": "assets/FactureMailModal-6nmfXeVr.js",
+    "name": "FactureMailModal",
+    "imports": [
+      "resources/js/app.js",
+      "_prestations-AgWsYLdo.js"
+    ]
+  },
+  "_prestations-AgWsYLdo.js": {
+    "file": "assets/prestations-AgWsYLdo.js",
+    "name": "prestations",
+    "imports": [
+      "resources/js/app.js"
+    ]
+  },
+  "resources/css/app.css": {
+    "file": "assets/app-DXDE9V29.css",
+    "src": "resources/css/app.css",
+    "isEntry": true
+  },
+  "resources/js/app.js": {
+    "file": "assets/app-CzuueUTO.js",
+    "name": "app",
+    "src": "resources/js/app.js",
+    "isEntry": true,
+    "dynamicImports": [
+      "resources/js/views/Dashboard.vue",
+      "resources/js/views/Facture.vue",
+      "resources/js/views/Login.vue",
+      "resources/js/views/NotFound.vue",
+      "resources/js/views/Prestation.vue"
+    ],
+    "css": [
+      "assets/app-DnojJsHo.css",
+      "assets/app-DXDE9V29.css"
+    ]
+  },
+  "resources/js/views/Dashboard.vue": {
+    "file": "assets/Dashboard--xJ-6oxl.js",
+    "name": "Dashboard",
+    "src": "resources/js/views/Dashboard.vue",
+    "isDynamicEntry": true,
+    "imports": [
+      "resources/js/app.js",
+      "_FactureMailModal-6nmfXeVr.js",
+      "_prestations-AgWsYLdo.js"
+    ],
+    "css": [
+      "assets/app-DXDE9V29.css"
+    ]
+  },
+  "resources/js/views/Facture.vue": {
+    "file": "assets/Facture-KpckyeXZ.js",
+    "name": "Facture",
+    "src": "resources/js/views/Facture.vue",
+    "isDynamicEntry": true,
+    "imports": [
+      "resources/js/app.js",
+      "_FactureMailModal-6nmfXeVr.js",
+      "_prestations-AgWsYLdo.js"
+    ],
+    "css": [
+      "assets/app-DXDE9V29.css"
+    ]
+  },
+  "resources/js/views/Login.vue": {
+    "file": "assets/Login-C6ZUWTX3.js",
+    "name": "Login",
+    "src": "resources/js/views/Login.vue",
+    "isDynamicEntry": true,
+    "imports": [
+      "resources/js/app.js"
+    ],
+    "css": [
+      "assets/app-DXDE9V29.css"
+    ]
+  },
+  "resources/js/views/NotFound.vue": {
+    "file": "assets/NotFound-CE-pq7Xw.js",
+    "name": "NotFound",
+    "src": "resources/js/views/NotFound.vue",
+    "isDynamicEntry": true,
+    "imports": [
+      "resources/js/app.js"
+    ],
+    "css": [
+      "assets/app-DXDE9V29.css"
+    ]
+  },
+  "resources/js/views/Prestation.vue": {
+    "file": "assets/Prestation-BpIOuOOr.js",
+    "name": "Prestation",
+    "src": "resources/js/views/Prestation.vue",
+    "isDynamicEntry": true,
+    "imports": [
+      "resources/js/app.js",
+      "_prestations-AgWsYLdo.js"
+    ],
+    "css": [
+      "assets/app-DXDE9V29.css"
+    ]
+  }
+}
