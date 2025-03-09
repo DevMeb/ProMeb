@@ -1,0 +1,48 @@
+FROM php:8.4-fpm
+
+# Installer uniquement les dépendances système nécessaires
+RUN apt-get update && apt-get install -y \
+    curl \
+    libpng-dev \
+    libjpeg-dev \
+    libfreetype6-dev \
+    libonig-dev \
+    libzip-dev \
+    unzip \
+    git \
+    && docker-php-ext-install pdo_mysql mbstring zip exif pcntl gd \
+    && apt-get clean && rm -rf /var/lib/apt/lists/*
+
+# Installer Composer
+COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
+
+# Créer un utilisateur non-root pour éviter les conflits de permissions
+RUN groupadd -g 1000 appgroup && \
+    useradd -u 1000 -g appgroup -m appuser && \
+    chown -R appuser:appgroup /var/www/html
+
+WORKDIR /var/www/html
+
+# Copier les fichiers source
+COPY . /var/www/html
+
+# Configurer les permissions nécessaires
+RUN chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache
+
+# Installer uniquement les dépendances PHP
+RUN composer install --no-dev --optimize-autoloader
+
+# Mettre en cache les configurations, routes et vues
+RUN php artisan config:cache \
+    && php artisan route:cache \
+    && php artisan view:cache
+
+# Supprimer les fichiers inutiles pour réduire la taille de l'image
+RUN rm -rf node_modules \
+    && rm -rf resources/js \
+    && rm -rf resources/css
+
+# Passer à l'utilisateur non-root
+USER appuser
+
+CMD ["php-fpm"]
