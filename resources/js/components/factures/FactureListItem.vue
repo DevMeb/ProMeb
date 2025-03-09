@@ -14,10 +14,10 @@
           <!-- Détails de la facturation -->
           <div class="bg-gray-900 p-4 rounded-md space-y-2">
             <p class="text-gray-300 text-sm">
-              ⏱️ <span class="font-semibold text-white">Nombre d'heures :</span> {{ invoice.quantite_heures }}
+              ⏱️ <span class="font-semibold text-white">Nombre d'heures :</span> {{ invoice.heures_total }} h
             </p>
             <p class="text-gray-300 text-sm">
-              💶 <span class="font-semibold text-white">Montant :</span> {{ invoice.total_ht }} €
+              💶 <span class="font-semibold text-white">Montant :</span> {{ invoice.montant_total }} €
             </p>
           </div>
           
@@ -42,10 +42,6 @@
         <div class="flex flex-wrap justify-center gap-3 mt-4">
           <button @click="showPdfModal = true" class="btn-action bg-gray-600">
               📄 Voir
-          </button>
-
-          <button v-if="invoice.statut === 'en_attente_envoi'" @click="showFormModal = true" class="btn-action bg-blue-500">
-              ✏️ Modifier
           </button>
 
           <button v-if="invoice.statut === 'en_attente_envoi'" @click="showDeleteModal = true" class="btn-action bg-red-500">

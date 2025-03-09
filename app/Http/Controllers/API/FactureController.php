@@ -206,6 +206,9 @@ class FactureController extends Controller
         try {
             $facture = $this->getFactureWithPrestations($id);
 
+            $pdfPath = "facture_{$facture->id}.pdf";
+            $this->getOrGeneratePdf($facture, $pdfPath);
+            
             // Envoyer l'email en attachant le PDF
             Mail::to($validated['emails'])->send(new FactureMail($facture));
 

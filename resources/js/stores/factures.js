@@ -1,9 +1,10 @@
 // src/stores/invoices.js
 import { defineStore } from 'pinia';
-import { computed, ref, watch } from 'vue';
+import { ref } from 'vue';
 import axios from 'axios';
 import { notify } from '@/utils';
-import { useStorage } from '@vueuse/core';
+import { useDashboardStore } from "@/stores/dashboard";
+
 
 export const useInvoicesStore = defineStore('invoices', () => {
   // Liste des factures
@@ -12,6 +13,8 @@ export const useInvoicesStore = defineStore('invoices', () => {
   const errors = ref({});
   // États de chargement par opération
   const loading = ref({});
+
+  const dashboardStore = useDashboardStore(); 
 
   function clearErrors(operation) {
     if (operation) {
@@ -64,6 +67,11 @@ export const useInvoicesStore = defineStore('invoices', () => {
       request: () => axios.post('/api/factures', invoice),
       onSuccess: (response) => {
         invoices.value.push(response.data.data || response.data);
+        
+        // Si on ajoute une facture depuis le dashboard on met à jour les données
+        if(dashboardStore.dashboardData) {
+          dashboardStore.fetchDashboard();
+        }
         notify('success', response.data.message || 'Facture ajoutée avec succès.');
       },
     });
@@ -123,7 +131,12 @@ export const useInvoicesStore = defineStore('invoices', () => {
           console.warn(`⚠️ Facture ${invoiceId} non trouvée dans le store invoices.`);
         }
 
-        notify('success', response.data.message | 'Facture envoyée avec succès.');
+        // Si on envoi un mail depuis le dashboard on met à jour les données
+        if(dashboardStore.dashboardData) {
+          dashboardStore.fetchDashboard();
+        }
+
+        notify('success', response.data.message || 'Facture envoyée avec succès.');
       },
     });
   }
@@ -142,7 +155,12 @@ export const useInvoicesStore = defineStore('invoices', () => {
           console.warn(`⚠️ Facture ${invoice.id} non trouvée dans le store invoices.`);
         }
 
-        notify('success', response.data.message | 'Facture marquée comme payée.');
+        // Si on marque une facture comme payée depuis le dashboard on met à jour les données
+        if(dashboardStore.dashboardData) {
+          dashboardStore.fetchDashboard();
+        }
+
+        notify('success', response.data.message || 'Facture marquée comme payée.');
       },
     });
   }

@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\API\AuthController;
+use App\Http\Controllers\API\DashboardController;
 use App\Http\Controllers\API\FactureController;
 use App\Http\Controllers\API\PrestationController;
 use Illuminate\Http\Request;
@@ -25,5 +26,5 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/factures/{id}/pdf', [FactureController::class, 'generatePdf'])->name('factures.generatePdf');
     Route::post('/factures/{id}/send-email', [FactureController::class, 'sendEmail'])->name('factures.sendEmail');
     Route::patch('/factures/{id}/paid', [FactureController::class, 'markAsPaid'])->name('factures.markAsPaid');
-
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard.index');
 });
