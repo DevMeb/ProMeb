@@ -1,0 +1,54 @@
+services:
+  promeb_app: # Service pour l'application Laravel
+    build:
+      context: .
+      dockerfile: Dockerfile.prod
+    container_name: promeb_app
+    restart: always
+    volumes:
+      - .:/var/www/html # Monté en lecture seule pour éviter les conflits
+      - ./storage:/var/www/html/storage # Permet l'écriture sur storage
+      - ./bootstrap/cache:/var/www/html/bootstrap/cache # Permet l'écriture sur cache
+    environment:
+      APP_KEY: ${APP_KEY}
+      DB_CONNECTION: mysql
+      DB_HOST: promeb_db # Référence au service DB
+      DB_PORT: 3306
+      DB_DATABASE: ${DB_DATABASE}
+      DB_USERNAME: ${DB_USERNAME}
+      DB_PASSWORD: ${DB_PASSWORD}
+    networks:
+      - sites_network
+
+  promeb_nginx: # Service Nginx pour gérer HTTP
+    image: nginx:alpine
+    container_name: promeb_nginx
+    restart: always
+    volumes:
+      - .:/var/www/html:ro
+      - ./nginx/default.prod.conf:/etc/nginx/conf.d/default.conf
+    depends_on:
+      - promeb_app
+    networks:
+      - sites_network
+
+  promeb_db: # Service MySQL
+    image: mysql:8.0
+    container_name: promeb_db
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+    volumes:
+      - promeb_dbdata:/var/lib/mysql
+    networks:
+      - sites_network
+
+volumes:
+  promeb_dbdata: # Volume spécifique pour différencier des autres sites
+
+networks:
+  sites_network:
+    external: true
