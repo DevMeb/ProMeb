@@ -20,7 +20,6 @@ router.beforeEach(async (to, from, next) => {
   if (to.meta.requiresAuth && !isAuth) {
     return next({ name: "Login" });
   } else if (to.meta.guestOnly && isAuth) {
-    // Redirige vers "Dashboard" (ou le nom de la route d'accueil) si l'utilisateur est connecté
     return next({ name: "Dashboard" });
   } else {
     return next();
