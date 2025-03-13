@@ -2,26 +2,21 @@ import { defineStore } from 'pinia';
 import { ref, computed, watch } from 'vue';
 import axios from 'axios';
 import { notify } from '@/utils';
-import dayjs from 'dayjs';
 
-export const usePrestationsStore = defineStore('prestations', () => {
-  const prestations = ref([]);
+export const useTauxHorairesStore = defineStore('taux-horaires', () => {
+  const tauxHoraires = ref([]);
   const errors = ref({});
   const loading = ref({});
 
-  // Filtres pour les prestations (par exemple, filtrer par date et adresse)
-  const activeFilters = ref({
+  /*
+  const activeFilters = useStorage("prestation-filters", {
     month_year: '',
-    client_id: '',
-    taux_horaire_id: '',
   });
 
-  // Mise à jour des filtres
   function updateFilters(filters) {
     activeFilters.value = filters;
   }
 
-  // Vérification si des filtres sont actifs
   const isAnyFilterActive = computed(() => {
     return Object.values(activeFilters.value).some(value => value !== "");
   });
@@ -30,14 +25,9 @@ export const usePrestationsStore = defineStore('prestations', () => {
   const filteredPrestations = ref([]);
   watch([prestations, activeFilters], () => {
     filteredPrestations.value = prestations.value.filter(prestation => {
-      const { month_year, client_id, taux_horaire_id } = activeFilters.value;
+      const { month_year } = activeFilters.value;
 
       if (month_year && dayjs(prestation.date).format('YYYY-MM') !== month_year) return false;
-
-      if (client_id && prestation.client_id !== client_id) return false;
-
-      if (taux_horaire_id && prestation.taux_horaire_id !== taux_horaire_id) return false;
-
 
       return true;
     });
@@ -53,6 +43,7 @@ export const usePrestationsStore = defineStore('prestations', () => {
   const unbilledPrestations = computed(() => {
     return prestations.value.filter((prestation) => !prestation.facture_id);
   });
+  */
 
   function clearErrors(operation) {
     if (operation) {
@@ -86,68 +77,61 @@ export const usePrestationsStore = defineStore('prestations', () => {
     }
   }
 
-  async function fetchPrestations() {
+  async function fetchTauxHoraires() {
     return apiCall({
       operation: 'fetch',
-      request: () => axios.get('/api/prestations'),
+      request: () => axios.get('/api/taux-horaires'),
       onSuccess: (response) => {
         // Si l'API renvoie les données dans une clé data, ajustez ici
-        prestations.value = response.data.prestations;
+        tauxHoraires.value = response.data.taux_horaires;
       },
     });
   }
 
-  async function addPrestation(prestation) {
+  async function addTauxHoraire(client) {
     return apiCall({
       operation: 'add',
-      request: () => axios.post('/api/prestations', prestation),
+      request: () => axios.post('/api/taux-horaires', client),
       onSuccess: (response) => {
-        prestations.value.push(response.data.prestation);
+        tauxHoraires.value.push(response.data.taux_horaire);
         notify('success', response.data.message);
       },
     });
   }
 
-  async function updatePrestation(prestation) {
+  async function updateTauxHoraire(tauxHoraire) {
     return apiCall({
       operation: 'update',
-      request: () => axios.put(`/api/prestations/${prestation.id}`, prestation),
+      request: () => axios.put(`/api/taux-horaires/${tauxHoraire.id}`, tauxHoraire),
       onSuccess: (response) => {
-        const index = prestations.value.findIndex(p => p.id === prestation.id);
+        const index = tauxHoraires.value.findIndex(th => th.id === tauxHoraire.id);
         if (index !== -1) {
-          prestations.value[index] = response.data.prestation;
+            tauxHoraires.value[index] = response.data.taux_horaire;
         }
         notify('success', response.data.message);
       },
     });
   }
 
-  async function deletePrestation(prestationId) {
+  async function deleteTauxHoraire(tauxHoraireId) {
     return apiCall({
       operation: 'delete',
-      request: () => axios.delete(`/api/prestations/${prestationId}`),
+      request: () => axios.delete(`/api/taux-horaires/${tauxHoraireId}`),
       onSuccess: (response) => {
-        prestations.value = prestations.value.filter(p => p.id !== prestationId);
+        tauxHoraires.value = tauxHoraires.value.filter(th => th.id !== tauxHoraireId);
         notify('success', response.data.message);
       },
     });
   }
 
   return {
-    prestations,
+    tauxHoraires,
     errors,
     loading,
-    activeFilters,
-    updateFilters,
-    filteredPrestations,
-    isAnyFilterActive,
-    fetchPrestations,
-    addPrestation,
-    updatePrestation,
-    deletePrestation,
+    fetchTauxHoraires,
+    addTauxHoraire,
+    updateTauxHoraire,
+    deleteTauxHoraire,
     clearErrors,
-    prestationCount,
-    totalHours,
-    unbilledPrestations,
   };
 });

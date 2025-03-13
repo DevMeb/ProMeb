@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-use DateTimeInterface;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -18,6 +17,7 @@ class Prestation extends Model
         'facture_id',
         'user_id',
         'client_id',
+        'taux_horaire_id',
     ];
 
     protected $casts = [
@@ -38,4 +38,10 @@ class Prestation extends Model
     {
         return $this->belongsTo(Client::class);
     }
+
+    public function tauxHoraire()
+    {
+        return $this->belongsTo(TauxHoraire::class);
+    }
+
 }

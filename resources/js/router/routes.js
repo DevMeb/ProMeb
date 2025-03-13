@@ -8,4 +8,5 @@ export default [
   { path: '/prestations', name: 'Prestation', component: loadView('Prestation'), meta: { requiresAuth: true } },
   { path: '/factures', name: 'Facture', component: loadView('Facture'), meta: { requiresAuth: true } },
   { path: '/settings', name: 'Profile', component: loadView('Profile'), meta: { requiresAuth: true } },
+  { path: '/taux-horaires', name: 'TauxHoraires', component: loadView('TauxHoraire'), meta: { requiresAuth: true } },
 ];

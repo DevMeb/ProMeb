@@ -45,16 +45,16 @@
         <div>
           <button
             type="submit"
-            :disabled="authStore.loading"
+            :disabled="authStore.loading.login"
             class="flex w-full justify-center rounded-md bg-indigo-500 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-indigo-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            <span v-if="authStore.loading" class="animate-spin mr-2">⏳</span>
+            <span v-if="authStore.loading.login" class="animate-spin mr-2">⏳</span>
             Se connecter
           </button>
         </div>
 
         <!-- Message d'erreur -->
-        <div v-if="authStore.error" class="text-center text-red-500 text-sm">
+        <div v-if="authStore.errors.login" class="text-center text-red-500 text-sm">
           {{ authStore.error }}
         </div>
       </form>

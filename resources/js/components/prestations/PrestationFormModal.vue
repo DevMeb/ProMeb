@@ -35,11 +35,38 @@
           </div>
           <button
             type="button"
-            v-if="clients.length === 0"
             @click="openClientModal"
             class="mt-2 text-indigo-600 text-sm flex items-center hover:underline"
           >
             ➕ Ajouter un client
+          </button>
+        </div>
+
+        <!-- Taux horaire -->
+        <div>
+          <label for="taux-horaire" class="block text-sm font-medium text-gray-700">Taux Horaire</label>
+          <div class="relative">
+            <select
+              id="taux-horaire"
+              v-model="prestationData.taux_horaire_id"
+              class="w-full border p-2 rounded focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              :class="{ 'border-red-500': errors.validationErrors?.taux_horaire_id }"
+            >
+              <option :disabled="tauxHoraires.length === 0" value="">Sélectionner un taux horaire</option>
+              <option v-for="tauxHoraire in tauxHoraires" :key="tauxHoraire.id" :value="tauxHoraire.id">
+                {{ tauxHoraire.taux }}
+              </option>
+            </select>
+            <p v-if="errors.validationErrors?.taux_horaire_id" class="text-red-500 text-xs mt-1">
+              {{ errors.validationErrors.taux_horaire_id.join(', ') }}
+            </p>
+          </div>
+          <button
+            type="button"
+            @click="openTauxHoraireModal"
+            class="mt-2 text-indigo-600 text-sm flex items-center hover:underline"
+          >
+            ➕ Ajouter un taux horaire
           </button>
         </div>
 
@@ -122,6 +149,7 @@
 
     <!-- Modale d'ajout d'un client -->
     <ClientFormModal v-if="showClientModal" @close="closeClientModal" />
+    <TauxHoraireFormModal v-if="showTauxHoraireModal" @close="closeTauxHoraireModal" />
   </div>
 </template>
 
@@ -129,9 +157,10 @@
 import { ref, watchEffect } from 'vue';
 import { usePrestationsStore } from '@/stores/prestations';
 import { useClientsStore } from '@/stores/clients';
+import { useTauxHorairesStore } from '@/stores/taux-horaires';
 import { storeToRefs } from 'pinia';
-import dayjs from 'dayjs';
-import ClientFormModal from '@/components/clients/ClientFormModal.vue';
+import { ClientFormModal } from '@/components/clients';
+import { TauxHoraireFormModal } from '@/components/taux-horaires';
 
 // Définir les propriétés et l'émission d'événements
 const props = defineProps({
@@ -141,11 +170,16 @@ const emit = defineEmits(['close']);
 
 // Accès aux stores
 const prestationsStore = usePrestationsStore();
-const clientsStore = useClientsStore();
 const { addPrestation, updatePrestation, clearErrors } = prestationsStore;
+const { errors, loading } = storeToRefs(prestationsStore);
+
+const clientsStore = useClientsStore();
 const { fetchClients } = clientsStore;
 const { clients } = storeToRefs(clientsStore);
-const { errors, loading } = storeToRefs(prestationsStore);
+
+const tauxHorairesStore = useTauxHorairesStore()
+const { fetchTauxHoraires } = tauxHorairesStore
+const { tauxHoraires } = storeToRefs(tauxHorairesStore)
 
 // Données réactives pour le formulaire
 const prestationData = ref({
@@ -155,9 +189,19 @@ const prestationData = ref({
   adresse: '',
   horaires: '',
   client_id: '',
+  taux_horaire_id: '',
 });
 
 // Modale d'ajout d'un client
+const showTauxHoraireModal = ref(false);
+const openTauxHoraireModal = () => {
+  showTauxHoraireModal.value = true;
+};
+const closeTauxHoraireModal = () => {
+  showTauxHoraireModal.value = false;
+  fetchTauxHoraires(); // Rafraîchir la liste des taux horaires après ajout
+};
+
 const showClientModal = ref(false);
 const openClientModal = () => {
   showClientModal.value = true;
@@ -171,9 +215,10 @@ const closeClientModal = () => {
 watchEffect(() => {
   prestationData.value = props.prestation
     ? { ...props.prestation }
-    : { id: null, date: '', heures: '', adresse: '', horaires: '', client_id: '' };
+    : { id: null, date: '', heures: '', adresse: '', horaires: '', client_id: '', taux_horaire_id: '' };
 
-  fetchClients(); // Charger la liste des clients
+  fetchClients();
+  fetchTauxHoraires()
 });
 
 // Soumission du formulaire

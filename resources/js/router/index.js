@@ -11,7 +11,6 @@ const router = createRouter({
 router.beforeEach(async (to, from, next) => {
   const authStore = useAuthStore();
 
-  // Si l'utilisateur n'est pas déjà chargé, vérifie l'authentification
   let isAuth = authStore.isAuthenticated;
   if (!isAuth) {
     isAuth = await authStore.checkAuth();

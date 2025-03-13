@@ -51,7 +51,7 @@
               <MenuButton class="relative flex items-center space-x-2 bg-gray-800 rounded-full text-sm focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800">
                 <span class="sr-only">Ouvrir le menu utilisateur</span>
                 <img class="size-8 rounded-full" :src="user.avatar || defaultAvatar" alt="Avatar utilisateur" />
-                <span class="hidden sm:inline-block text-gray-300 text-sm font-medium">{{ user.name }}</span>
+                <span class="hidden sm:inline-block text-gray-300 text-sm font-medium">{{ user.name }} {{ user.prenom }}</span>
               </MenuButton>
             </div>
 
@@ -126,6 +126,7 @@ const { user, isAuthenticated, logout } = authStore;
 // Définition des liens de navigation
 const navigation = [
   { name: "Tableau de bord", href: "/" },
+  { name: "Taux Horaires", href: "/taux-horaires" },
   { name: "Clients", href: "/clients" },
   { name: "Prestations", href: "/prestations" },
   { name: "Factures", href: "/factures" },

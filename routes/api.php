@@ -2,7 +2,9 @@
 
 use App\Http\Controllers\API\AuthController;
 use App\Http\Controllers\API\ClientController;
+use App\Http\Controllers\API\FactureController;
 use App\Http\Controllers\API\PrestationController;
+use App\Http\Controllers\API\TauxHoraireController;
 use App\Http\Controllers\API\UserController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
@@ -20,12 +22,10 @@ Route::middleware('auth:sanctum')->group(function () {
         ->as('prestations.')
         ->group(function () {
             Route::get('/', [PrestationController::class, 'index'])
-                ->name('index')
-                ->middleware('can:viewAny,App\Models\Prestation');
+                ->name('index');
 
             Route::post('/', [PrestationController::class, 'store'])
-                ->name('store')
-                ->middleware('can:create,App\Models\Prestation');
+                ->name('store');
 
             Route::put('/{prestation}', [PrestationController::class, 'update'])
                 ->name('update')
@@ -40,12 +40,10 @@ Route::middleware('auth:sanctum')->group(function () {
         ->as('clients.')
         ->group(function () {
             Route::get('/', [ClientController::class, 'index'])
-                ->name('index')
-                ->middleware('can:viewAny,App\Models\Client');
+                ->name('index');
 
             Route::post('/', [ClientController::class, 'store'])
-                ->name('store')
-                ->middleware('can:create,App\Models\Client');
+                ->name('store');
 
             Route::put('/{client}', [ClientController::class, 'update'])
                 ->name('update')
@@ -54,6 +52,24 @@ Route::middleware('auth:sanctum')->group(function () {
             Route::delete('/{client}', [ClientController::class, 'destroy'])
                 ->name('destroy')
                 ->middleware('can:delete,client');
+        });
+
+        Route::prefix('taux-horaires')
+        ->as('taux-horaires.')
+        ->group(function () {
+            Route::get('/', [TauxHoraireController::class, 'index'])
+                ->name('index');
+
+            Route::post('/', [TauxHoraireController::class, 'store'])
+                ->name('store');
+
+            Route::put('/{tauxHoraire}', [TauxHoraireController::class, 'update'])
+                ->name('update')
+                ->middleware('can:update,tauxHoraire');
+                
+            Route::delete('/{tauxHoraire}', [TauxHoraireController::class, 'destroy'])
+                ->name('destroy')
+                ->middleware('can:delete,tauxHoraire');
         });
 
         

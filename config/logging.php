@@ -79,6 +79,20 @@ return [
             'level' => env('LOG_LEVEL', 'debug'),
         ],
 
+        // Logs pour les factures
+        'client' => [
+            'driver' => 'single',
+            'path' => storage_path('logs/client.log'),
+            'level' => env('LOG_LEVEL', 'debug'),
+        ],
+
+        // Logs pour les factures
+        'taux_horaire' => [
+            'driver' => 'single',
+            'path' => storage_path('logs/taux_horaire.log'),
+            'level' => env('LOG_LEVEL', 'debug'),
+        ],
+
         'daily' => [
             'driver' => 'daily',
             'path' => storage_path('logs/laravel.log'),

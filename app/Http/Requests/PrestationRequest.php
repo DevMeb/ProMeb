@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule;
 
 class PrestationRequest extends FormRequest
@@ -12,7 +13,7 @@ class PrestationRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return true;
+        return Auth::check();
     }
 
     /**
@@ -34,6 +35,13 @@ class PrestationRequest extends FormRequest
                     $query->where('user_id', $this->user()->id);
                 }),
             ],
+            'taux_horaire_id' => [
+                'required',
+                'integer',
+                Rule::exists('taux_horaires', 'id')->where(function ($query) {
+                    $query->where('user_id', $this->user()->id);
+                })
+            ]
         ];
     }
 
@@ -57,6 +65,9 @@ class PrestationRequest extends FormRequest
             'client_id.required' => 'Un client doit être sélectionné pour cette prestation.',
             'client_id.integer'  => 'Le client sélectionné est invalide.',
             'client_id.exists'   => 'Le client sélectionné n’existe pas ou ne vous appartient pas.',
+            'taux_horaire_id.required' => 'Un taux horaire doit être sélectionné pour cette prestation.',
+            'taux_horaire_id.integer'  => 'Le taux horaire sélectionné est invalide.',
+            'taux_horaire_id.exists'   => 'Le taux horaire sélectionné n’existe pas ou ne vous appartient pas.',
         ];
     }
 }

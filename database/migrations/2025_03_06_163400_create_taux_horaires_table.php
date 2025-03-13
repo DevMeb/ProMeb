@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('taux_horaire', function (Blueprint $table) {
+        Schema::create('taux_horaires', function (Blueprint $table) {
             $table->id();
             $table->integer('taux');
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
@@ -24,6 +24,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('taux_horaire');
+        Schema::dropIfExists('taux_horaires');
     }
 };

@@ -10,7 +10,9 @@ class PrestationService extends BaseService
     public function getAll()
     {
         return $this->handleExceptions(function () {
-            return Prestation::where('user_id', Auth::id())->with('client')->get();
+            return Prestation::where('user_id', Auth::id())
+                    ->with('client', 'tauxHoraire')
+                    ->get();
         }, "Erreur lors de la récupération des prestations", "prestation");
     }
 
@@ -19,7 +21,7 @@ class PrestationService extends BaseService
         return $this->handleExceptions(function () use ($data) {
             $data['user_id'] = Auth::id();
             $prestation = Prestation::create($data);
-            return $prestation->refresh()->load('client');;
+            return $prestation->refresh()->load('client', 'tauxHoraire');
         }, "Erreur lors de la création de la prestation", "prestation");
     }
 
@@ -27,7 +29,7 @@ class PrestationService extends BaseService
     {
         return $this->handleExceptions(function () use ($prestation, $data) {
             $prestation->update($data);
-            return $prestation->refresh()->load('client');;
+            return $prestation->refresh()->load('client', 'tauxHoraire');
         }, "Erreur lors de la mise à jour de la prestation (ID: $prestation->id)", "prestation");
     }
 

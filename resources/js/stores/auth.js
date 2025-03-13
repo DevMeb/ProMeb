@@ -29,8 +29,8 @@ export const useAuthStore = defineStore("auth", () => {
 
   /** Connexion utilisateur */
   async function login(email, password) {
-    loading.value = true;
-    error.value = null;
+    loading.value['login'] = true;
+    errors.value['login'] = null;
     try {
       await axios.get("/sanctum/csrf-cookie");
       await axios.post("/api/auth/login", { email, password });
@@ -38,7 +38,7 @@ export const useAuthStore = defineStore("auth", () => {
       toast.success("Connexion réussie !");
       await router.push("/");
     } catch (err) {
-      error.value = "Nom d’utilisateur ou mot de passe incorrect.";
+      errors.value = "Nom d’utilisateur ou mot de passe incorrect.";
       toast.error("Échec de la connexion.");
     } finally {
       loading.value = false;
