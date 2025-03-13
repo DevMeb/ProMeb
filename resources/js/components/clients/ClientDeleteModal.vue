@@ -13,8 +13,8 @@
   
         <!-- Contenu -->
         <p class="text-gray-700 mt-3">
-          Êtes-vous sûr de vouloir supprimer la prestation du 
-          <strong class="text-gray-900">{{ formatDate(prestation.date_prestation) }}</strong> ?
+          Êtes-vous sûr de vouloir supprimer le client
+          <strong class="text-gray-900">{{ client.nom }}</strong> ?
         </p>
         <p class="text-sm text-gray-500 mt-2">
           Cette action est <span class="font-semibold text-red-500">irréversible</span>.
@@ -29,7 +29,7 @@
             Annuler
           </button>
           <button 
-            @click="destroyPrestation"
+            @click="destroyClient"
             class="px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600 transition flex items-center"
           >
             <span class="mr-2">🗑️</span> Supprimer
@@ -38,13 +38,12 @@
       </div>
     </div>
   </template>
-    
+  
   <script setup>
-  import { usePrestationsStore } from '@/stores/prestations';
-  import { formatDate } from '@/utils'
+  import { useClientsStore } from '@/stores/clients';
   
   const props = defineProps({
-    prestation: {
+    client: {
       type: Object,
       required: true,
     },
@@ -52,17 +51,17 @@
   
   const emit = defineEmits(["close"]);
   
-  const prestationsStore = usePrestationsStore();
-  const { deletePrestation } = prestationsStore;
+  const clientsStore = useClientsStore();
+  const { deleteClient } = clientsStore;
   
   // Fonction de fermeture de la modal
   function close() {
     emit("close");
   }
   
-  // Fonction pour supprimer la prestation
-  async function destroyPrestation() {
-    await deletePrestation(props.prestation.id);
+  // Fonction pour supprimer le client
+  async function destroyClient() {
+    await deleteClient(props.client.id);
     close();
   }
   </script>

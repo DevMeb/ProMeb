@@ -31,6 +31,11 @@ class Facture extends Model
         return $date->format('d/m/Y');
     }
 
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
+
     public function prestations()
     {
         return $this->hasMany(Prestation::class);

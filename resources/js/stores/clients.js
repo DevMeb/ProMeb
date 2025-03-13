@@ -2,25 +2,23 @@ import { defineStore } from 'pinia';
 import { ref, computed, watch } from 'vue';
 import axios from 'axios';
 import { notify } from '@/utils';
+import { useStorage } from '@vueuse/core';
 import dayjs from 'dayjs';
 
-export const usePrestationsStore = defineStore('prestations', () => {
-  const prestations = ref([]);
+export const useClientsStore = defineStore('clients', () => {
+  const clients = ref([]);
   const errors = ref({});
   const loading = ref({});
 
-  // Filtres pour les prestations (par exemple, filtrer par date et adresse)
-  const activeFilters = ref({
+  /*
+  const activeFilters = useStorage("prestation-filters", {
     month_year: '',
-    client_id: '',
   });
 
-  // Mise à jour des filtres
   function updateFilters(filters) {
     activeFilters.value = filters;
   }
 
-  // Vérification si des filtres sont actifs
   const isAnyFilterActive = computed(() => {
     return Object.values(activeFilters.value).some(value => value !== "");
   });
@@ -29,11 +27,9 @@ export const usePrestationsStore = defineStore('prestations', () => {
   const filteredPrestations = ref([]);
   watch([prestations, activeFilters], () => {
     filteredPrestations.value = prestations.value.filter(prestation => {
-      const { month_year, client_id } = activeFilters.value;
+      const { month_year } = activeFilters.value;
 
       if (month_year && dayjs(prestation.date).format('YYYY-MM') !== month_year) return false;
-
-      if (client_id && prestation.client_id !== client_id) return false;
 
       return true;
     });
@@ -49,6 +45,7 @@ export const usePrestationsStore = defineStore('prestations', () => {
   const unbilledPrestations = computed(() => {
     return prestations.value.filter((prestation) => !prestation.facture_id);
   });
+  */
 
   function clearErrors(operation) {
     if (operation) {
@@ -82,68 +79,61 @@ export const usePrestationsStore = defineStore('prestations', () => {
     }
   }
 
-  async function fetchPrestations() {
+  async function fetchClients() {
     return apiCall({
       operation: 'fetch',
-      request: () => axios.get('/api/prestations'),
+      request: () => axios.get('/api/clients'),
       onSuccess: (response) => {
         // Si l'API renvoie les données dans une clé data, ajustez ici
-        prestations.value = response.data.prestations;
+        clients.value = response.data.clients;
       },
     });
   }
 
-  async function addPrestation(prestation) {
+  async function addClient(client) {
     return apiCall({
       operation: 'add',
-      request: () => axios.post('/api/prestations', prestation),
+      request: () => axios.post('/api/clients', client),
       onSuccess: (response) => {
-        prestations.value.push(response.data.prestation);
+        clients.value.push(response.data.client);
         notify('success', response.data.message);
       },
     });
   }
 
-  async function updatePrestation(prestation) {
+  async function updateClient(client) {
     return apiCall({
       operation: 'update',
-      request: () => axios.put(`/api/prestations/${prestation.id}`, prestation),
+      request: () => axios.put(`/api/clients/${client.id}`, client),
       onSuccess: (response) => {
-        const index = prestations.value.findIndex(p => p.id === prestation.id);
+        const index = clients.value.findIndex(c => c.id === client.id);
         if (index !== -1) {
-          prestations.value[index] = response.data.prestation;
+            clients.value[index] = response.data.client;
         }
         notify('success', response.data.message);
       },
     });
   }
 
-  async function deletePrestation(prestationId) {
+  async function deleteClient(clientId) {
     return apiCall({
       operation: 'delete',
-      request: () => axios.delete(`/api/prestations/${prestationId}`),
+      request: () => axios.delete(`/api/clients/${clientId}`),
       onSuccess: (response) => {
-        prestations.value = prestations.value.filter(p => p.id !== prestationId);
+        clients.value = clients.value.filter(c => c.id !== clientId);
         notify('success', response.data.message);
       },
     });
   }
 
   return {
-    prestations,
+    clients,
     errors,
     loading,
-    activeFilters,
-    updateFilters,
-    filteredPrestations,
-    isAnyFilterActive,
-    fetchPrestations,
-    addPrestation,
-    updatePrestation,
-    deletePrestation,
+    fetchClients,
+    addClient,
+    updateClient,
+    deleteClient,
     clearErrors,
-    prestationCount,
-    totalHours,
-    unbilledPrestations,
   };
 });

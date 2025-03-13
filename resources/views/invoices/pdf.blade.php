@@ -112,8 +112,7 @@
                 <!-- Bloc gauche : Informations du détenteur -->
                 <td class="header-left">
                     <strong>MEBARKI Younes</strong><br>
-                    90 route de gournay<br>
-                    93160 Noisy-le-grand<br>
+                    90 route de gournay, 93160 Noisy-le-grand, France<br>
                     Email: mebarki.younes93@gmail.com<br>
                     Téléphone: 0750258791<br>
                     SIREN: 940150691

@@ -18,6 +18,8 @@ return new class extends Migration
             $table->string('horaires');
             $table->string('adresse');
             $table->foreignId('facture_id')->nullable()->constrained()->onDelete('cascade');
+            $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
+            $table->foreignId('client_id')->constrained('clients')->onDelete('cascade');
             $table->timestamps();
         });
     }

@@ -83,6 +83,7 @@ const logout = async () => {
 // Liste des liens de navigation
 const navigation = ref([
   { name: 'Tableau de bord', href: '/', current: false },
+  { name: 'Clients', href: '/clients', current: false },
   { name: 'Prestations', href: '/prestations', current: false },
   { name: 'Factures', href: '/factures', current: false },
 
