@@ -3,47 +3,38 @@ import { ref, computed } from "vue";
 import { useRouter } from "vue-router";
 import axios from "axios";
 import { useToast } from "vue-toastification";
+import { notify } from "@/utils";
 
 export const useAuthStore = defineStore("auth", () => {
-  // On se base sur l'objet utilisateur pour déterminer l'authentification
   const user = ref(null);
-  const error = ref(null);
-  const loading = ref(false);
+  const errors = ref({});
+  const loading = ref({});
   const router = useRouter();
   const toast = useToast();
 
-  // L'utilisateur est authentifié si "user" est non null
   const isAuthenticated = computed(() => !!user.value);
 
-  /**
-   * Vérifie si l'utilisateur est connecté.
-   * Si l'utilisateur est déjà chargé, on retourne true pour éviter des appels réseau superflus.
-   */
+  /** Vérifie si l'utilisateur est connecté */
   async function checkAuth() {
     if (user.value) return true;
     try {
       const response = await axios.get("/api/user");
-      user.value = response.data;
+      user.value = response.data.user;
       return true;
     } catch (err) {
       user.value = null;
       return false;
     }
   }
-  
+
   /** Connexion utilisateur */
   async function login(email, password) {
     loading.value = true;
     error.value = null;
     try {
-      // Récupère le cookie CSRF pour initialiser la session
       await axios.get("/sanctum/csrf-cookie");
-      // Envoie la requête de connexion
       await axios.post("/api/auth/login", { email, password });
-      
-      // Met à jour l'état utilisateur en appelant checkAuth()
       await checkAuth();
-      
       toast.success("Connexion réussie !");
       await router.push("/");
     } catch (err) {
@@ -57,23 +48,65 @@ export const useAuthStore = defineStore("auth", () => {
   /** Déconnexion utilisateur */
   async function logout() {
     try {
-      // Appel à l'endpoint de déconnexion pour invalider la session côté serveur
       await axios.post("/api/auth/logout", {});
-    } catch (e) {
-      // On peut ignorer l'erreur si l'appel échoue
-    }
+    } catch (e) {}
     user.value = null;
     toast.info("Déconnexion réussie.");
     await router.push("/login");
   }
 
+  function clearErrors(operation) {
+    if (operation) {
+      errors.value[operation] = null;
+    } else {
+      errors.value = {};
+    }
+  }
+
+  function setLoading(operation, state) {
+    loading.value[operation] = state;
+  }
+
+  async function apiCall({ operation, request, onSuccess }) {
+      clearErrors(operation);
+      setLoading(operation, true);
+      try {
+        const response = await request();
+        if (onSuccess) onSuccess(response);
+        return response;
+      } catch (err) {
+        if (err.response?.status === 422) {
+          errors.value.validationErrors = err.response.data.errors;
+        } else {
+          errors.value[operation] = err.response?.data?.message || "Une erreur est survenue.";
+          notify('error', errors.value[operation]);
+        }
+        throw err;
+      } finally {
+        setLoading(operation, false);
+      }
+  }
+
+  async function updateUser(user) {
+    return apiCall({
+      operation: 'update',
+      request: () => axios.put(`/api/user/`, user),
+      onSuccess: (response) => {
+        user.value = response.data.user;
+        notify('success', response.data.message);
+      },
+    });
+  }
+
   return {
     user,
-    error,
+    errors,
     loading,
     isAuthenticated,
     checkAuth,
     login,
     logout,
+    updateUser,
+    clearErrors,
   };
 });

@@ -3,14 +3,18 @@
 use App\Http\Controllers\API\AuthController;
 use App\Http\Controllers\API\ClientController;
 use App\Http\Controllers\API\PrestationController;
+use App\Http\Controllers\API\UserController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware('auth:sanctum')->group(function () {
-    
-    Route::get('/user', function () {
-        return Auth::user();
-    });
+
+    Route::prefix('user')
+        ->as('user.')
+        ->group(function () {
+            Route::get('/', [UserController::class, 'show'])->name('show');
+            Route::put('/', [UserController::class, 'update'])->name('update');
+        });
 
     Route::prefix('prestations')
         ->as('prestations.')
@@ -51,6 +55,8 @@ Route::middleware('auth:sanctum')->group(function () {
                 ->name('destroy')
                 ->middleware('can:delete,client');
         });
+
+        
 });
 
 Route::prefix('auth')

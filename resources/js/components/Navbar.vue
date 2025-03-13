@@ -1,100 +1,141 @@
 <template>
   <Disclosure as="nav" class="bg-gray-800" v-slot="{ open }">
-    <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-      <div class="flex h-16 justify-between">
-        <div class="flex">
-          <div class="-ml-2 mr-2 flex items-center md:hidden">
-            <!-- Mobile menu button -->
-            <DisclosureButton class="relative inline-flex items-center justify-center rounded-md p-2 text-gray-400 hover:bg-gray-700 hover:text-white focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white">
-              <span class="sr-only">Open main menu</span>
-              <Bars3Icon v-if="!open" class="block h-6 w-6" aria-hidden="true" />
-              <XMarkIcon v-else class="block h-6 w-6" aria-hidden="true" />
-            </DisclosureButton>
+    <div class="mx-auto max-w-7xl px-2 sm:px-6 lg:px-8">
+      <div class="relative flex h-16 items-center justify-between">
+        
+        <!-- Bouton menu mobile -->
+        <div class="absolute inset-y-0 left-0 flex items-center sm:hidden">
+          <DisclosureButton
+            class="inline-flex items-center justify-center rounded-md p-2 text-gray-400 hover:bg-gray-700 hover:text-white focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800"
+          >
+            <span class="sr-only">Ouvrir le menu</span>
+            <Bars3Icon v-if="!open" class="block size-6" aria-hidden="true" />
+            <XMarkIcon v-else class="block size-6" aria-hidden="true" />
+          </DisclosureButton>
+        </div>
+
+        <!-- Logo & Navigation -->
+        <div class="flex flex-1 items-center justify-center sm:items-stretch sm:justify-start">
+          <div class="flex shrink-0 items-center">
+            <img
+              class="h-8 w-auto"
+              src="https://tailwindcss.com/plus-assets/img/logos/mark.svg?color=indigo&shade=500"
+              alt="Logo"
+            />
           </div>
-          <div class="flex flex-shrink-0 items-center">
-            <!-- <router-link to="/">
-              <img class="h-16 w-auto" :src="logoUrl" alt="Hotel Longchamps" />
-            </router-link> -->
-          </div>
-          <div class="hidden md:ml-6 md:flex md:items-center md:space-x-4">
-            <router-link
-              v-for="item in navigation"
-              :key="item.name"
-              :to="item.href"
-              :class="[
-                item.current ? 'bg-gray-900 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white',
-                'rounded-md px-3 py-2 text-sm font-medium'
-              ]"
-              :aria-current="item.current ? 'page' : undefined"
-            >
-              {{ item.name }}
-            </router-link>
+
+          <!-- Navigation desktop -->
+          <div class="hidden sm:ml-6 sm:block">
+            <div class="flex space-x-4">
+              <RouterLink
+                v-for="item in navigation"
+                :key="item.name"
+                :to="item.href"
+                class="rounded-md px-3 py-2 text-sm font-medium transition duration-200"
+                :class="{
+                  'bg-gray-900 text-white': isActive(item.href),
+                  'text-gray-300 hover:bg-gray-700 hover:text-white': !isActive(item.href)
+                }"
+                >{{ item.name }}</RouterLink
+              >
+            </div>
           </div>
         </div>
-        <div class="flex items-center">
-          <div class="flex-shrink-0">
-            <button
-              @click="logout"
-              type="button"
-              class="relative inline-flex items-center gap-x-1.5 rounded-md bg-indigo-500 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
+
+        <!-- Profil utilisateur ou Connexion -->
+        <div class="absolute inset-y-0 right-0 flex items-center pr-2 sm:static sm:inset-auto sm:ml-6 sm:pr-0">
+          
+          <!-- Si l'utilisateur est connecté, afficher le menu utilisateur -->
+          <Menu v-if="isAuthenticated" as="div" class="relative ml-3">
+            <div>
+              <MenuButton class="relative flex items-center space-x-2 bg-gray-800 rounded-full text-sm focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800">
+                <span class="sr-only">Ouvrir le menu utilisateur</span>
+                <img class="size-8 rounded-full" :src="user.avatar || defaultAvatar" alt="Avatar utilisateur" />
+                <span class="hidden sm:inline-block text-gray-300 text-sm font-medium">{{ user.name }}</span>
+              </MenuButton>
+            </div>
+
+            <transition
+              enter-active-class="transition ease-out duration-100"
+              enter-from-class="transform opacity-0 scale-95"
+              enter-to-class="transform opacity-100 scale-100"
+              leave-active-class="transition ease-in duration-75"
+              leave-from-class="transform opacity-100 scale-100"
+              leave-to-class="transform opacity-0 scale-95"
             >
-              Déconnexion
-            </button>
-          </div>
+              <MenuItems class="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 ring-1 ring-black/5 focus:outline-none">
+                <MenuItem v-slot="{ active }">
+                  <RouterLink
+                    to="/settings"
+                    :class="[active ? 'bg-gray-100' : '', 'block px-4 py-2 text-sm text-gray-700']"
+                  >
+                    ⚙️ Paramètres
+                  </RouterLink>
+                </MenuItem>
+                <MenuItem v-slot="{ active }">
+                  <button
+                    @click="logout"
+                    :class="[active ? 'bg-gray-100' : '', 'block w-full text-left px-4 py-2 text-sm text-gray-700']"
+                  >
+                    🚪 Se déconnecter
+                  </button>
+                </MenuItem>
+              </MenuItems>
+            </transition>
+          </Menu>
+
+          <!-- Si l'utilisateur n'est pas connecté, afficher le bouton Connexion -->
+          <RouterLink v-else to="/login" class="bg-indigo-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-indigo-700 transition">
+            🔑 Se connecter
+          </RouterLink>
         </div>
       </div>
     </div>
 
-    <DisclosurePanel class="md:hidden">
-      <div class="space-y-1 px-2 pb-3 pt-2 sm:px-3">
-        <router-link
+    <!-- Navigation mobile -->
+    <DisclosurePanel class="sm:hidden">
+      <div class="space-y-1 px-2 pt-2 pb-3">
+        <DisclosureButton
           v-for="item in navigation"
           :key="item.name"
+          as="RouterLink"
           :to="item.href"
-          class="block rounded-md px-3 py-2 text-base font-medium"
-          :class="item.current ? 'bg-gray-900 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white'"
-          :aria-current="item.current ? 'page' : undefined"
+          class="block rounded-md px-3 py-2 text-base font-medium transition duration-200"
+          :class="{
+            'bg-gray-900 text-white': isActive(item.href),
+            'text-gray-300 hover:bg-gray-700 hover:text-white': !isActive(item.href)
+          }"
         >
           {{ item.name }}
-        </router-link>
+        </DisclosureButton>
       </div>
     </DisclosurePanel>
   </Disclosure>
 </template>
 
 <script setup>
-import { ref, watch } from 'vue';
-import { useRouter, useRoute } from 'vue-router';
-import { Disclosure, DisclosureButton, DisclosurePanel } from '@headlessui/vue';
-import { Bars3Icon, XMarkIcon } from '@heroicons/vue/24/outline';
+import { useRoute, RouterLink } from "vue-router";
+import { Disclosure, DisclosureButton, DisclosurePanel, Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/vue";
+import { Bars3Icon, XMarkIcon } from "@heroicons/vue/24/outline";
+import { useAuthStore } from "@/stores/auth"; // Importation du store Auth
 
-//import logoUrl from '@/../images/hotel-logo.png';
-import { useAuthStore } from '@/stores/auth';
-
+// Store d'authentification
 const authStore = useAuthStore();
-const router = useRouter();
+const { user, isAuthenticated, logout } = authStore;
+
+// Définition des liens de navigation
+const navigation = [
+  { name: "Tableau de bord", href: "/" },
+  { name: "Clients", href: "/clients" },
+  { name: "Prestations", href: "/prestations" },
+  { name: "Factures", href: "/factures" },
+];
+
+// Image par défaut si l'utilisateur n'a pas d'avatar
+const defaultAvatar = "https://i.pravatar.cc/300";
+
+// Vérifier si un lien est actif
 const route = useRoute();
-
-// Déconnexion asynchrone
-const logout = async () => {
-  await authStore.logout();
-};
-
-// Liste des liens de navigation
-const navigation = ref([
-  { name: 'Tableau de bord', href: '/', current: false },
-  { name: 'Clients', href: '/clients', current: false },
-  { name: 'Prestations', href: '/prestations', current: false },
-  { name: 'Factures', href: '/factures', current: false },
-
-]);
-
-// Met à jour l'état 'current' en fonction du chemin actif
-const updateCurrentLink = () => {
-  navigation.value.forEach((item) => {
-    item.current = item.href === route.path;
-  });
-};
-
-watch(route, updateCurrentLink, { immediate: true });
+const isActive = (href) => route.path === href;
 </script>
+
