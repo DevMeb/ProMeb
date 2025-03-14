@@ -1,6 +1,6 @@
 <template>
   <div
-    :class="`bg-gradient-to-tr ${gradient} p-6 rounded-xl shadow-xl transform transition-all hover:scale-[1.02] hover:shadow-2xl relative overflow-hidden`"
+    :class="`bg-gradient-to-tr ${gradient} p-6 rounded-xl shadow-xl transform transition-all hover:scale-[1.02] hover:cursor-pointer hover:shadow-2xl relative overflow-hidden`"
   >
     <!-- Lueur subtile -->
     <div class="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent"></div>
@@ -43,7 +43,8 @@ const props = defineProps({
   gradient: String,
   textColor: String,
   badge: String,
-  isDifference: Boolean
+  isDifference: Boolean,
+  cursor: Boolean,
 });
 
 const formattedValue = computed(() => {

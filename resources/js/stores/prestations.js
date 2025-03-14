@@ -51,7 +51,13 @@ export const usePrestationsStore = defineStore('prestations', () => {
   });
 
   const unbilledPrestations = computed(() => {
-    return prestations.value.filter((prestation) => prestation.facture_id == null);
+    return prestations.value.filter((prestation) => { 
+      
+      console.log('PRESTATION', prestation)
+      console.log(prestation.facture_id)
+      return prestation.facture_id == null
+
+    });
   });
 
   function clearErrors(operation) {

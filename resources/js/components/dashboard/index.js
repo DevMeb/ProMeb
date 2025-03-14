@@ -1,15 +1,13 @@
 import PrestationsStatistiques from "./PrestationsStatistiques.vue"
 import CAStatistiques from "./CAStatistiques.vue"
-import FacturesPrestationsList from "./FacturesPrestationsList.vue"
-import FacturesListItem from "./FacturesListItem.vue"
-import FacturePrestationsListItem from "./FacturePrestationsListItem.vue"
-import PrestationsNonFactured from "./PrestationsNonFactured.vue"
+import DashboardCard from "./DashboardCard.vue"
+import PrestationsModal from "./PrestationsModal.vue"
+import FacturesModal from "./FacturesModal.vue"
 
 export {
     PrestationsStatistiques,
     CAStatistiques,
-    FacturesPrestationsList,
-    FacturesListItem,
-    FacturePrestationsListItem,
-    PrestationsNonFactured,
+    DashboardCard,
+    PrestationsModal,
+    FacturesModal,
 }

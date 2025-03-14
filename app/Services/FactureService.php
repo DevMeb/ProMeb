@@ -50,7 +50,7 @@ class FactureService extends BaseService
                 Prestation::whereIn('id', $data['prestations'])
                     ->update(['facture_id' => $facture->id]);
 
-                return $facture->refresh()->load('prestations');
+                return $facture->refresh()->load('prestations.client', 'prestations.tauxHoraire');
             });
         }, "Erreur lors de la création de la facture", "facture");
     }

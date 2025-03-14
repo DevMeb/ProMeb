@@ -58,26 +58,26 @@
             />
             
             <div class="ml-4 flex-1">
-              <div class="flex items-center gap-3">
+              <div class="flex items-center justify-center gap-3">
                 <span class="text-xs bg-gray-900 text-gray-400 px-2 py-1 rounded-full">
                   {{ formatDate(prestation.date) }}
                 </span>
               </div>
               
               <div class="grid grid-cols-2 gap-2 mt-2">
-                <div class="flex items-center gap-2 text-sm">
+                <div class="flex items-center justify-center  gap-2 text-sm">
                   <span class="text-gray-500">🕒</span>
                   <span class="text-gray-300">{{ prestation.heures }}h</span>
                 </div>
-                <div class="flex items-center gap-2 text-sm">
+                <div class="flex items-center justify-center  gap-2 text-sm">
                   <span class="text-gray-500">📍</span>
                   <span class="text-gray-300 truncate">{{ prestation.adresse }}</span>
                 </div>
-                <div class="flex items-center gap-2 text-sm">
+                <div class="flex items-center justify-center  gap-2 text-sm">
                   <span class="text-gray-500">👤</span>
                   <span class="text-gray-300 truncate">{{ prestation.client.nom }}</span>
                 </div>
-                <div class="flex items-center gap-2 text-sm">
+                <div class="flex items-center justify-center  gap-2 text-sm">
                   <span class="text-gray-500">💰</span>
                   <span class="text-gray-300 truncate">{{ prestation.taux_horaire.taux }} € / h</span>
                 </div>

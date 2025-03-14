@@ -3,7 +3,7 @@
     <!-- CA Facturé -->
     <DashboardCard
       title="CA facturé"
-      :value="dashboardData.caDetails.ca_facture"
+      :value="dashboardData.ca_billed"
       description="Revenus confirmés"
       icon="💶"
       gradient="from-blue-600 to-blue-700"
@@ -13,7 +13,7 @@
     <!-- CA Attendu -->
     <DashboardCard
       title="CA attendu"
-      :value="dashboardData.caDetails.ca_attendu"
+      :value="dashboardData.ca_attendu"
       description="Revenus prévisionnels"
       icon="📈"
       gradient="from-amber-500 to-amber-600"
@@ -23,11 +23,11 @@
     <!-- Différence -->
     <DashboardCard
       title="Écart"
-      :value="dashboardData.caDetails.difference"
+      :value="dashboardData.difference"
       description="Différence CA réel/prévisionnel"
       icon="⚖️"
-      :gradient="dashboardData.caDetails.difference >= 0 ? 'from-green-600 to-green-700' : 'from-red-500 to-red-600'"
-      :textColor="dashboardData.caDetails.difference >= 0 ? 'text-green-100' : 'text-red-100'"
+      :gradient="dashboardData.difference >= 0 ? 'from-green-600 to-green-700' : 'from-red-500 to-red-600'"
+      :textColor="dashboardData.difference >= 0 ? 'text-green-100' : 'text-red-100'"
       :isDifference="true"
     />
   </div>

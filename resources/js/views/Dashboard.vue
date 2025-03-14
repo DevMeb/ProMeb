@@ -22,10 +22,6 @@
       <PrestationsStatistiques />
 
       <CAStatistiques />
-
-      <FacturesPrestationsList />
-
-      <PrestationsNonFactured />
     </div>
   </div>
 
@@ -35,8 +31,7 @@
 import { onMounted } from 'vue';
 import { useDashboardStore } from '@/stores/dashboard';
 import { storeToRefs } from 'pinia';
-import { formatDate } from '@/utils';
-import { PrestationsStatistiques, CAStatistiques, FacturesPrestationsList, PrestationsNonFactured } from '@/components/dashboard';
+import { PrestationsStatistiques, CAStatistiques } from '@/components/dashboard';
 const dashboardStore = useDashboardStore();
 const { dashboardData, period, loading, error } = storeToRefs(dashboardStore);
 const { fetchDashboard } = dashboardStore;
