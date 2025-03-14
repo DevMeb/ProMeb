@@ -2,12 +2,14 @@
 
 use App\Http\Controllers\API\AuthController;
 use App\Http\Controllers\API\ClientController;
+use App\Http\Controllers\API\DashboardController;
 use App\Http\Controllers\API\FactureController;
 use App\Http\Controllers\API\PrestationController;
 use App\Http\Controllers\API\TauxHoraireController;
 use App\Http\Controllers\API\UserController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
+use SebastianBergmann\CodeCoverage\Report\Html\Dashboard;
 
 Route::middleware('auth:sanctum')->group(function () {
 
@@ -72,7 +74,32 @@ Route::middleware('auth:sanctum')->group(function () {
                 ->middleware('can:delete,tauxHoraire');
         });
 
-        
+        Route::prefix('factures')
+        ->as('factures.')
+        ->group(function () {
+            Route::get('/', [FactureController::class, 'index'])
+                ->name('index');
+
+            Route::post('/', [FactureController::class, 'store'])
+                ->name('store');
+                
+            Route::delete('/{facture}', [FactureController::class, 'destroy'])
+                ->name('destroy')
+                ->middleware('can:delete,facture');
+            
+            Route::get('/{facture}/pdf', [FactureController::class, 'pdf'])
+                ->name('pdf');
+
+            Route::patch('/{facture}/paid', [FactureController::class, 'paid'])
+                ->name('paid');
+        });
+
+        Route::prefix('dashboard')
+        ->as('dashboard.')
+        ->group(function () {
+            Route::get('/', [DashboardController::class, 'index'])
+                ->name('index');
+        });
 });
 
 Route::prefix('auth')

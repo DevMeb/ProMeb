@@ -111,11 +111,12 @@
             <tr>
                 <!-- Bloc gauche : Informations du détenteur -->
                 <td class="header-left">
-                    <strong>MEBARKI Younes</strong><br>
-                    90 route de gournay, 93160 Noisy-le-grand, France<br>
-                    Email: mebarki.younes93@gmail.com<br>
-                    Téléphone: 0750258791<br>
-                    SIREN: 940150691
+                    <strong>{{ $user->name }} {{ $user->prenom }}</strong><br>
+                    {{ $user->adresse }}, {{ $user->code_postal }} {{ $user->ville }}, {{ $user->pays }}<br>
+                    {{ $user->email }}<br>
+                    {{ $user->telephone }}<br>
+                    {{ $user->siren }}
+                    {{ $user->nom_societe }}
                 </td>
                 <!-- Bloc droit : Récapitulatif et réceptionneur -->
                 <td class="header-right">
@@ -134,10 +135,10 @@
                         </table>
                     </div>
                     <div class="receiver">
-                        <strong>EBS</strong><br>
-                        21 rue de Fecamp<br>
-                        75012 Paris, France<br>
-                        SIREN: 92042893500018
+                        <strong>{{ $client->nom }}</strong><br>
+                        {{ $client->adresse }}<br>
+                        {{ $client->code_postal }} {{ $client->ville }}, {{ $client->pays }}<br>
+                        {{ $client->siren }}
                     </div>
                 </td>
             </tr>
@@ -164,8 +165,8 @@
                         <td>{{ \Carbon\Carbon::parse($prestation->date)->format('d/m/Y') }}</td>
                         <td>{{ $prestation->horaires }}</td>
                         <td>{{ $prestation->heures }}</td>
-                        <td>{{ number_format($facture->taux_horaire ?? 20, 2, ',', ' ') }} €</td>
-                        <td>{{ number_format($prestation->heures * ($facture->taux_horaire ?? 20), 2, ',', ' ') }} €</td>
+                        <td>{{ number_format($prestation->tauxHoraire->taux ?? 20, 2, ',', ' ') }} €</td>
+                        <td>{{ number_format($prestation->heures * ($prestation->tauxHoraire->taux ?? 20), 2, ',', ' ') }} €</td>
                     </tr>
                     @endforeach
                 </tbody>

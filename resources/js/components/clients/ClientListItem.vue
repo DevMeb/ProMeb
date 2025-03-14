@@ -12,37 +12,20 @@
   
       <!-- Informations générales -->
       <div class="bg-gray-900 p-4 rounded-md space-y-3">
-        <p class="text-gray-300 text-sm flex items-center">
-          🏠 <span class="ml-2 font-semibold text-white">Adresse :</span>
-          <span class="text-indigo-400 ml-1">{{ client.adresse || 'Non renseignée' }}</span>
+        <p class="text-gray-300 text-lg flex items-center">
+          🏠 <span class="ml-2 font-semibold text-white">{{ client.adresse || 'Non renseignée' }}</span>
         </p>
-        <p class="text-gray-300 text-sm flex items-center">
-          📮 <span class="ml-2 font-semibold text-white">Code Postal :</span>
-          <span class="text-indigo-400 ml-1">{{ client.code_postal || 'Non renseigné' }}</span>
+        <p class="text-gray-300 text-lg flex items-center">
+          📮 <span class="ml-2 font-semibold text-white">{{ client.code_postal || 'Non renseigné' }}</span>
         </p>
-        <p class="text-gray-300 text-sm flex items-center">
-          🏙 <span class="ml-2 font-semibold text-white">Ville :</span>
-          <span class="text-indigo-400 ml-1">{{ client.ville || 'Non renseignée' }}</span>
+        <p class="text-gray-300 text-lg flex items-center">
+          🏙 <span class="ml-2 font-semibold text-white">{{ client.ville || 'Non renseignée' }}</span>
         </p>
-        <p class="text-gray-300 text-sm flex items-center">
-          🌍 <span class="ml-2 font-semibold text-white">Pays :</span>
-          <span class="text-indigo-400 ml-1">{{ client.pays || 'Non renseigné' }}</span>
+        <p class="text-gray-300 text-lg flex items-center">
+          🌍 <span class="ml-2 font-semibold text-white">{{ client.pays || 'Non renseigné' }}</span>
         </p>
-        <p class="text-gray-300 text-sm flex items-center">
-          🔢 <span class="ml-2 font-semibold text-white">SIREN :</span>
-          <span class="text-indigo-400 ml-1">{{ client.siren || 'Non renseigné' }}</span>
-        </p>
-      </div>
-  
-      <!-- Dates clés -->
-      <div class="bg-gray-900 p-4 rounded-lg flex flex-col space-y-2">
-        <p class="text-gray-300 text-sm flex items-center">
-          🕒 <span class="ml-2 font-semibold text-white">Ajouté le :</span>
-          <span class="ml-1 text-indigo-300">{{ client.created_at }}</span>
-        </p>
-        <p class="text-gray-300 text-sm flex items-center">
-          🔄 <span class="ml-2 font-semibold text-white">Mis à jour le :</span>
-          <span class="ml-1 text-indigo-300">{{ client.updated_at }}</span>
+        <p class="text-gray-300 text-lg flex items-center">
+          🔢 <span class="ml-2 font-semibold text-white">{{ client.siren || 'Non renseigné' }}</span>
         </p>
       </div>
   

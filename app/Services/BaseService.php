@@ -21,15 +21,9 @@ class BaseService
     {
         try {
             return $callback();
-        } catch (ModelNotFoundException $e) {
-            Log::channel($logChannel)->warning("$errorMessage - Ressource non trouvée : " . $e->getMessage());
-            return response()->json(['error' => 'Ressource non trouvée'], 404);
-        } catch (ValidationException $ve) {
-            Log::channel($logChannel)->info("$errorMessage - Validation échouée : " . json_encode($ve->errors()));
-            return response()->json(['errors' => $ve->errors()], 422);
         } catch (Exception $e) {
             Log::channel($logChannel)->error("$errorMessage - " . $e->getMessage());
-            return response()->json(['error' => $errorMessage], 500);
+            throw $e;
         }
     }
 }

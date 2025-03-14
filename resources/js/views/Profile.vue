@@ -2,7 +2,7 @@
     <div class="container mx-auto max-w-3xl p-6 bg-gray-800 text-white rounded-lg shadow-lg mt-4">
       <!-- Titre -->
       <h2 class="text-3xl font-semibold text-center mb-6 flex items-center justify-center gap-2">
-        <span class="text-indigo-400 text-4xl">👤</span> Profil Utilisateur
+        <span class="text-indigo-400 text-4xl">👤</span>
       </h2>
   
       <p class="text-gray-300 text-center mb-6">
@@ -17,7 +17,7 @@
             <label class="block text-sm font-medium flex items-center gap-2">
               <span class="text-indigo-400">🏷️</span> Nom :
             </label>
-            <input type="text" v-model="userData.name" class="input-field" :disabled="loading" />
+            <input type="text" v-model="userData.name" class="input-field" />
             <p v-if="errors.validationErrors?.name" class="text-red-500 text-xs mt-1">
             {{ errors.validationErrors.name.join(', ') }}
             </p>
@@ -28,7 +28,7 @@
             <label class="block text-sm font-medium flex items-center gap-2">
               <span class="text-indigo-400">📝</span> Prénom :
             </label>
-            <input type="text" v-model="userData.prenom" class="input-field" :disabled="loading" />
+            <input type="text" v-model="userData.prenom" class="input-field" />
             <p v-if="errors.validationErrors?.prenom" class="text-red-500 text-xs mt-1">
             {{ errors.validationErrors.prenom.join(', ') }}
             </p>
@@ -47,7 +47,7 @@
             <label class="block text-sm font-medium flex items-center gap-2">
               <span class="text-indigo-400">📍</span> Adresse :
             </label>
-            <input type="text" v-model="userData.adresse" class="input-field" :disabled="loading" />
+            <input type="text" v-model="userData.adresse" class="input-field" />
             <p v-if="errors.validationErrors?.adresse" class="text-red-500 text-xs mt-1">
             {{ errors.validationErrors.adresse.join(', ') }}
             </p>
@@ -58,7 +58,7 @@
             <label class="block text-sm font-medium flex items-center gap-2">
               <span class="text-indigo-400">🏙️</span> Code Postal :
             </label>
-            <input type="text" v-model="userData.code_postal" class="input-field" :disabled="loading" />
+            <input type="text" v-model="userData.code_postal" class="input-field" />
             <p v-if="errors.validationErrors?.code_postal" class="text-red-500 text-xs mt-1">
             {{ errors.validationErrors.code_postal.join(', ') }}
             </p>
@@ -69,7 +69,7 @@
             <label class="block text-sm font-medium flex items-center gap-2">
               <span class="text-indigo-400">🌆</span> Ville :
             </label>
-            <input type="text" v-model="userData.ville" class="input-field" :disabled="loading" />
+            <input type="text" v-model="userData.ville" class="input-field" />
             <p v-if="errors.validationErrors?.ville" class="text-red-500 text-xs mt-1">
             {{ errors.validationErrors.ville.join(', ') }}
             </p>
@@ -80,7 +80,7 @@
             <label class="block text-sm font-medium flex items-center gap-2">
               <span class="text-indigo-400">🌍</span> Pays :
             </label>
-            <input type="text" v-model="userData.pays" class="input-field" :disabled="loading" />
+            <input type="text" v-model="userData.pays" class="input-field" />
             <p v-if="errors.validationErrors?.pays" class="text-red-500 text-xs mt-1">
             {{ errors.validationErrors.pays.join(', ') }}
             </p>
@@ -91,7 +91,7 @@
             <label class="block text-sm font-medium flex items-center gap-2">
               <span class="text-indigo-400">📞</span> Téléphone :
             </label>
-            <input type="text" v-model="userData.telephone" class="input-field" :disabled="loading" />
+            <input type="text" v-model="userData.telephone" class="input-field" />
             <p v-if="errors.validationErrors?.telephone" class="text-red-500 text-xs mt-1">
             {{ errors.validationErrors.telephone.join(', ') }}
             </p>
@@ -102,7 +102,7 @@
             <label class="block text-sm font-medium flex items-center gap-2">
               <span class="text-indigo-400">🏢</span> SIREN :
             </label>
-            <input type="text" v-model="userData.siren" class="input-field" :disabled="loading" />
+            <input type="text" v-model="userData.siren" class="input-field" />
             <p v-if="errors.validationErrors?.siren" class="text-red-500 text-xs mt-1">
             {{ errors.validationErrors.siren.join(', ') }}
             </p>
@@ -113,7 +113,7 @@
             <label class="block text-sm font-medium flex items-center gap-2">
               <span class="text-indigo-400">🏛️</span> Nom de la société :
             </label>
-            <input type="text" v-model="userData.nom_societe" class="input-field" :disabled="loading" />
+            <input type="text" v-model="userData.nom_societe" class="input-field" />
             <p v-if="errors.validationErrors?.nom_societe" class="text-red-500 text-xs mt-1">
             {{ errors.validationErrors.nom_societe.join(', ') }}
             </p>

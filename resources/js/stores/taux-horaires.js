@@ -71,7 +71,6 @@ export const useTauxHorairesStore = defineStore('taux-horaires', () => {
         errors.value[operation] = err.response?.data?.message || "Une erreur est survenue.";
         notify('error', errors.value[operation]);
       }
-      throw err;
     } finally {
       setLoading(operation, false);
     }

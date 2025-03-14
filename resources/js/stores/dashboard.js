@@ -15,7 +15,6 @@ export const useDashboardStore = defineStore('dashboard', () => {
       // On passe la période (ex: "2025-03") en paramètre
       const response = await axios.get('/api/dashboard', {
         params: { month: period.value },
-        withCredentials: true,
       });
       dashboardData.value = response.data;
     } catch (err) {

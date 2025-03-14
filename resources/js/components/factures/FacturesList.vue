@@ -10,9 +10,9 @@
       </div>
   
       <!-- ❌ Erreur -->
-      <div v-else-if="error" class="flex justify-center my-6 bg-red-500 text-white px-6 py-3 rounded-lg shadow-lg">
+      <div v-else-if="errors.fetch" class="flex justify-center my-6 bg-red-500 text-white px-6 py-3 rounded-lg shadow-lg">
         <span class="text-xl">❌</span>
-        <p class="text-lg font-medium ml-2">{{ error }}</p>
+        <p class="text-lg font-medium ml-2">{{ errors.fetch }}</p>
       </div>
   
       <!-- 📭 Aucune facture trouvée -->
@@ -35,7 +35,7 @@
   
   const invoicesStore = useInvoicesStore();
   const { fetchInvoices } = invoicesStore;
-  const { invoices, error, loading } = storeToRefs(invoicesStore);
+  const { invoices, errors, loading } = storeToRefs(invoicesStore);
   
   onMounted(() => {
     fetchInvoices();

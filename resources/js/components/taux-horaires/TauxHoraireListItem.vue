@@ -4,30 +4,10 @@
       <div class="flex justify-between items-center border-b pb-3">
         <h2 class="text-xl font-semibold text-white flex items-center gap-2">
           <!-- Icône taux horaire -->
-          <span class="text-indigo-300 text-2xl">⏳</span>
+          <span class="text-indigo-300 text-2xl">💰</span>
           <!-- Nom du taux horaire -->
-          {{ tauxHoraire.nom }}
+          {{ tauxHoraire.taux }} €/h
         </h2>
-      </div>
-  
-      <!-- Informations générales -->
-      <div class="bg-gray-900 p-4 rounded-md space-y-3">
-        <p class="text-gray-300 text-sm flex items-center">
-          💰 <span class="ml-2 font-semibold text-white">Tarif :</span>
-          <span class="text-indigo-400 ml-1">{{ tauxHoraire.taux }} €/h</span>
-        </p>
-      </div>
-  
-      <!-- Dates clés -->
-      <div class="bg-gray-900 p-4 rounded-lg flex flex-col space-y-2">
-        <p class="text-gray-300 text-sm flex items-center">
-          🕒 <span class="ml-2 font-semibold text-white">Ajouté le :</span>
-          <span class="ml-1 text-indigo-300">{{ tauxHoraire.created_at }}</span>
-        </p>
-        <p class="text-gray-300 text-sm flex items-center">
-          🔄 <span class="ml-2 font-semibold text-white">Mis à jour le :</span>
-          <span class="ml-1 text-indigo-300">{{ tauxHoraire.updated_at }}</span>
-        </p>
       </div>
   
       <!-- Actions -->

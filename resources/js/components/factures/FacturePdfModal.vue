@@ -18,8 +18,8 @@
       </h2>
 
       <!-- Erreur -->
-      <div v-if="error" class="text-red-500 text-center">
-        <p>❌ {{ error }}</p>
+      <div v-if="errors.pdf" class="text-red-500 text-center">
+        <p>❌ {{ errors.pdf }}</p>
       </div>
       <!-- Sur mobile : lien de téléchargement -->
       <div v-else-if="isMobile && pdfUrl" class="flex flex-col items-center justify-center space-y-4 h-full">
@@ -66,22 +66,15 @@ const emit = defineEmits(["close"]);
 
 const invoicesStore = useInvoicesStore();
 const { getInvoicePdf } = invoicesStore;
-const { loading } = storeToRefs(invoicesStore);
+const { loading, errors } = storeToRefs(invoicesStore);
 
 const pdfUrl = ref("");
-const error = ref(null);
 
 // Détecter un mobile basique via userAgent
 const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
 
 onMounted(async () => {
-  try {
-    error.value = null;
-    pdfUrl.value = null;
     pdfUrl.value = await getInvoicePdf(props.invoice.id);
-  } catch (err) {
-    error.value = "Impossible de charger le PDF.";
-  }
 });
 
 function close() {

@@ -17,6 +17,11 @@ class Facture extends Model
         'statut',
         'paye_le',
         'envoye_le',
+        'user_id',
+    ];
+
+    protected $casts = [
+        'paye_le' => 'date:Y-m-d',
     ];
 
     protected function casts(): array

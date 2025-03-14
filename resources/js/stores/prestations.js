@@ -51,7 +51,7 @@ export const usePrestationsStore = defineStore('prestations', () => {
   });
 
   const unbilledPrestations = computed(() => {
-    return prestations.value.filter((prestation) => !prestation.facture_id);
+    return prestations.value.filter((prestation) => prestation.facture_id == null);
   });
 
   function clearErrors(operation) {
@@ -80,7 +80,6 @@ export const usePrestationsStore = defineStore('prestations', () => {
         errors.value[operation] = err.response?.data?.message || "Une erreur est survenue.";
         notify('error', errors.value[operation]);
       }
-      throw err;
     } finally {
       setLoading(operation, false);
     }
