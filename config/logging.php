@@ -65,6 +65,34 @@ return [
             'replace_placeholders' => true,
         ],
 
+        // Logs pour les prestations
+        'prestation' => [
+            'driver' => 'single',
+            'path' => storage_path('logs/prestation.log'),
+            'level' => env('LOG_LEVEL', 'debug'),
+        ],
+
+        // Logs pour les factures
+        'facture' => [
+            'driver' => 'single',
+            'path' => storage_path('logs/facture.log'),
+            'level' => env('LOG_LEVEL', 'debug'),
+        ],
+
+        // Logs pour les factures
+        'client' => [
+            'driver' => 'single',
+            'path' => storage_path('logs/client.log'),
+            'level' => env('LOG_LEVEL', 'debug'),
+        ],
+
+        // Logs pour les factures
+        'taux_horaire' => [
+            'driver' => 'single',
+            'path' => storage_path('logs/taux_horaire.log'),
+            'level' => env('LOG_LEVEL', 'debug'),
+        ],
+
         'daily' => [
             'driver' => 'daily',
             'path' => storage_path('logs/laravel.log'),

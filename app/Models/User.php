@@ -21,6 +21,15 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'prenom',
+        'adresse',
+        'code_postal',
+        'ville',
+        'pays',
+        'telephone',
+        'siren',
+        'nom_societe',
+        'iban',
     ];
 
     /**
@@ -44,5 +53,15 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+
+    public function prestations()
+    {
+        return $this->hasMany(Prestation::class);
+    }
+
+    public function factures()
+    {
+        return $this->hasMany(Facture::class);
     }
 }

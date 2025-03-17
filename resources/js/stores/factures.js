@@ -7,14 +7,11 @@ import { useDashboardStore } from "@/stores/dashboard";
 
 
 export const useInvoicesStore = defineStore('invoices', () => {
-  // Liste des factures
   const invoices = ref([]);
-  // Erreurs pour chaque opération
   const errors = ref({});
-  // États de chargement par opération
   const loading = ref({});
 
-  const dashboardStore = useDashboardStore(); 
+  const dashboardStore = useDashboardStore();
 
   function clearErrors(operation) {
     if (operation) {
@@ -28,142 +25,103 @@ export const useInvoicesStore = defineStore('invoices', () => {
     loading.value[operation] = state;
   }
 
-  async function apiCall({ operation, request, onSuccess }) {
+  async function apiCall({ operation, request, onSuccess, onError }) {
     clearErrors(operation);
     setLoading(operation, true);
     try {
       const response = await request();
-      if (onSuccess) onSuccess(response);
-      return response;
+      return onSuccess ? onSuccess(response) : response;
     } catch (err) {
-      if (err.response?.status === 422) {
+      console.error(err)
+      if (onError) {
+        onError(err);
+      } else if (err.response?.status === 422) {
         errors.value.validationErrors = err.response.data.errors;
       } else {
         errors.value[operation] = err.response?.data?.message || "Une erreur est survenue.";
         notify('error', errors.value[operation]);
       }
-      console.error(err);
-      throw err;
     } finally {
       setLoading(operation, false);
     }
   }
 
-  // Récupère la liste des factures via l'API
   async function fetchInvoices() {
     return apiCall({
       operation: 'fetch',
-      request: () => axios.get('/api/factures', { withCredentials: true }),
+      request: () => axios.get('/api/factures'),
       onSuccess: (response) => {
-        invoices.value = response.data;
+        invoices.value = response.data.factures;
       },
     });
   }
 
-  // Ajoute une facture (si vous avez besoin de créer une facture sans PDF, sinon on utilise la méthode store de l'InvoiceController)
   async function addInvoice(invoice) {
     return apiCall({
       operation: 'add',
       request: () => axios.post('/api/factures', invoice),
       onSuccess: (response) => {
-        invoices.value.push(response.data.data || response.data);
+        invoices.value.push(response.data.facture);
         
-        // Si on ajoute une facture depuis le dashboard on met à jour les données
         if(dashboardStore.dashboardData) {
           dashboardStore.fetchDashboard();
         }
-        notify('success', response.data.message || 'Facture ajoutée avec succès.');
+
+        notify('success', response.data.message);
       },
     });
   }
 
-  // Supprime une facture
   async function deleteInvoice(invoiceId) {
     return apiCall({
       operation: 'delete',
       request: () => axios.delete(`/api/factures/${invoiceId}`),
       onSuccess: (response) => {
         invoices.value = invoices.value.filter(i => i.id !== invoiceId);
-        notify('success', response.data.message || 'Facture supprimée avec succès.');
+        notify('success', response.data.message);
       },
     });
   }
 
-  // Cache pour les URLs Blob des PDFs
-  const pdfCache = new Map();
-
-  // Récupère le PDF d'une facture
+  // Récupère et affiche le PDF d'une facture
   async function getInvoicePdf(invoiceId) {
-    if (pdfCache.has(invoiceId)) {
-      return pdfCache.get(invoiceId);
-    }
-    try {
-      const response = await apiCall({
-        operation: 'pdf',
-        request: () => axios.get(`/api/factures/${invoiceId}/pdf`, { 
-          withCredentials: true,
-          responseType: 'blob' 
-        }),
-      });
-      if (!response || !response.data) {
-        throw new Error("Réponse invalide lors de la récupération du PDF.");
+    return apiCall({
+      operation: "pdf",
+      request: () => axios.get(`/api/factures/${invoiceId}/pdf`, { responseType: "blob" }),
+      onSuccess: (response) => {
+        return URL.createObjectURL(new Blob([response.data], { type: "application/pdf" }));
+      },
+      onError: async (err) => {
+        const contentType = err.response.headers["content-type"];
+        if (contentType === "application/json") {
+          const errorText = await err.response.data.text();
+          const errorJson = JSON.parse(errorText);
+          errors.value['pdf'] = 'Impossible de charger le PDF'
+          notify('error', errorJson.message);
+        } 
       }
-      const blobUrl = URL.createObjectURL(new Blob([response.data], { type: 'application/pdf' }));
-      pdfCache.set(invoiceId, blobUrl);
-      return blobUrl;
-    } catch (err) {
-      console.error(`Erreur lors de la récupération du PDF de la facture ${invoiceId} :`, err);
-      throw new Error("Impossible de récupérer le PDF.");
-    }
-  }
-
-  async function sendEmail(invoiceId, emails) {
-    return apiCall({
-      operation: 'sendEmail',
-      request: () => axios.post(`/api/factures/${invoiceId}/send-email`, { emails }),
-      onSuccess: (response) => {
-        const updatedInvoice = response.data.data;
-        const index = invoices.value.findIndex(i => i.id === invoiceId);
-
-        if (index !== -1) {
-          invoices.value[index] = updatedInvoice;
-        } else {
-          console.warn(`⚠️ Facture ${invoiceId} non trouvée dans le store invoices.`);
-        }
-
-        // Si on envoi un mail depuis le dashboard on met à jour les données
-        if(dashboardStore.dashboardData) {
-          dashboardStore.fetchDashboard();
-        }
-
-        notify('success', response.data.message || 'Facture envoyée avec succès.');
-      },
     });
   }
 
-  async function invoicePaid(invoice) {
+  async function paid(invoiceId) {
     return apiCall({
-      operation: 'paid',
-      request: () => axios.patch(`/api/factures/${invoice.id}/paid`),
+      operation: "paid",
+      request: () => axios.patch(`/api/factures/${invoiceId}/paid`),
       onSuccess: (response) => {
-        const updatedInvoice = response.data.data;
-        const index = invoices.value.findIndex(i => i.id === invoice.id);
-
+        if (dashboardStore.dashboardData) {
+          const factureHasPaid = response.data.facture
+          dashboardStore.factureFromUnpaidToPaid(factureHasPaid)
+        }
+        
+        const index = invoices.value.findIndex(f => f.id === invoiceId);
         if (index !== -1) {
-          invoices.value[index] = updatedInvoice;
-        } else {
-          console.warn(`⚠️ Facture ${invoice.id} non trouvée dans le store invoices.`);
+          invoices.value[index] = response.data.facture;
         }
-
-        // Si on marque une facture comme payée depuis le dashboard on met à jour les données
-        if(dashboardStore.dashboardData) {
-          dashboardStore.fetchDashboard();
-        }
-
-        notify('success', response.data.message || 'Facture marquée comme payée.');
-      },
+        notify('success', response.data.message);
+      }
     });
   }
+
 
   return { 
     invoices, 
@@ -172,9 +130,8 @@ export const useInvoicesStore = defineStore('invoices', () => {
     fetchInvoices,
     addInvoice, 
     deleteInvoice, 
-    getInvoicePdf, 
     clearErrors,
-    sendEmail,
-    invoicePaid,
+    getInvoicePdf,
+    paid,
   };
 });

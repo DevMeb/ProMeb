@@ -111,12 +111,11 @@
             <tr>
                 <!-- Bloc gauche : Informations du détenteur -->
                 <td class="header-left">
-                    <strong>MEBARKI Younes</strong><br>
-                    90 route de gournay<br>
-                    93160 Noisy-le-grand<br>
-                    Email: mebarki.younes93@gmail.com<br>
-                    Téléphone: 0750258791<br>
-                    SIREN: 940150691
+                    <strong>{{ $user->name }} {{ $user->prenom }} - {{ $user->nom_societe }}</strong><br>
+                    {{ $user->adresse }}<br>
+                    {{ $user->ville }} {{ $user->code_postal }} {{ $user->pays }}<br>
+                    {{ $user->email }} {{ $user->telephone }}<br>
+                    {{ $user->siren }}<br>
                 </td>
                 <!-- Bloc droit : Récapitulatif et réceptionneur -->
                 <td class="header-right">
@@ -135,10 +134,10 @@
                         </table>
                     </div>
                     <div class="receiver">
-                        <strong>EBS</strong><br>
-                        21 rue de Fecamp<br>
-                        75012 Paris, France<br>
-                        SIREN: 92042893500018
+                        <strong>{{ $client->nom }}</strong><br>
+                        {{ $client->adresse }}<br>
+                        {{ $client->code_postal }} {{ $client->ville }}, {{ $client->pays }}<br>
+                        {{ $client->siren }}
                     </div>
                 </td>
             </tr>
@@ -165,8 +164,8 @@
                         <td>{{ \Carbon\Carbon::parse($prestation->date)->format('d/m/Y') }}</td>
                         <td>{{ $prestation->horaires }}</td>
                         <td>{{ $prestation->heures }}</td>
-                        <td>{{ number_format($facture->taux_horaire ?? 20, 2, ',', ' ') }} €</td>
-                        <td>{{ number_format($prestation->heures * ($facture->taux_horaire ?? 20), 2, ',', ' ') }} €</td>
+                        <td>{{ number_format($prestation->tauxHoraire->taux ?? 20, 2, ',', ' ') }} €</td>
+                        <td>{{ number_format($prestation->heures * ($prestation->tauxHoraire->taux ?? 20), 2, ',', ' ') }} €</td>
                     </tr>
                     @endforeach
                 </tbody>
@@ -185,10 +184,7 @@
         <div class="bank-details">
             <p>
                 <strong>Coordonnées bancaires pour réception du paiement :</strong><br>
-                Banque: BoursoBank, 44 rue Traversière, CS 80134, 92772 BOULOGNE-BILLANCOURT CEDEX, France<br>
-                BIC / Swift: BOUS FRPP XXX<br>
-                IBAN: FR76 4061 8804 4500 0407 6686 026<br>
-                RIB: Banque: 40618, Guichet: 80445, N° de compte: 00040766860, Clé Rib: 26
+                RIB: {{ $user->iban }}
             </p>
         </div>
 

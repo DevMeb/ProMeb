@@ -41,7 +41,7 @@
     
   <script setup>
   import { usePrestationsStore } from '@/stores/prestations';
-  import dayjs from 'dayjs';
+  import { formatDate } from '@/utils'
   
   const props = defineProps({
     prestation: {
@@ -58,11 +58,6 @@
   // Fonction de fermeture de la modal
   function close() {
     emit("close");
-  }
-  
-  // Fonction pour formater les dates au format "DD/MM/YYYY"
-  function formatDate(date) {
-    return dayjs(date).format('DD/MM/YYYY');
   }
   
   // Fonction pour supprimer la prestation

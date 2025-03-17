@@ -19,28 +19,35 @@
 
       <!-- Liste des prestations -->
       <div class="mt-6">
-        <h3 class="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+        <h3 class="flex flex-col text-lg font-semibold text-white mb-4 flex items-center gap-4">
           📋 Prestations disponibles
           <span class="text-sm bg-gray-800 text-gray-400 px-3 py-1 rounded-full">
             {{ unbilledPrestations.length }} non facturées
           </span>
         </h3>
-        
+
+        <!-- <PrestationsFilters class="mb-4" /> -->
+
         <!-- État vide -->
         <div 
           v-if="unbilledPrestations.length === 0" 
           class="p-6 text-center rounded-xl border-2 border-dashed border-gray-800 hover:border-indigo-500 transition-colors"
         >
           <div class="text-4xl mb-3">🎉</div>
-          <p class="text-gray-400">Toutes les prestations sont facturées !</p>
+          <p class="text-gray-400">Aucune prestations à facturées !</p>
         </div>
 
         <!-- Liste des prestations -->
         <div v-else class="space-y-3">
+          <label class="flex items-center justify-center text-xl text-white mb-4">
+            <input type="checkbox" v-model="selectAll" @change="toggleAll" class="mr-2">
+            Tout sélectionner
+          </label>
+
           <label
             v-for="prestation in unbilledPrestations"
             :key="prestation.id"
-            class="group flex items-start p-4 rounded-xl border border-gray-800 hover:border-indigo-500 bg-gray-800/50 cursor-pointer transition-all"
+            class="group flex items-center p-4 rounded-xl border border-gray-800 hover:border-indigo-500 bg-gray-800/50 cursor-pointer transition-all"
             :class="{ 'border-indigo-500 bg-indigo-500/10': selectedPrestations.includes(prestation) }"
           >
             <input
@@ -51,35 +58,42 @@
             />
             
             <div class="ml-4 flex-1">
-              <div class="flex items-center gap-3">
-                <span class="font-mono text-sm text-indigo-400">#{{ prestation.id }}</span>
-                <span class="text-xs bg-gray-900 text-gray-400 px-2 py-1 rounded-full">
-                  {{ formatDate(prestation.date) }}
-                </span>
-              </div>
-              
-              <div class="grid grid-cols-2 gap-2 mt-2">
-                <div class="flex items-center gap-2 text-sm">
-                  <span class="text-gray-500">🕒</span>
-                  <span class="text-gray-300">{{ prestation.heures }}h</span>
+                <div class="flex items-center justify-center gap-3">
+                  <span class="font-bold text-md bg-gray-900 text-gray-400 px-2 py-1 rounded-full">
+                    {{ formatDate(prestation.date) }}
+                  </span>
                 </div>
-                <div class="flex items-center gap-2 text-sm">
-                  <span class="text-gray-500">📍</span>
-                  <span class="text-gray-300 truncate">{{ prestation.adresse }}</span>
+                
+                <div class="grid grid-cols-2 gap-2 mt-2 font-bold">
+                  <div class="flex items-center justify-center gap-2 text-lg">
+                    <span class="text-gray-500">🕒</span>
+                    <span class="text-gray-300">{{ prestation.heures }}h</span>
+                  </div>
+                  <div class="flex items-center justify-center  gap-2 text-lg">
+                    <span class="text-gray-500">📍</span>
+                    <span class="text-gray-300 truncate">{{ prestation.adresse }}</span>
+                  </div>
+                  <div class="flex items-center justify-center  gap-2 text-lg">
+                    <span class="text-gray-500">👤</span>
+                    <span class="text-gray-300 truncate">{{ prestation.client.nom }}</span>
+                  </div>
+                  <div class="flex items-center justify-center  gap-2 text-lg">
+                    <span class="text-gray-500">💰</span>
+                    <span class="text-gray-300 truncate">{{ prestation.taux_horaire.taux }} € / h</span>
+                  </div>
                 </div>
-              </div>
             </div>
           </label>
         </div>
       </div>
 
       <!-- Récapitulatif -->
-      <div class="mt-6 bg-gray-800 p-4 rounded-xl border border-gray-700">
+      <div v-if="selectedPrestations.length !==0" class="mt-6 bg-gray-800 p-4 rounded-xl border border-gray-700">
         <h3 class="text-lg font-semibold text-white mb-3 flex items-center gap-2">
           📝 Récapitulatif
         </h3>
         
-        <div v-if="selectedPrestations.length" class="space-y-2">
+        <div class="space-y-2">
           <div class="flex justify-between items-center">
             <span class="text-gray-400">Prestations sélectionnées :</span>
             <span class="text-white font-medium">{{ selectedPrestations.length }}</span>
@@ -93,14 +107,10 @@
             <span class="text-green-400 font-bold">{{ totalHT }} €</span>
           </div>
         </div>
-        
-        <div v-else class="text-center py-3 text-gray-500">
-          Aucune prestation sélectionnée
-        </div>
       </div>
 
       <!-- Actions -->
-      <div class="mt-6 flex flex-col sm:flex-row justify-end gap-3">
+      <div v-if="selectedPrestations.length !==0" class="mt-6 flex flex-col sm:flex-row justify-end gap-3">
         <button 
           @click="close" 
           class="px-6 py-3 rounded-xl font-semibold transition-all bg-gray-700 hover:bg-gray-600 text-white"
@@ -132,9 +142,10 @@
   <script setup>
   import { ref, computed, onMounted } from "vue";
   import { storeToRefs } from "pinia";
-  import dayjs from "dayjs";
   import { usePrestationsStore } from "@/stores/prestations";
   import { useInvoicesStore } from "@/stores/factures";
+  import { PrestationsFilters } from "@/components/prestations/"
+  import { formatDate } from '@/utils'
   
   // Props et événements
   const emit = defineEmits(["close"]);
@@ -147,13 +158,19 @@
   // Charger les prestations
   onMounted(() => {
     fetchPrestations();
-  });
-  
-  // Filtrer les prestations non facturées
-  
+  });  
   
   // Sélection des prestations
   const selectedPrestations = ref([]);
+  const selectAll = ref(false);
+
+  const toggleAll = () => {
+    if (selectAll.value) {
+      selectedPrestations.value = [...unbilledPrestations.value];
+    } else {
+      selectedPrestations.value = [];
+    }
+  };
   
   // Calcul du total des heures et du montant HT
   const totalHeures = computed(() => {
@@ -161,14 +178,12 @@
       .reduce((sum, prestation) => sum + parseFloat(prestation.heures), 0);
   });
   
-  const tauxHoraire = 20;
   const totalHT = computed(() => {
-    return (totalHeures.value * tauxHoraire);
+    return selectedPrestations.value.reduce((total, prestation) => {
+      return total + (prestation.taux_horaire.taux * prestation.heures)
+    }, 0);
   });
-  
-  // Formater la date
-  const formatDate = (date) => dayjs(date).format("DD/MM/YYYY");
-  
+    
   // Fonction de création de facture
   async function createInvoiceHandler() {
     if (!selectedPrestations.value.length) return;
@@ -177,12 +192,8 @@
       prestations: selectedPrestations.value.map((p) => p.id),
     };
   
-    try {
-      await addInvoice(payload);
-      emit("close"); // Fermer la modale après succès
-    } catch (err) {
-      console.error("Erreur lors de la création de la facture :", err);
-    }
+    await addInvoice(payload);
+    close();
   }
   
   // Fonction pour fermer la modale

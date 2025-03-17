@@ -2,7 +2,6 @@ import { defineStore } from 'pinia';
 import { ref, computed, watch } from 'vue';
 import axios from 'axios';
 import { notify } from '@/utils';
-import { useStorage } from '@vueuse/core';
 import dayjs from 'dayjs';
 
 export const usePrestationsStore = defineStore('prestations', () => {
@@ -11,8 +10,10 @@ export const usePrestationsStore = defineStore('prestations', () => {
   const loading = ref({});
 
   // Filtres pour les prestations (par exemple, filtrer par date et adresse)
-  const activeFilters = useStorage("prestation-filters", {
+  const activeFilters = ref({
     month_year: '',
+    client_id: '',
+    taux_horaire_id: '',
   });
 
   // Mise à jour des filtres
@@ -29,9 +30,14 @@ export const usePrestationsStore = defineStore('prestations', () => {
   const filteredPrestations = ref([]);
   watch([prestations, activeFilters], () => {
     filteredPrestations.value = prestations.value.filter(prestation => {
-      const { month_year } = activeFilters.value;
+      const { month_year, client_id, taux_horaire_id } = activeFilters.value;
 
       if (month_year && dayjs(prestation.date).format('YYYY-MM') !== month_year) return false;
+
+      if (client_id && prestation.client_id !== client_id) return false;
+
+      if (taux_horaire_id && prestation.taux_horaire_id !== taux_horaire_id) return false;
+
 
       return true;
     });
@@ -45,7 +51,13 @@ export const usePrestationsStore = defineStore('prestations', () => {
   });
 
   const unbilledPrestations = computed(() => {
-    return prestations.value.filter((prestation) => !prestation.facture_id);
+    return prestations.value.filter((prestation) => { 
+      
+      console.log('PRESTATION', prestation)
+      console.log(prestation.facture_id)
+      return prestation.facture_id == null
+
+    });
   });
 
   function clearErrors(operation) {
@@ -74,7 +86,6 @@ export const usePrestationsStore = defineStore('prestations', () => {
         errors.value[operation] = err.response?.data?.message || "Une erreur est survenue.";
         notify('error', errors.value[operation]);
       }
-      throw err;
     } finally {
       setLoading(operation, false);
     }
@@ -86,7 +97,7 @@ export const usePrestationsStore = defineStore('prestations', () => {
       request: () => axios.get('/api/prestations'),
       onSuccess: (response) => {
         // Si l'API renvoie les données dans une clé data, ajustez ici
-        prestations.value = response.data;
+        prestations.value = response.data.prestations;
       },
     });
   }
@@ -96,8 +107,8 @@ export const usePrestationsStore = defineStore('prestations', () => {
       operation: 'add',
       request: () => axios.post('/api/prestations', prestation),
       onSuccess: (response) => {
-        prestations.value.push(response.data);
-        notify('success', response.data.message || 'Prestation ajoutée avec succès.');
+        prestations.value.push(response.data.prestation);
+        notify('success', response.data.message);
       },
     });
   }
@@ -109,9 +120,9 @@ export const usePrestationsStore = defineStore('prestations', () => {
       onSuccess: (response) => {
         const index = prestations.value.findIndex(p => p.id === prestation.id);
         if (index !== -1) {
-          prestations.value[index] = response.data.data || response.data;
+          prestations.value[index] = response.data.prestation;
         }
-        notify('success', response.data.message || 'Prestation mise à jour avec succès.');
+        notify('success', response.data.message);
       },
     });
   }
@@ -122,7 +133,7 @@ export const usePrestationsStore = defineStore('prestations', () => {
       request: () => axios.delete(`/api/prestations/${prestationId}`),
       onSuccess: (response) => {
         prestations.value = prestations.value.filter(p => p.id !== prestationId);
-        notify('success', response.data.message || 'Prestation supprimée avec succès.');
+        notify('success', response.data.message);
       },
     });
   }

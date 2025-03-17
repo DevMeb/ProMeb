@@ -17,7 +17,10 @@ return new class extends Migration
             $table->integer('heures');
             $table->string('horaires');
             $table->string('adresse');
-            $table->foreignId('facture_id')->nullable()->constrained()->onDelete('cascade');
+            $table->foreignId('facture_id')->nullable()->constrained('factures')->nullOnDelete();
+            $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
+            $table->foreignId('client_id')->constrained('clients')->onDelete('cascade');
+            $table->foreignId('taux_horaire_id')->constrained('taux_horaires')->onDelete('cascade');
             $table->timestamps();
         });
     }

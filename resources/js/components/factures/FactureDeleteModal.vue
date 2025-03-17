@@ -39,7 +39,6 @@
   
   <script setup>
   import { useInvoicesStore } from '@/stores/factures';
-  import { useToast } from 'vue-toastification';
   
   const props = defineProps({
     invoice: Object,
@@ -49,9 +48,7 @@
   
   const invoicesStore = useInvoicesStore();
   const { deleteInvoice } = invoicesStore;
-  
-  const toast = useToast();
-  
+    
   function close() {
     emit('close');
   }

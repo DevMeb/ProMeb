@@ -13,28 +13,51 @@
           
           <!-- Détails de la facturation -->
           <div class="bg-gray-900 p-4 rounded-md space-y-2">
-            <p class="text-gray-300 text-sm">
-              ⏱️ <span class="font-semibold text-white">Nombre d'heures :</span> {{ invoice.heures_total }} h
+            <p class="text-gray-300 text-lg">
+              ⏱️ <span class="font-semibold text-white">{{ invoice.heures_total }} h</span>  
             </p>
-            <p class="text-gray-300 text-sm">
-              💶 <span class="font-semibold text-white">Montant :</span> {{ invoice.montant_total }} €
+            <p class="text-gray-300 text-lg">
+              💶 <span class="font-semibold text-white">{{ invoice.montant_total }} €</span> 
             </p>
           </div>
           
+          <!-- Informations Client -->
+          <div class="bg-gray-900 p-4 rounded-lg flex flex-col space-y-3">
+            <h3 class="text-lg font-semibold text-white flex items-center gap-2">
+              <span class="text-indigo-300 text-xl">👤</span>
+              {{ invoice.prestations[0].client.nom }}
+            </h3>
+          </div>
+
+          <!-- Informations Prestations -->
+          <div class="bg-gray-900 p-4 rounded-lg flex flex-col space-y-3">
+            <h3 class="text-lg font-semibold text-white flex items-center gap-2">
+              <span class="text-indigo-300 text-xl">💼</span>
+              Prestations
+            </h3>
+
+            <div v-for="prestation in invoice.prestations" :key="prestation.id" class="bg-gray-800 p-3 rounded-md grid grid-cols-2">
+              <p class="text-gray-300 text-md flex items-center">
+                📆 <span class="ml-2 font-semibold text-white">{{ formatDate(prestation.date) }}</span>
+              </p>
+              <p class="text-gray-300 text-md flex items-center">
+                💵 <span class="ml-2 font-semibold text-white">{{ prestation.heures * prestation.taux_horaire.taux }} €</span>
+              </p>
+              <p class="text-gray-300 text-md flex items-center">
+                💰 <span class="ml-2 font-semibold text-white">{{ prestation.taux_horaire.taux }} € / h</span>
+              </p>
+              <p class="text-gray-300 text-md flex items-center">
+                ⏳ <span class="ml-2 font-semibold text-white">{{ prestation.heures }} h</span>
+              </p>
+              
+            </div>
+          </div>
 
         <!-- ⏳ Statuts et dates clés -->
-        <div class="bg-gray-900 p-4 rounded-md grid grid-cols-2 gap-4">
-          <p class="text-gray-300 text-sm">
-              🕒 <span class="font-semibold text-white">Créée le :</span> {{ invoice.created_at }}
-          </p>
-          <p class="text-gray-300 text-sm">
-              🔄 <span class="font-semibold text-white">Mise à jour le :</span> {{ invoice.updated_at }}
-          </p>
-          <p class="text-gray-300 text-sm">
-              💰 <span class="font-semibold text-white">Payée le :</span> {{ dayjs(invoice.paye_le).format('DD/MM/YYYY HH:mm:ss') || "Non payée" }}
-          </p>
-          <p class="text-gray-300 text-sm">
-              📩 <span class="font-semibold text-white">Émise le :</span> {{ dayjs(invoice.envoye_le).format('DD/MM/YYYY HH:mm:ss') || "Non envoyé" }}
+        <div class="bg-gray-900 p-4 rounded-md
+        ">
+          <p class="text-gray-300 text-lg">
+            ✅ <span class="font-semibold text-white">Payée le :</span> {{ invoice.paye_le !== null ? invoice.paye_le : "Non payée" }}
           </p>
       </div>
 
@@ -44,12 +67,8 @@
               📄 Voir
           </button>
 
-          <button v-if="invoice.statut === 'en_attente_envoi'" @click="showDeleteModal = true" class="btn-action bg-red-500">
+          <button v-if="invoice.statut === 'en_attente_paiement'" @click="showDeleteModal = true" class="btn-action bg-red-500">
               🗑️ Supprimer
-          </button>
-
-          <button v-if="invoice.statut === 'en_attente_envoi'" @click="showMailModal = true" class="btn-action bg-yellow-500">
-              📩 Envoyer
           </button>
 
           <button v-if="invoice.statut === 'en_attente_paiement'" @click="markAsPaid(invoice)" :disabled="loading.paid"
@@ -74,13 +93,12 @@ import {
     FactureMailModal,
 } from '@/components/factures/'
 
-import dayjs from 'dayjs'
-
+import { formatDate } from '@/utils'
 import { useInvoicesStore } from '@/stores/factures'
 import { storeToRefs } from 'pinia'
 
 const invoicesStore = useInvoicesStore()
-const { invoicePaid } = invoicesStore
+const { paid } = invoicesStore
 const { loading } = storeToRefs(invoicesStore)
 
 const props = defineProps({
@@ -96,10 +114,8 @@ const showMailModal = ref(false)
  */
  function getStatusBadge(status) {
   switch (status) {
-    case 'en_attente_envoi':
-      return "bg-yellow-500 text-white px-3 py-1 rounded-full text-xs";
     case 'en_attente_paiement':
-      return "bg-blue-500 text-white px-3 py-1 rounded-full text-xs";
+      return "bg-red-500 text-white px-3 py-1 rounded-full text-xs";
     case 'payé':
       return "bg-green-500 text-white px-3 py-1 rounded-full text-xs";
     default:
@@ -125,6 +141,6 @@ const showMailModal = ref(false)
 
 // 📌 Marquer la facture comme payée avec chargement
 async function markAsPaid(invoice) {
-    await invoicePaid(invoice)
+    await paid(invoice.id)
 }
 </script>

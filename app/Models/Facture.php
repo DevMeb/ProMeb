@@ -17,6 +17,11 @@ class Facture extends Model
         'statut',
         'paye_le',
         'envoye_le',
+        'user_id',
+    ];
+
+    protected $casts = [
+        'paye_le' => 'date:Y-m-d',
     ];
 
     protected function casts(): array
@@ -29,6 +34,11 @@ class Facture extends Model
     protected function serializeDate(DateTimeInterface $date): string
     {
         return $date->format('d/m/Y');
+    }
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
     }
 
     public function prestations()

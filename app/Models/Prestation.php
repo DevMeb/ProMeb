@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-use DateTimeInterface;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -16,15 +15,33 @@ class Prestation extends Model
         'adresse',
         'horaires',
         'facture_id',
+        'user_id',
+        'client_id',
+        'taux_horaire_id',
     ];
 
-    protected function serializeDate(DateTimeInterface $date): string
+    protected $casts = [
+        'date' => 'date:Y-m-d',
+    ];
+
+    public function user()
     {
-        return $date->format('d/m/Y');
+        return $this->belongsTo(User::class);
     }
 
     public function facture()
     {
         return $this->belongsTo(Facture::class);
     }
+
+    public function client()
+    {
+        return $this->belongsTo(Client::class);
+    }
+
+    public function tauxHoraire()
+    {
+        return $this->belongsTo(TauxHoraire::class);
+    }
+
 }

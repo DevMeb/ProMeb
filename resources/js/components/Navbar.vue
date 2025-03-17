@@ -1,99 +1,98 @@
 <template>
   <Disclosure as="nav" class="bg-gray-800" v-slot="{ open }">
-    <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-      <div class="flex h-16 justify-between">
-        <div class="flex">
-          <div class="-ml-2 mr-2 flex items-center md:hidden">
-            <!-- Mobile menu button -->
-            <DisclosureButton class="relative inline-flex items-center justify-center rounded-md p-2 text-gray-400 hover:bg-gray-700 hover:text-white focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white">
-              <span class="sr-only">Open main menu</span>
-              <Bars3Icon v-if="!open" class="block h-6 w-6" aria-hidden="true" />
-              <XMarkIcon v-else class="block h-6 w-6" aria-hidden="true" />
-            </DisclosureButton>
+    <div class="mx-auto max-w-7xl px-2 sm:px-6 lg:px-8">
+      <div class="relative flex h-16 items-center justify-between">
+        <div class="absolute inset-y-0 left-0 flex items-center sm:hidden">
+          <!-- Mobile menu button-->
+          <DisclosureButton class="relative inline-flex items-center justify-center rounded-md p-2 text-gray-400 hover:bg-gray-700 hover:text-white focus:ring-2 focus:ring-white focus:outline-hidden focus:ring-inset">
+            <span class="absolute -inset-0.5" />
+            <span class="sr-only">Open main menu</span>
+            <Bars3Icon v-if="!open" class="block size-6" aria-hidden="true" />
+            <XMarkIcon v-else class="block size-6" aria-hidden="true" />
+          </DisclosureButton>
+        </div>
+        <div class="flex flex-1 items-center justify-center sm:items-stretch sm:justify-start">
+          <div class="flex shrink-0 items-center">
+            <img class="h-8 w-auto" src="https://tailwindcss.com/plus-assets/img/logos/mark.svg?color=indigo&shade=500" alt="Your Company" />
           </div>
-          <div class="flex flex-shrink-0 items-center">
-            <!-- <router-link to="/">
-              <img class="h-16 w-auto" :src="logoUrl" alt="Hotel Longchamps" />
-            </router-link> -->
-          </div>
-          <div class="hidden md:ml-6 md:flex md:items-center md:space-x-4">
-            <router-link
-              v-for="item in navigation"
-              :key="item.name"
-              :to="item.href"
-              :class="[
-                item.current ? 'bg-gray-900 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white',
-                'rounded-md px-3 py-2 text-sm font-medium'
-              ]"
-              :aria-current="item.current ? 'page' : undefined"
-            >
-              {{ item.name }}
-            </router-link>
+          <div class="hidden sm:ml-6 sm:block">
+            <div class="flex space-x-4">
+              <RouterLink 
+                v-for="item in navigation" 
+                :key="item.name" 
+                :to="item.href" 
+                :class="[isActive(item.href) ? 'bg-gray-900 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white', 'rounded-md px-3 py-2 text-sm font-medium']" 
+                :aria-current="isActive(item.href) ? 'page' : undefined">
+                {{ item.name }}
+              </RouterLink>
+            </div>
           </div>
         </div>
-        <div class="flex items-center">
-          <div class="flex-shrink-0">
-            <button
-              @click="logout"
-              type="button"
-              class="relative inline-flex items-center gap-x-1.5 rounded-md bg-indigo-500 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
-            >
-              Déconnexion
-            </button>
-          </div>
+        <div class="absolute inset-y-0 right-0 flex items-center pr-2 sm:static sm:inset-auto sm:ml-6 sm:pr-0">
+          <!-- Profile dropdown -->
+          <Menu as="div" class="relative ml-3">
+            <div>
+              <MenuButton class="relative flex rounded-full bg-gray-800 text-sm focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800 focus:outline-hidden">
+                <span class="absolute -inset-1.5" />
+                <span class="sr-only">Open user menu</span>
+                <img class="size-8 rounded-full" :src="user.avatar || defaultAvatar" alt="Avatar utilisateur" />
+              </MenuButton>
+            </div>
+            <transition enter-active-class="transition ease-out duration-100" enter-from-class="transform opacity-0 scale-95" enter-to-class="transform opacity-100 scale-100" leave-active-class="transition ease-in duration-75" leave-from-class="transform opacity-100 scale-100" leave-to-class="transform opacity-0 scale-95">
+              <MenuItems class="absolute right-0 z-10 mt-2 w-48 origin-top-right rounded-md bg-white py-1 ring-1 shadow-lg ring-black/5 focus:outline-hidden">
+                <MenuItem v-slot="{ active }">
+                  <a href="/settings" :class="[active ? 'bg-gray-100 outline-hidden' : '', 'block px-4 py-2 text-sm text-gray-700']">👤 Profile</a>
+                </MenuItem>
+                <MenuItem v-slot="{ active }">
+                  <a @click="logout" :class="[active ? 'bg-gray-100 outline-hidden' : '', 'block px-4 py-2 text-sm text-gray-700']">🚪 Se déconnecter</a>
+                </MenuItem>
+              </MenuItems>
+            </transition>
+          </Menu>
         </div>
       </div>
     </div>
 
-    <DisclosurePanel class="md:hidden">
-      <div class="space-y-1 px-2 pb-3 pt-2 sm:px-3">
-        <router-link
-          v-for="item in navigation"
-          :key="item.name"
-          :to="item.href"
-          class="block rounded-md px-3 py-2 text-base font-medium"
-          :class="item.current ? 'bg-gray-900 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white'"
-          :aria-current="item.current ? 'page' : undefined"
-        >
-          {{ item.name }}
-        </router-link>
+    <DisclosurePanel class="sm:hidden">
+      <div class="space-y-1 px-2 pt-2 pb-3">
+        <DisclosureButton 
+          v-for="item in navigation" 
+          :key="item.name" 
+          as="a" 
+          :href="item.href" 
+          :class="[isActive(item.href) ? 'bg-gray-900 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white', 'block rounded-md px-3 py-2 text-base font-medium']" 
+          :aria-current="isActive(item.href) ? 'page' : undefined">
+            {{ item.name }}
+        </DisclosureButton>
       </div>
     </DisclosurePanel>
   </Disclosure>
 </template>
 
 <script setup>
-import { ref, watch } from 'vue';
-import { useRouter, useRoute } from 'vue-router';
-import { Disclosure, DisclosureButton, DisclosurePanel } from '@headlessui/vue';
-import { Bars3Icon, XMarkIcon } from '@heroicons/vue/24/outline';
+import { useRoute, RouterLink } from "vue-router";
+import { Disclosure, DisclosureButton, DisclosurePanel, Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/vue";
+import { Bars3Icon, XMarkIcon } from "@heroicons/vue/24/outline";
+import { useAuthStore } from "@/stores/auth"; // Importation du store Auth
 
-//import logoUrl from '@/../images/hotel-logo.png';
-import { useAuthStore } from '@/stores/auth';
-
+// Store d'authentification
 const authStore = useAuthStore();
-const router = useRouter();
+const { user, isAuthenticated, logout } = authStore;
+
+// Définition des liens de navigation
+const navigation = [
+  { name: "Tableau de bord", href: "/" },
+  { name: "Taux Horaires", href: "/taux-horaires" },
+  { name: "Clients", href: "/clients" },
+  { name: "Prestations", href: "/prestations" },
+  { name: "Factures", href: "/factures" },
+];
+
+// Image par défaut si l'utilisateur n'a pas d'avatar
+const defaultAvatar = "https://i.pravatar.cc/300";
+
+// Vérifier si un lien est actif
 const route = useRoute();
-
-// Déconnexion asynchrone
-const logout = async () => {
-  await authStore.logout();
-};
-
-// Liste des liens de navigation
-const navigation = ref([
-  { name: 'Tableau de bord', href: '/', current: false },
-  { name: 'Prestations', href: '/prestations', current: false },
-  { name: 'Factures', href: '/factures', current: false },
-
-]);
-
-// Met à jour l'état 'current' en fonction du chemin actif
-const updateCurrentLink = () => {
-  navigation.value.forEach((item) => {
-    item.current = item.href === route.path;
-  });
-};
-
-watch(route, updateCurrentLink, { immediate: true });
+const isActive = (href) => route.path === href;
 </script>
+

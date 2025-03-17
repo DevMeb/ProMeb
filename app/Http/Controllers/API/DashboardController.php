@@ -8,6 +8,7 @@ use App\Models\Prestation;
 use App\Enums\FactureStatut;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class DashboardController extends Controller
 {
@@ -28,50 +29,38 @@ class DashboardController extends Controller
             return response()->json(['error' => 'Format de mois invalide.'], 422);
         }
         
-        $prestations = Prestation::whereBetween('date', [$start, $end])->with('facture')->get();
-        
-        $prestationsNonFactured = $prestations->filter(function ($prestation) {
-            return is_null($prestation->facture_id);
-        })->values();
-        
-        $factures = Facture::whereBetween('created_at', [$start, $end])
-            ->with('prestations')
+        $userId = Auth::id();
+
+        // 🔹 Récupération des prestations du mois
+        $prestations = Prestation::where('user_id', $userId)
+            ->whereBetween('date', [$start, $end])
+            ->with('tauxHoraire')
             ->get();
 
-        $countPrestationsFactured = $factures->map(function ($facture) {
-            return $facture->prestations->count();
-        })->sum();
+        // 🔹 Prestations non facturées
+        $prestationsUnbilled = $prestations->whereNull('facture_id');
 
-        $caFacture = $factures->filter(function ($facture) {
-            return $facture->statut === FactureStatut::Paye;
-        })->sum('montant_total');
-        
-        $tauxHoraire = env('TAUX_HORAIRE', 20);
+        // 🔹 Factures payées (factures déjà réglées)
+        $facturesPaid = Facture::where('user_id', $userId)
+            ->whereBetween('created_at', [$start, $end])
+            ->where('statut', FactureStatut::Paye)
+            ->with('prestations.client', 'prestations.tauxHoraire')
+            ->get();
 
-        $caAttendu = Prestation::whereBetween('date', [$start, $end])
-            ->sum('heures') * $tauxHoraire;
-        
-        // Différence entre CA facturé et CA attendu
-        $difference = $caFacture - $caAttendu;
 
-        $caDetails = [
-            'ca_facture' => $caFacture,
-            'ca_attendu' => $caAttendu,
-            'difference' => $difference,
-        ];
+        // 🔹 Factures en attente de paiement
+        $facturesUnpaid = Facture::where('user_id', $userId)
+            ->whereBetween('created_at', [$start, $end])
+            ->where('statut', FactureStatut::EnAttentePaiement)
+            ->with('prestations.client', 'prestations.tauxHoraire')
+            ->get();
 
-        $prestationsDetails = [
-            'count_prestations' => count($prestations),
-            'count_prestations_factured' => $countPrestationsFactured,
-            'count_prestations_non_factured' => count($prestationsNonFactured),
-        ];
-        
         return response()->json([
-            'month'                => $month,
-            'factures'             => $factures,
-            'prestations_non_factured' => $prestationsNonFactured,
-            'caDetails'           => $caDetails,
-            'prestationsDetails'   => $prestationsDetails,
+            'month' => $month,
+            'prestations' => $prestations,
+            'prestations_unbilled' => $prestationsUnbilled,
+            'factures_paid' => $facturesPaid,
+            'factures_unpaid' => $facturesUnpaid,
         ], 200);
     }
 
