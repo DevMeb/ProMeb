@@ -11,7 +11,7 @@ export const useInvoicesStore = defineStore('invoices', () => {
   const errors = ref({});
   const loading = ref({});
 
-  const dashboardStore = useDashboardStore(); 
+  const dashboardStore = useDashboardStore();
 
   function clearErrors(operation) {
     if (operation) {
@@ -32,6 +32,7 @@ export const useInvoicesStore = defineStore('invoices', () => {
       const response = await request();
       return onSuccess ? onSuccess(response) : response;
     } catch (err) {
+      console.error(err)
       if (onError) {
         onError(err);
       } else if (err.response?.status === 422) {
@@ -107,9 +108,14 @@ export const useInvoicesStore = defineStore('invoices', () => {
       operation: "paid",
       request: () => axios.patch(`/api/factures/${invoiceId}/paid`),
       onSuccess: (response) => {
-        const index = factures.value.findIndex(f => f.id === facture.id);
+        if (dashboardStore.dashboardData) {
+          const factureHasPaid = response.data.facture
+          dashboardStore.factureFromUnpaidToPaid(factureHasPaid)
+        }
+        
+        const index = invoices.value.findIndex(f => f.id === invoiceId);
         if (index !== -1) {
-          factures.value[index] = response.data.facture;
+          invoices.value[index] = response.data.facture;
         }
         notify('success', response.data.message);
       }

@@ -76,7 +76,7 @@ class FactureService extends BaseService
             $client = $facture->prestations->first()->client;
             $user = Auth::user();
 
-            $champsRequis = ['name', 'prenom', 'adresse', 'ville', 'code_postal', 'siren', 'nom_societe'];
+            $champsRequis = ['iban', 'name', 'prenom', 'adresse', 'ville', 'code_postal', 'siren', 'nom_societe'];
             $infosManquantes = array_filter($champsRequis, fn($champ) => empty($user->$champ));
 
             if (!empty($infosManquantes)) {
@@ -102,7 +102,7 @@ class FactureService extends BaseService
                 'paye_le' => now(),
             ]);
 
-            return $facture->refresh()->load('prestations');
+            return $facture->refresh()->load('prestations.client', 'prestations.tauxHoraire');
         }, "Erreur lors de la suppression de la facture (ID: $facture->id)", "facture");
         
     }

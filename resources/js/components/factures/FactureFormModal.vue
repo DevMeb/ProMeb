@@ -58,30 +58,30 @@
             />
             
             <div class="ml-4 flex-1">
-              <div class="flex items-center justify-center gap-3">
-                <span class="text-xs bg-gray-900 text-gray-400 px-2 py-1 rounded-full">
-                  {{ formatDate(prestation.date) }}
-                </span>
-              </div>
-              
-              <div class="grid grid-cols-2 gap-2 mt-2">
-                <div class="flex items-center justify-center  gap-2 text-sm">
-                  <span class="text-gray-500">🕒</span>
-                  <span class="text-gray-300">{{ prestation.heures }}h</span>
+                <div class="flex items-center justify-center gap-3">
+                  <span class="font-bold text-md bg-gray-900 text-gray-400 px-2 py-1 rounded-full">
+                    {{ formatDate(prestation.date) }}
+                  </span>
                 </div>
-                <div class="flex items-center justify-center  gap-2 text-sm">
-                  <span class="text-gray-500">📍</span>
-                  <span class="text-gray-300 truncate">{{ prestation.adresse }}</span>
+                
+                <div class="grid grid-cols-2 gap-2 mt-2 font-bold">
+                  <div class="flex items-center justify-center gap-2 text-lg">
+                    <span class="text-gray-500">🕒</span>
+                    <span class="text-gray-300">{{ prestation.heures }}h</span>
+                  </div>
+                  <div class="flex items-center justify-center  gap-2 text-lg">
+                    <span class="text-gray-500">📍</span>
+                    <span class="text-gray-300 truncate">{{ prestation.adresse }}</span>
+                  </div>
+                  <div class="flex items-center justify-center  gap-2 text-lg">
+                    <span class="text-gray-500">👤</span>
+                    <span class="text-gray-300 truncate">{{ prestation.client.nom }}</span>
+                  </div>
+                  <div class="flex items-center justify-center  gap-2 text-lg">
+                    <span class="text-gray-500">💰</span>
+                    <span class="text-gray-300 truncate">{{ prestation.taux_horaire.taux }} € / h</span>
+                  </div>
                 </div>
-                <div class="flex items-center justify-center  gap-2 text-sm">
-                  <span class="text-gray-500">👤</span>
-                  <span class="text-gray-300 truncate">{{ prestation.client.nom }}</span>
-                </div>
-                <div class="flex items-center justify-center  gap-2 text-sm">
-                  <span class="text-gray-500">💰</span>
-                  <span class="text-gray-300 truncate">{{ prestation.taux_horaire.taux }} € / h</span>
-                </div>
-              </div>
             </div>
           </label>
         </div>
@@ -110,7 +110,7 @@
       </div>
 
       <!-- Actions -->
-      <div class="mt-6 flex flex-col sm:flex-row justify-end gap-3">
+      <div v-if="selectedPrestations.length !==0" class="mt-6 flex flex-col sm:flex-row justify-end gap-3">
         <button 
           @click="close" 
           class="px-6 py-3 rounded-xl font-semibold transition-all bg-gray-700 hover:bg-gray-600 text-white"

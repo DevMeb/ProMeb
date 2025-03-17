@@ -24,6 +24,7 @@ class UserResource extends JsonResource
             'telephone'   => $this->telephone,
             'siren'       => $this->siren,
             'nom_societe' => $this->nom_societe,
+            'iban'        => $this->iban, 
             'created_at'  => $this->created_at ? $this->created_at->format('d/m/Y H:i:s') : null,
             'updated_at'  => $this->updated_at ? $this->updated_at->format('d/m/Y H:i:s') : null,
         ];

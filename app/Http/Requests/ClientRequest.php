@@ -26,7 +26,7 @@ class ClientRequest extends FormRequest
             'code_postal' => 'nullable|string|max:20',
             'ville'       => 'nullable|string|max:100',
             'pays'        => 'nullable|string|max:100',
-            'siren'       => 'nullable|digits:14',
+            'siren'       => 'nullable|regex:/^\d{9}(\d{5})?$/',
         ];
     }
 
@@ -36,7 +36,7 @@ class ClientRequest extends FormRequest
             'nom.required'        => 'Le nom du client est obligatoire.',
             'nom.string'          => 'Le nom doit être une chaîne de caractères.',
             'nom.max'             => 'Le nom ne doit pas dépasser 255 caractères.',
-            'siren.digits'        => 'Le SIREN doit contenir exactement 14 chiffres.',
+            'siren.regex'  => 'Le SIREN doit être un numéro de 9 chiffres ou de 14 chiffres (siret).',
         ];
     }
 }

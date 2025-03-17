@@ -44,34 +44,16 @@ class DashboardController extends Controller
         $facturesPaid = Facture::where('user_id', $userId)
             ->whereBetween('created_at', [$start, $end])
             ->where('statut', FactureStatut::Paye)
-            ->with('prestations')
+            ->with('prestations.client', 'prestations.tauxHoraire')
             ->get();
 
-        $countPrestationsPaid = $facturesPaid->flatMap->prestations->count();
 
         // 🔹 Factures en attente de paiement
         $facturesUnpaid = Facture::where('user_id', $userId)
             ->whereBetween('created_at', [$start, $end])
             ->where('statut', FactureStatut::EnAttentePaiement)
-            ->with('prestations')
+            ->with('prestations.client', 'prestations.tauxHoraire')
             ->get();
-
-        $countPrestationsUnpaid = $facturesUnpaid->flatMap->prestations->count();
-
-        // 🔹 CA facturé (uniquement les factures payées)
-        $caBilled = $facturesPaid->sum('montant_total');
-
-        // 🔹 CA non encore encaissé (factures en attente de paiement)
-        $caUnpaid = $facturesUnpaid->sum('montant_total');
-
-        // 🔹 CA des prestations non encore facturées
-        $caUnbilled = $prestationsUnbilled->sum(fn($p) => $p->heures * ($p->tauxHoraire->taux ?? 0));
-
-        // 🔹 Calcul du CA attendu
-        $caAttendu = $caBilled + $caUnpaid + $caUnbilled;
-
-        // 🔹 Différence entre ce qui est attendu et ce qui est facturé
-        $difference = $caAttendu - $caBilled;
 
         return response()->json([
             'month' => $month,
@@ -79,12 +61,6 @@ class DashboardController extends Controller
             'prestations_unbilled' => $prestationsUnbilled,
             'factures_paid' => $facturesPaid,
             'factures_unpaid' => $facturesUnpaid,
-            'ca_attendu' => $caAttendu,
-            'ca_billed' => $caBilled,
-            'ca_unbilled' => $caUnbilled,
-            'difference' => $difference,
-            'count_prestations_paid' => $countPrestationsPaid,
-            'count_prestations_unpaid' => $countPrestationsUnpaid,
         ], 200);
     }
 

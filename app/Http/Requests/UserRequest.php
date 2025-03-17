@@ -28,8 +28,9 @@ class UserRequest extends FormRequest
             'ville'        => 'nullable|string|max:100',
             'pays'         => 'nullable|string|max:100',
             'telephone'    => 'nullable|string|max:20',
-            'siren'        => 'nullable|digits:9',
+            'siren'        => 'nullable|regex:/^\d{9}(\d{5})?$/',
             'nom_societe'  => 'nullable|string|max:255',
+            'iban'         => 'nullable|string|max:255'
         ];
     }
 
@@ -40,7 +41,7 @@ class UserRequest extends FormRequest
     {
         return [
             'name.required' => 'Le nom est obligatoire.',
-            'siren.digits'  => 'Le SIREN doit être un numéro de 9 chiffres.',
+            'siren.regex'  => 'Le SIREN doit être un numéro de 9 chiffres ou de 14 chiffres (siret).',
         ];
     }
 }

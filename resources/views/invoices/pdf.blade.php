@@ -111,12 +111,11 @@
             <tr>
                 <!-- Bloc gauche : Informations du détenteur -->
                 <td class="header-left">
-                    <strong>{{ $user->name }} {{ $user->prenom }}</strong><br>
-                    {{ $user->adresse }}, {{ $user->code_postal }} {{ $user->ville }}, {{ $user->pays }}<br>
-                    {{ $user->email }}<br>
-                    {{ $user->telephone }}<br>
-                    {{ $user->siren }}
-                    {{ $user->nom_societe }}
+                    <strong>{{ $user->name }} {{ $user->prenom }} - {{ $user->nom_societe }}</strong><br>
+                    {{ $user->adresse }}<br>
+                    {{ $user->ville }} {{ $user->code_postal }} {{ $user->pays }}<br>
+                    {{ $user->email }} {{ $user->telephone }}<br>
+                    {{ $user->siren }}<br>
                 </td>
                 <!-- Bloc droit : Récapitulatif et réceptionneur -->
                 <td class="header-right">
@@ -185,10 +184,7 @@
         <div class="bank-details">
             <p>
                 <strong>Coordonnées bancaires pour réception du paiement :</strong><br>
-                Banque: BoursoBank, 44 rue Traversière, CS 80134, 92772 BOULOGNE-BILLANCOURT CEDEX, France<br>
-                BIC / Swift: BOUS FRPP XXX<br>
-                IBAN: FR76 4061 8804 4500 0407 6686 026<br>
-                RIB: Banque: 40618, Guichet: 80445, N° de compte: 00040766860, Clé Rib: 26
+                RIB: {{ $user->iban }}
             </p>
         </div>
 

@@ -35,7 +35,7 @@
           </div>
   
           <!-- Email -->
-          <div class="md:col-span-2">
+          <div>
             <label class="block text-sm font-medium flex items-center gap-2">
               <span class="text-indigo-400">📧</span> Email :
             </label>
@@ -43,7 +43,7 @@
           </div>
   
           <!-- Adresse -->
-          <div class="md:col-span-2">
+          <div>
             <label class="block text-sm font-medium flex items-center gap-2">
               <span class="text-indigo-400">📍</span> Adresse :
             </label>
@@ -109,7 +109,7 @@
           </div>
   
           <!-- Nom de la société -->
-          <div class="md:col-span-2">
+          <div>
             <label class="block text-sm font-medium flex items-center gap-2">
               <span class="text-indigo-400">🏛️</span> Nom de la société :
             </label>
@@ -118,7 +118,20 @@
             {{ errors.validationErrors.nom_societe.join(', ') }}
             </p>
           </div>
+
+          <!-- IBAN -->
+          <div class="md:col-span-2">
+            <label class="block text-sm font-medium flex items-center gap-2">
+              <span class="text-indigo-400">🏛️</span> IBAN :
+            </label>
+            <input type="text" v-model="userData.iban" class="input-field" />
+            <p v-if="errors.validationErrors?.iban" class="text-red-500 text-xs mt-1">
+            {{ errors.validationErrors.iban.join(', ') }}
+            </p>
+          </div>
         </div>
+
+
   
         <!-- Boutons -->
         <div class="flex justify-center gap-4 mt-6">
@@ -151,6 +164,7 @@
     telephone: "",
     siren: "",
     nom_societe: "",
+    iban: "",
   });
   
   // Charger les infos utilisateur lors du montage du composant

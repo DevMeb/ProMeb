@@ -3,31 +3,32 @@
     <!-- CA Facturé -->
     <DashboardCard
       title="CA facturé"
-      :value="dashboardData.ca_billed"
+      :value="caBilled"
+      :taxe="taxe"
+      :afterTaxe="caBilledWithTax"
+      :badge="taxe"
+      badgeColor="text-red-500"
       description="Revenus confirmés"
       icon="💶"
-      gradient="from-blue-600 to-blue-700"
-      textColor="text-blue-100"
+      gradient="from-green-600 to-green-700"
     />
 
     <!-- CA Attendu -->
     <DashboardCard
       title="CA attendu"
-      :value="dashboardData.ca_attendu"
+      :value="caAttendu"
       description="Revenus prévisionnels"
       icon="📈"
       gradient="from-amber-500 to-amber-600"
-      textColor="text-amber-100"
     />
 
     <!-- Différence -->
     <DashboardCard
       title="Écart"
-      :value="dashboardData.difference"
+      :value="difference"
       description="Différence CA réel/prévisionnel"
       icon="⚖️"
-      :gradient="dashboardData.difference >= 0 ? 'from-green-600 to-green-700' : 'from-red-500 to-red-600'"
-      :textColor="dashboardData.difference >= 0 ? 'text-green-100' : 'text-red-100'"
+      :gradient="difference >= 0 ? 'from-green-600 to-green-700' : 'from-red-500 to-red-600'"
       :isDifference="true"
     />
   </div>
@@ -39,5 +40,12 @@ import { storeToRefs } from 'pinia';
 import DashboardCard from '@/components/dashboard/DashboardCard.vue';
 
 const dashboardStore = useDashboardStore();
-const { dashboardData } = storeToRefs(dashboardStore);
+const { 
+  dashboardData,
+  taxe, 
+  caBilledWithTax,
+  caBilled,
+  caAttendu,
+  difference,
+} = storeToRefs(dashboardStore);
 </script>

@@ -11,18 +11,6 @@
       @click="showPrestationsModal = true"
     />
 
-    <!-- Prestations Facturées -->
-    <DashboardCard
-      title="Factures payées"
-      :value="dashboardData.factures_paid.length"
-      description="Factures régularisées"
-      icon="📑"
-      gradient="from-green-500 to-green-600"
-      textColor="text-green-100"
-      badge="✔️ Payées"
-      @click="showPrestationsBilledModal = true"
-    />
-
     <!-- Prestations Non Facturées -->
     <DashboardCard
       title="Prestations en attente de facturation"
@@ -31,25 +19,53 @@
       icon="⏳"
       gradient="from-orange-400 to-orange-500"
       textColor="text-orange-100"
-      badge="⚠️ En attente de facturation"
       @click="showPrestationsUnbilledModal = true"
     />
 
+    <!-- Factures payées -->
     <DashboardCard
-      title="Factures en attente de paiement"
+      title="Factures payées"
+      :value="dashboardData.factures_paid.length"
+      description="Factures régularisées"
+      icon="📑"
+      gradient="from-green-500 to-green-600"
+      textColor="text-green-100"
+      @click="showFacturesBilledModal = true"
+    />
+
+    <!-- Factures non payées -->
+    <DashboardCard
+      title="Factures non payées"
       :value="dashboardData.factures_unpaid.length"
-      description="Prestations en attente de facturation"
+      description="Factures en attente de facturation"
       icon="⏳"
       gradient="from-red-400 to-red-700"
       textColor="text-orange-100"
-      badge="⚠️ En attente de paiement"
-      @click="showPrestationsUnbilledModal = true"
+      @click="showFacturesUnbilledModal = true"
     />
   </div>
 
-  <FactureFormModal v-if="showPrestationsUnbilledModal" @close="showPrestationsUnbilledModal = false" />
-  <PrestationsModal v-if="showPrestationsModal" @close="showPrestationsModal = false" />
-  <FacturesModal v-if="showPrestationsBilledModal" @close="showPrestationsBilledModal = false" />
+  <FactureFormModal
+    v-if="showPrestationsUnbilledModal"
+    @close="showPrestationsUnbilledModal = false" 
+  />
+  
+  <PrestationsModal 
+    v-if="showPrestationsModal"
+    @close="showPrestationsModal = false" 
+  />
+
+  <FacturesModal 
+    v-if="showFacturesBilledModal"
+    :factures="dashboardData.factures_paid" 
+    @close="showFacturesBilledModal = false" 
+  />
+
+  <FacturesModal 
+    v-if="showFacturesUnbilledModal"
+    :factures="dashboardData.factures_unpaid" 
+    @close="showFacturesUnbilledModal = false" 
+  />
 
 </template>
 
@@ -64,6 +80,7 @@ const dashboardStore = useDashboardStore();
 const { dashboardData } = storeToRefs(dashboardStore);
 
 const showPrestationsModal = ref(false)
-const showPrestationsBilledModal = ref(false)
 const showPrestationsUnbilledModal = ref(false)
+const showFacturesBilledModal = ref(false)
+const showFacturesUnbilledModal = ref(false)
 </script>

@@ -25,6 +25,7 @@ return new class extends Migration
             $table->string('telephone')->nullable();
             $table->string('siren')->nullable();
             $table->string('nom_societe')->nullable();
+            $table->string('iban')->nullable();
             $table->rememberToken();
             $table->timestamps();
         });

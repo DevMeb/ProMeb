@@ -29,6 +29,7 @@ class User extends Authenticatable
         'telephone',
         'siren',
         'nom_societe',
+        'iban',
     ];
 
     /**

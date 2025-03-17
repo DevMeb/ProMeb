@@ -12,8 +12,15 @@
       <h2 class="text-xl font-semibold text-white drop-shadow-md">{{ title }}</h2>
     </div>
     
-    <p :class="`text-4xl font-bold ${textColor} mb-2 drop-shadow-md relative z-10`">
-      {{ formattedValue }}
+   
+    <!-- Affichage normal pour les autres cartes -->
+    <p class="text-4xl font-bold text-white mb-2 drop-shadow-md relative z-10">
+      <span :class="{'line-through text-gray-400': title === 'CA facturé' && taxe > 0 }">
+        {{ formattedValue }}
+      </span>
+      <span class="pl-4" v-if="title === 'CA facturé' && taxe > 0">
+        {{ afterTaxe }} €
+      </span>
       <span v-if="isDifference" :class="`text-lg ml-2 ${differenceColor}`">
         {{ differenceIcon }}
       </span>
@@ -23,11 +30,10 @@
 
     <!-- Badge moderne -->
     <div
-      v-if="badge"
-      class="absolute top-3 right-3 backdrop-blur-sm bg-white/10 text-white/90 text-xs font-medium px-3 py-1.5 rounded-full shadow-sm"
-      :class="badgeColor"
+      v-if="title === 'CA facturé' && taxe > 0"
+      class="absolute top-3 right-3 backdrop-blur-sm bg-red-400 text-white/90 text-xs font-medium px-3 py-1.5 rounded-full shadow-sm border border-red-500"
     >
-      {{ badge }}
+      -{{ taxe }} %
     </div>
   </div>
 </template>
@@ -41,8 +47,9 @@ const props = defineProps({
   description: String,
   icon: String,
   gradient: String,
-  textColor: String,
-  badge: String,
+  badge: Number,
+  taxe: Number,
+  afterTaxe: Number,
   isDifference: Boolean,
   cursor: Boolean,
 });
