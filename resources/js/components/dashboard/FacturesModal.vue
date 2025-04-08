@@ -5,7 +5,7 @@
       <!-- En-tête -->
       <div class="flex justify-between items-center pb-4 border-b border-gray-800">
         <h2 class="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-purple-400">
-          🧾 Factures Payées
+          🧾 {{ title }}
         </h2>
         <button @click="close" class="text-gray-400 hover:text-white transition-transform hover:scale-110">
           ✕
@@ -116,8 +116,10 @@ import { storeToRefs } from "pinia";
 // Props et événements
 const props = defineProps({
   factures: Array,
+  title: String,
   required: true,
 });
+
 const emit = defineEmits(["close"]);
 
 const invoiceStore = useInvoicesStore()
