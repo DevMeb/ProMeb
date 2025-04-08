@@ -57,13 +57,15 @@
 
   <FacturesModal 
     v-if="showFacturesBilledModal"
-    :factures="dashboardData.factures_paid" 
+    :factures="dashboardData.factures_paid"
+    title="Factures payées"
     @close="showFacturesBilledModal = false" 
   />
 
   <FacturesModal 
     v-if="showFacturesUnbilledModal"
-    :factures="dashboardData.factures_unpaid" 
+    :factures="dashboardData.factures_unpaid"
+    title="Factures non payées"
     @close="showFacturesUnbilledModal = false" 
   />
 
