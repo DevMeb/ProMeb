@@ -55,7 +55,7 @@
 
         <!-- Message d'erreur -->
         <div v-if="authStore.errors.login" class="text-center text-red-500 text-sm">
-          {{ authStore.error }}
+          {{ authStore.errors['login'] }}
         </div>
       </form>
     </div>
@@ -73,11 +73,7 @@ const authStore = useAuthStore();
 
 const handleLogin = async () => {
   // Réinitialise les erreurs avant la tentative de connexion
-  authStore.error = null;
-  try {
-    await authStore.login(email.value, password.value);
-  } catch (err) {
-    console.error("Erreur de connexion :", err);
-  }
+  authStore.errors['login'] = null;
+  await authStore.login(email.value, password.value);
 };
 </script>
