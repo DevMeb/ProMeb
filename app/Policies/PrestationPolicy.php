@@ -12,7 +12,7 @@ class PrestationPolicy
      */
     public function update(User $user, Prestation $prestation): bool
     {
-        return !$prestation->facture_id;;
+        return !$prestation->facture_id;
     }
 
     /**
@@ -20,7 +20,7 @@ class PrestationPolicy
      */
     public function delete(User $user, Prestation $prestation): bool
     {
-        return !$prestation->facture_id;;
+        return !$prestation->facture_id;
     }
 }
 

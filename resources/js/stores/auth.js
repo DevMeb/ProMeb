@@ -29,6 +29,7 @@ export const useAuthStore = defineStore("auth", () => {
 
   /** Connexion utilisateur */
   async function login(email, password) {
+    console.log('LOGIN VALUE', loading.value);
     loading.value['login'] = true;
     errors.value['login'] = null;
     try {
@@ -38,10 +39,10 @@ export const useAuthStore = defineStore("auth", () => {
       toast.success("Connexion réussie !");
       await router.push("/");
     } catch (err) {
-      errors.value = "Nom d’utilisateur ou mot de passe incorrect.";
+      errors.value['login'] = "Nom d’utilisateur ou mot de passe incorrect.";
       toast.error("Échec de la connexion.");
     } finally {
-      loading.value = false;
+      loading.value['login'] = false;
     }
   }
 
