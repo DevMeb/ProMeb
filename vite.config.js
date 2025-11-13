@@ -137,11 +137,11 @@ export default () => {
 
                 // Manifest settings - these will appear in the generated manifest.webmanifest
                 manifest: {
-                    name: 'Plan’Chef',
-                    short_name: 'Plan’Chef',
-                    description: 'Planifie tes repas, gère tes recettes et ta liste de courses.',
-                    theme_color: '#4f46e5',
-                    background_color: '#ffffff',
+                    name: 'ProMeb',
+                    short_name: 'ProMeb',
+                    description: 'Gère tes clients, prestations, factures et ton activité en toute simplicité.',
+                    theme_color: '#00D4B4',
+                    background_color: '#111827',
                     orientation: 'portrait',
                     display: 'standalone',
                     scope: '/',
