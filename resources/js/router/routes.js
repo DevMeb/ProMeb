@@ -9,5 +9,5 @@ export default [
   { path: '/factures', name: 'Facture', component: loadView('Facture'), meta: { requiresAuth: true } },
   { path: '/settings', name: 'Profile', component: loadView('Profile'), meta: { requiresAuth: true } },
   { path: '/taux-horaires', name: 'TauxHoraires', component: loadView('TauxHoraire'), meta: { requiresAuth: true } },
-  { path: '/pwa', name: 'pwa', component: loadView('TauxHoraire'), meta: { requiresAuth: true } },
+  { path: '/pwa', name: 'pwa', component: loadView('PwaStatus'), meta: { requiresAuth: true } },
 ];

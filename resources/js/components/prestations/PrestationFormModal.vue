@@ -116,7 +116,6 @@
         </div>
 
         <!-- Horaires -->
-        <!--
         <div>
           <label for="horaires" class="block text-sm font-medium text-gray-700">Horaires</label>
           <input
@@ -130,38 +129,6 @@
             {{ errors.validationErrors.horaires.join(', ') }}
           </p>
         </div>
-        -->
-
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">
-              Heure de début
-            </label>
-            <input
-              type="time"
-              v-model="startTime"
-              class="w-full border rounded-lg px-3 py-2 text-sm"
-              :class="{ 'border-red-500': errors.validationErrors?.horaires }"
-            >
-          </div>
-
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">
-              Heure de fin
-            </label>
-            <input
-              type="time"
-              v-model="endTime"
-              class="w-full border rounded-lg px-3 py-2 text-sm"
-              :class="{ 'border-red-500': errors.validationErrors?.horaires }"
-            >
-          </div>
-          
-        </div>
-
-        <p v-if="errors.validationErrors?.horaires" class="text-red-500 text-xs mt-1 text-center">
-            {{ errors.validationErrors.horaires.join(', ') }}
-          </p>
 
         <!-- Boutons -->
         <div class="flex justify-end space-x-3 mt-4">
@@ -187,29 +154,13 @@
 </template>
 
 <script setup>
-import { ref, watchEffect, onMounted } from 'vue';
+import { ref, watchEffect } from 'vue';
 import { usePrestationsStore } from '@/stores/prestations';
 import { useClientsStore } from '@/stores/clients';
 import { useTauxHorairesStore } from '@/stores/taux-horaires';
 import { storeToRefs } from 'pinia';
 import { ClientFormModal } from '@/components/clients';
 import { TauxHoraireFormModal } from '@/components/taux-horaires';
-
-const startTime = ref('');
-const endTime = ref('');
-
-// Si tu es en mode édition, tu peux parser l'ancienne valeur
-// genre "08:00 - 17:00" pour pré-remplir les champs
-onMounted(() => {
-  if (prestationData.value.horaires) {
-    // Exemple simple : "08:00 - 17:00"
-    const parts = prestationData.value.horaires.split('-');
-    if (parts.length === 2) {
-      startTime.value = parts[0].trim(); // "08:00"
-      endTime.value = parts[1].trim();   // "17:00"
-    }
-  }
-});
 
 // Définir les propriétés et l'émission d'événements
 const props = defineProps({
@@ -272,7 +223,6 @@ watchEffect(() => {
 
 // Soumission du formulaire
 const submitForm = async () => {
-  prestationData.value.horaires = `${startTime.value} - ${endTime.value}`;
   const success = prestationData.value.id
     ? await updatePrestation(prestationData.value)
     : await addPrestation(prestationData.value);
