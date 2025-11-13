@@ -89,21 +89,16 @@
   </template>
     
     <script setup>
-    import { computed, onMounted } from "vue";
-    import { storeToRefs } from "pinia";
-    import { usePrestationsStore } from "@/stores/prestations";
+    import { computed } from "vue";
     import { formatDate } from '@/utils'
     
     // Props et événements
     const emit = defineEmits(["close"]);
-    const prestationsStore = usePrestationsStore();
-    const { prestations } = storeToRefs(prestationsStore);
-    const { fetchPrestations } = prestationsStore;
-  
-    // Charger les prestations
-    onMounted(() => {
-      fetchPrestations();
-    });  
+    const props = defineProps({
+      prestations: Array
+    })
+
+    const prestations = computed(() => props.prestations ?? [])
     
     // Calcul du total des heures et du montant HT
     const totalHeures = computed(() => {

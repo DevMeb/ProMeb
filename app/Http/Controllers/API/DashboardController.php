@@ -34,7 +34,7 @@ class DashboardController extends Controller
         // 🔹 Récupération des prestations du mois
         $prestations = Prestation::where('user_id', $userId)
             ->whereBetween('date', [$start, $end])
-            ->with('tauxHoraire')
+            ->with('tauxHoraire', 'client')
             ->get();
 
         // 🔹 Prestations non facturées
