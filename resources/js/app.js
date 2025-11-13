@@ -8,6 +8,9 @@ import router from '@/router';
 import Toast from "vue-toastification";
 import "vue-toastification/dist/index.css";
 
+import { usePwa } from './composables/usePwa'
+const { createPwa } = usePwa()
+createPwa()
 
 import '../css/app.css';
 

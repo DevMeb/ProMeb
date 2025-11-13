@@ -86,6 +86,7 @@ const navigation = [
   { name: "Clients", href: "/clients" },
   { name: "Prestations", href: "/prestations" },
   { name: "Factures", href: "/factures" },
+  { name: "Mise à jour", href: "/pwa" },
 ];
 
 // Image par défaut si l'utilisateur n'a pas d'avatar
