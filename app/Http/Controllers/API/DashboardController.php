@@ -40,18 +40,28 @@ class DashboardController extends Controller
         // 🔹 Prestations non facturées
         $prestationsUnbilled = $prestations->whereNull('facture_id');
 
-        // 🔹 Factures payées (factures déjà réglées)
+        // 🔹 Factures payées (ayant au moins une prestation dans la période)
         $facturesPaid = Facture::where('user_id', $userId)
-            ->whereBetween('created_at', [$start, $end])
             ->where('statut', FactureStatut::Paye)
+            ->whereHas('prestations', function ($q) use ($start, $end) {
+                $q->whereBetween('date', [
+                    $start->toDateString(),
+                    $end->toDateString(),
+                ]);
+            })
+            // ⬇️ On charge TOUTES les prestations de la facture
             ->with('prestations.client', 'prestations.tauxHoraire')
             ->get();
 
-
-        // 🔹 Factures en attente de paiement
+        // 🔹 Factures en attente de paiement (ayant au moins une prestation dans la période)
         $facturesUnpaid = Facture::where('user_id', $userId)
-            ->whereBetween('created_at', [$start, $end])
             ->where('statut', FactureStatut::EnAttentePaiement)
+            ->whereHas('prestations', function ($q) use ($start, $end) {
+                $q->whereBetween('date', [
+                    $start->toDateString(),
+                    $end->toDateString(),
+                ]);
+            })
             ->with('prestations.client', 'prestations.tauxHoraire')
             ->get();
 
