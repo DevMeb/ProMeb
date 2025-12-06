@@ -82,7 +82,6 @@ import { FactureFormModal } from '@/components/factures';
 const dashboardStore = useDashboardStore();
 const { dashboardData } = storeToRefs(dashboardStore);
 
-console.log(dashboardData.value.prestations)
 const showPrestationsModal = ref(false)
 const showPrestationsUnbilledModal = ref(false)
 const showFacturesBilledModal = ref(false)

@@ -88,7 +88,7 @@
     </div>
   </template>
     
-    <script setup>
+  <script setup>
     import { computed } from "vue";
     import { formatDate } from '@/utils'
     
@@ -116,5 +116,5 @@
     const close = () => {
       emit("close");
     };
-    </script>
+  </script>
     
