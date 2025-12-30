@@ -32,7 +32,6 @@ export const useInvoicesStore = defineStore('invoices', () => {
       const response = await request();
       return onSuccess ? onSuccess(response) : response;
     } catch (err) {
-      console.error(err)
       if (onError) {
         onError(err);
       } else if (err.response?.status === 422) {
