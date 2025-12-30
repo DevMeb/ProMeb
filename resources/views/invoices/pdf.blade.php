@@ -197,8 +197,8 @@
 
         <!-- Footer -->
         <div class="footer">
-            <p>Facture N° {{ $facture->id }} | Page 1/1</p>
-            <p>MEBARKI Younes, 90 route de gournay, 93160 Noisy-le-grand</p>
+            <p>Facture N° {{ $facture->id }}</p>
+            <p>TVA NON APPLICABLE, article 293B du CGI</p>
         </div>
     </div>
 </body>
