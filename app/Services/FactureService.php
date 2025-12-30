@@ -9,6 +9,7 @@ use Barryvdh\DomPDF\Facade\Pdf;
 use Exception;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\ValidationException;
 
 class FactureService extends BaseService
 {
@@ -80,7 +81,25 @@ class FactureService extends BaseService
             $infosManquantes = array_filter($champsRequis, fn($champ) => empty($user->$champ));
 
             if (!empty($infosManquantes)) {
-                throw new Exception("Veuillez compléter votre profil dans vos paramètres avant de générer une facture !");
+                $labels = [
+                    'iban' => 'IBAN',
+                    'name' => 'Nom',
+                    'prenom' => 'Prénom',
+                    'adresse' => 'Adresse',
+                    'ville' => 'Ville',
+                    'code_postal' => 'Code postal',
+                    'siren' => 'SIREN',
+                    'nom_societe' => 'Nom de la société',
+                ];
+
+                $champsLisibles = array_map(
+                    fn ($champ) => $labels[$champ] ?? $champ,
+                    $infosManquantes
+                );
+
+                abort(response()->json([
+                    'message' => 'Les champs suivants ne sont pas renseignés dans votre profil : ' . implode(', ', $champsLisibles),
+                ], 422));
             }
 
             $pdf = Pdf::loadView('invoices.pdf', [

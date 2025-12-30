@@ -32,7 +32,6 @@ export const useInvoicesStore = defineStore('invoices', () => {
       const response = await request();
       return onSuccess ? onSuccess(response) : response;
     } catch (err) {
-      console.error(err)
       if (onError) {
         onError(err);
       } else if (err.response?.status === 422) {
@@ -92,14 +91,55 @@ export const useInvoicesStore = defineStore('invoices', () => {
         return URL.createObjectURL(new Blob([response.data], { type: "application/pdf" }));
       },
       onError: async (err) => {
-        const contentType = err.response.headers["content-type"];
-        if (contentType === "application/json") {
-          const errorText = await err.response.data.text();
-          const errorJson = JSON.parse(errorText);
-          errors.value['pdf'] = 'Impossible de charger le PDF'
-          notify('error', errorJson.message);
-        } 
+      // 1) Erreurs réseau (aucune réponse HTTP)
+      if (!err.response) {
+        const msg =
+          err.code === "ECONNABORTED"
+            ? "Délai d’attente dépassé. Vérifiez votre connexion et réessayez."
+            : "Impossible de contacter le serveur. Vérifiez votre connexion Internet.";
+
+        errors.value.pdf = msg;   // modale
+        notify("error", msg);     // toast
+        return "";
       }
+
+      const status = err.response.status;
+      const contentType = (err.response.headers?.["content-type"] || "").toLowerCase();
+
+      // Helper: extraire un message JSON même si responseType=blob
+      const readJsonMessage = async () => {
+        if (!contentType.includes("application/json")) return null;
+
+        const text = await err.response.data.text();
+        try {
+          const payload = JSON.parse(text);
+          return payload?.message || null;
+        } catch {
+          return null;
+        }
+      };
+
+      // 2) Erreur métier "profil incomplet" (ou autre validation)
+      // Si vous ne voulez viser QUE le profil incomplet, vous pouvez aussi matcher sur le texte.
+      if (status === 422 || status === 403) {
+        const msg =
+          (await readJsonMessage()) ||
+          "Votre profil est incomplet. Complétez vos informations dans les paramètres.";
+
+        errors.value.pdf = msg;   // modale
+        notify("error", msg);     // toast
+        return "";
+      }
+
+      // 3) Autres erreurs HTTP (serveur, permissions, etc.)
+      const msg =
+        (await readJsonMessage()) ||
+        "Erreur technique lors de la génération du PDF. Réessayez dans quelques instants.";
+
+      errors.value.pdf = msg;     // modale
+      notify("error", msg);       // toast
+      return "";
+    },
     });
   }
 
