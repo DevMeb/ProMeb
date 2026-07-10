@@ -22,6 +22,7 @@ class Prestation extends Model
 
     protected $casts = [
         'date' => 'date:Y-m-d',
+        'heures' => 'decimal:2',
     ];
 
     public function user()

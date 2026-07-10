@@ -22,6 +22,8 @@ class Facture extends Model
 
     protected $casts = [
         'paye_le' => 'date:Y-m-d',
+        'heures_total' => 'decimal:2',
+        'montant_total' => 'decimal:2',
     ];
 
     protected function casts(): array

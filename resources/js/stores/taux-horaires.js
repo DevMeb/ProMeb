@@ -37,7 +37,7 @@ export const useTauxHorairesStore = defineStore('taux-horaires', () => {
 
   const totalHours = computed(() => {
     return filteredPrestations.value
-      .reduce((acc, prestation) => acc + prestation.heures, 0)
+      .reduce((acc, prestation) => acc + parseFloat(prestation.heures), 0)
   });
 
   const unbilledPrestations = computed(() => {

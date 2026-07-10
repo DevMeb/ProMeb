@@ -39,7 +39,7 @@ export const useClientsStore = defineStore('clients', () => {
 
   const totalHours = computed(() => {
     return filteredPrestations.value
-      .reduce((acc, prestation) => acc + prestation.heures, 0)
+      .reduce((acc, prestation) => acc + parseFloat(prestation.heures), 0)
   });
 
   const unbilledPrestations = computed(() => {
