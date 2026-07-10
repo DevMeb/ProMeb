@@ -23,9 +23,10 @@ RUN apt-get update && apt-get install -y \
     libfreetype6-dev \
     libonig-dev \
     libzip-dev \
+    libicu-dev \
     unzip \
     git \
-    && docker-php-ext-install pdo_mysql mbstring zip exif pcntl gd \
+    && docker-php-ext-install pdo_mysql mbstring zip exif pcntl gd intl \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # Installer Composer
