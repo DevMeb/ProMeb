@@ -1,0 +1,41 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  tests:
+    name: Tests (Pest)
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout du code
+        uses: actions/checkout@v4
+
+      - name: Installation de PHP 8.4
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.4'
+          extensions: pdo, pdo_sqlite, mbstring, zip, exif, pcntl, gd, bcmath, intl
+          coverage: none
+
+      - name: Cache des dépendances Composer
+        uses: actions/cache@v4
+        with:
+          path: vendor
+          key: composer-${{ hashFiles('composer.lock') }}
+          restore-keys: composer-
+
+      - name: Installation des dépendances Composer
+        run: composer install --no-interaction --prefer-dist --no-progress
+
+      - name: Préparation de l'environnement
+        run: |
+          cp .env.example .env
+          php artisan key:generate
+
+      - name: Exécution des tests
+        run: php artisan test --testsuite=Feature

@@ -41,7 +41,18 @@ expect()->extend('toBeOne', function () {
 |
 */
 
-function something()
+/**
+ * Construit un payload de prestation valide dont le client et le taux horaire
+ * appartiennent à l'utilisateur donné (requis par PrestationRequest).
+ */
+function prestationPayload(\App\Models\User $user, array $overrides = []): array
 {
-    // ..
+    return array_merge([
+        'date'            => now()->toDateString(),
+        'heures'          => 5,
+        'adresse'         => '123 rue du Test',
+        'horaires'        => '10:00-12:00',
+        'client_id'       => \App\Models\Client::factory()->create(['user_id' => $user->id])->id,
+        'taux_horaire_id' => \App\Models\TauxHoraire::factory()->create(['user_id' => $user->id])->id,
+    ], $overrides);
 }

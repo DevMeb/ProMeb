@@ -30,12 +30,7 @@ it('crée une prestation avec des données valides', function () {
     $user = User::factory()->create();
     Auth::login($user);
 
-    $data = [
-        'date'      => now()->toDateString(),
-        'heures'    => 5,
-        'adresse'   => '123 rue du Test',
-        'horaires'  => '10:00-12:00',
-    ];
+    $data = prestationPayload($user);
 
     $prestation = $this->service->create($data);
 

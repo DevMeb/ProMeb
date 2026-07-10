@@ -24,12 +24,7 @@ it('autorise un utilisateur connecté à accéder aux routes', function () {
     $this->actingAs($user);
 
     $this->getJson(route('prestations.index'))->assertStatus(200);
-    $this->postJson(route('prestations.store'), [
-        'date'      => now()->toDateString(),
-        'heures'    => 5,
-        'adresse'   => '123 rue du Test',
-        'horaires'  => '10:00-12:00',
-    ])->assertStatus(201);
+    $this->postJson(route('prestations.store'), prestationPayload($user))->assertStatus(201);
 });
 
 it('vérifie qu\'une erreur 405 est retournée pour une mauvaise méthode', function () {
@@ -109,12 +104,7 @@ it('empêche un utilisateur de modifier la prestation d\'un autre', function () 
     $prestation = Prestation::factory()->create(['user_id' => $user1->id]);
 
     $this->actingAs($user2)
-        ->putJson(route('prestations.update', $prestation), [
-            'date'      => now()->toDateString(),
-            'heures'    => 3,
-            'adresse'   => 'Adresse modifiée',
-            'horaires'  => '14:00-16:00',
-        ])
+        ->putJson(route('prestations.update', $prestation), prestationPayload($user2))
         ->assertForbidden(); // Devrait renvoyer 403
 });
 
@@ -137,12 +127,12 @@ it('permet la mise à jour correcte d\'une prestation', function () {
     $prestation = Prestation::factory()->create(['user_id' => $user->id]);
 
     $this->actingAs($user)
-        ->putJson(route('prestations.update', $prestation), [
+        ->putJson(route('prestations.update', $prestation), prestationPayload($user, [
             'date'      => now()->addDay()->toDateString(),
             'heures'    => 4,
             'adresse'   => 'Nouvelle adresse',
             'horaires'  => '12:00-14:00',
-        ])
+        ]))
         ->assertStatus(200)
         ->assertJson([
             'message' => 'Prestation mise à jour avec succès.',

@@ -47,12 +47,8 @@ it('autorise la création d\'une prestation avec des données valides', function
     $user = User::factory()->create();
     $this->actingAs($user);
 
-    $this->postJson(route('prestations.store'), [
-        'date'      => now()->toDateString(),
-        'heures'    => 5,
-        'adresse'   => '123 rue du Test',
-        'horaires'  => '10:00-12:00',
-    ])->assertCreated()
+    $this->postJson(route('prestations.store'), prestationPayload($user))
+      ->assertCreated()
       ->assertJsonStructure(['message', 'prestation']);
 });
 
@@ -61,12 +57,12 @@ it('autorise la mise à jour d\'une prestation avec des données valides', funct
     $prestation = Prestation::factory()->create(['user_id' => $user->id]);
 
     $this->actingAs($user)
-        ->putJson(route('prestations.update', $prestation), [
+        ->putJson(route('prestations.update', $prestation), prestationPayload($user, [
             'date'      => now()->addDays(5)->toDateString(),
             'heures'    => 8,
             'adresse'   => 'Nouvelle adresse',
             'horaires'  => '12:00-14:00',
-        ])
+        ]))
         ->assertOk()
         ->assertJsonStructure(['message', 'prestation']);
 });

@@ -9,7 +9,6 @@ use App\Http\Controllers\API\TauxHoraireController;
 use App\Http\Controllers\API\UserController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
-use SebastianBergmann\CodeCoverage\Report\Html\Dashboard;
 
 Route::middleware('auth:sanctum')->group(function () {
 
@@ -88,10 +87,12 @@ Route::middleware('auth:sanctum')->group(function () {
                 ->middleware('can:delete,facture');
             
             Route::get('/{facture}/pdf', [FactureController::class, 'pdf'])
-                ->name('pdf');
+                ->name('pdf')
+                ->middleware('can:view,facture');
 
             Route::patch('/{facture}/paid', [FactureController::class, 'paid'])
-                ->name('paid');
+                ->name('paid')
+                ->middleware('can:update,facture');
         });
 
         Route::prefix('dashboard')

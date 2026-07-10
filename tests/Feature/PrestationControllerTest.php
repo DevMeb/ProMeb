@@ -34,12 +34,7 @@ it('récupère les prestations de l\'utilisateur connecté', function () {
  * 🔹 TEST: Création d'une prestation avec des données valides
  */
 it('crée une prestation avec des données valides', function () {
-    $data = [
-        'date'      => now()->toDateString(),
-        'heures'    => 5,
-        'adresse'   => '123 rue du Test',
-        'horaires'  => '10:00-12:00',
-    ];
+    $data = prestationPayload($this->user);
 
     $response = $this->postJson(route('prestations.store'), $data);
 
@@ -69,12 +64,12 @@ it('retourne une erreur 422 si les données sont invalides lors de la création'
 it('met à jour une prestation existante', function () {
     $prestation = Prestation::factory()->create(['user_id' => $this->user->id]);
 
-    $updatedData = [
+    $updatedData = prestationPayload($this->user, [
         'date'      => now()->addDays(5)->toDateString(),
         'heures'    => 3,
         'adresse'   => '456 rue Modifiée',
         'horaires'  => '14:00-16:00',
-    ];
+    ]);
 
     $response = $this->putJson(route('prestations.update', $prestation), $updatedData);
 
@@ -90,12 +85,7 @@ it('retourne une erreur 403 si l\'utilisateur tente de modifier une prestation q
     $autreUser = User::factory()->create();
     $prestation = Prestation::factory()->create(['user_id' => $autreUser->id]);
 
-    $response = $this->putJson(route('prestations.update', $prestation), [
-        'date'      => now()->toDateString(),
-        'heures'    => 3,
-        'adresse'   => 'Nouvelle adresse',
-        'horaires'  => '10:00-12:00',
-    ]);
+    $response = $this->putJson(route('prestations.update', $prestation), prestationPayload($this->user));
 
     $response->assertForbidden();
 });
