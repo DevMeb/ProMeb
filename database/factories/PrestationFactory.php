@@ -2,6 +2,8 @@
 
 namespace Database\Factories;
 
+use App\Models\Client;
+use App\Models\TauxHoraire;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
@@ -23,6 +25,8 @@ class PrestationFactory extends Factory
             'adresse'   => $this->faker->address(),
             'horaires'  => $this->faker->time(),
             'user_id'   => User::factory(),
+            'client_id' => Client::factory(),
+            'taux_horaire_id' => TauxHoraire::factory(),
         ];
     }
 }

@@ -28,9 +28,19 @@ class FactureService extends BaseService
     {
         return $this->handleExceptions(function () use ($data) {
             return DB::transaction(function () use ($data) {
-                $prestations = Prestation::whereIn('id', $data['prestations'])
+                $ids = $data['prestations'];
+
+                $prestations = Prestation::whereIn('id', $ids)
+                                    ->where('user_id', Auth::id())
                                     ->with('tauxHoraire')
                                     ->get();
+
+                // Vérifier que toutes les prestations demandées appartiennent bien à l'utilisateur
+                if ($prestations->count() !== count(array_unique($ids))) {
+                    throw ValidationException::withMessages([
+                        'prestations' => "Une ou plusieurs prestations sélectionnées n'existent pas ou ne vous appartiennent pas.",
+                    ]);
+                }
 
                 // Vérifier si toutes les prestations appartiennent au même client
                 $clients = $prestations->groupBy('client_id');
@@ -48,7 +58,8 @@ class FactureService extends BaseService
                     'statut'        => FactureStatut::EnAttentePaiement,
                 ]);
 
-                Prestation::whereIn('id', $data['prestations'])
+                Prestation::whereIn('id', $ids)
+                    ->where('user_id', Auth::id())
                     ->update(['facture_id' => $facture->id]);
 
                 return $facture->refresh()->load('prestations.client', 'prestations.tauxHoraire');
