@@ -37,7 +37,7 @@ it('crée une prestation avec des données valides', function () {
     expect($prestation)->toBeInstanceOf(Prestation::class);
     expect($prestation->user_id)->toBe($user->id);
     expect($prestation->date->toDateString())->toBe($data['date']); // ✅ Fix ici
-    expect($prestation->heures)->toBe($data['heures']);
+    expect($prestation->heures)->toEqual($data['heures']); // decimal:2 → "5.00" == 5
     expect($prestation->adresse)->toBe($data['adresse']);
     expect($prestation->horaires)->toBe($data['horaires']);
 });
@@ -58,7 +58,7 @@ it('met à jour une prestation existante', function () {
     $updatedPrestation = $this->service->update($prestation, $updatedData);
 
     expect($updatedPrestation->date->toDateString())->toBe($updatedData['date']); // ✅ Fix ici
-    expect($updatedPrestation->heures)->toBe($updatedData['heures']);
+    expect($updatedPrestation->heures)->toEqual($updatedData['heures']); // decimal:2 → "8.00" == 8
     expect($updatedPrestation->adresse)->toBe($updatedData['adresse']);
     expect($updatedPrestation->horaires)->toBe($updatedData['horaires']);
 });

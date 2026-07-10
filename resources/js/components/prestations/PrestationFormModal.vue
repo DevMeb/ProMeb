@@ -90,6 +90,8 @@
           <label for="heures" class="block text-sm font-medium text-gray-700">Nombre d'heures</label>
           <input
             type="number"
+            step="0.25"
+            min="0"
             id="heures"
             v-model="prestationData.heures"
             class="w-full border p-2 rounded focus:outline-none focus:ring-2 focus:ring-indigo-500"

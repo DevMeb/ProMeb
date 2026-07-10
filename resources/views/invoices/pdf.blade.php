@@ -163,7 +163,7 @@
                         <td>{{ $prestation->id }}</td>
                         <td>{{ \Carbon\Carbon::parse($prestation->date)->format('d/m/Y') }}</td>
                         <td>{{ $prestation->horaires }}</td>
-                        <td>{{ $prestation->heures }}</td>
+                        <td>{{ number_format($prestation->heures, 2, ',', ' ') }}</td>
                         <td>{{ number_format($prestation->tauxHoraire->taux ?? 20, 2, ',', ' ') }} €</td>
                         <td>{{ number_format($prestation->heures * ($prestation->tauxHoraire->taux ?? 20), 2, ',', ' ') }} €</td>
                     </tr>

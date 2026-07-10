@@ -134,7 +134,7 @@ const totalHeures = computed(() => {
 });
 
 const totalHT = computed(() => {
-  return props.factures.reduce((total, invoice) => total + invoice.montant_total, 0);
+  return props.factures.reduce((total, invoice) => total + parseFloat(invoice.montant_total), 0);
 });
 
 // 📌 Marquer la facture comme payée avec chargement
