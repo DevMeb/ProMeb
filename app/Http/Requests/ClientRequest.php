@@ -21,12 +21,13 @@ class ClientRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'nom'         => 'required|string|max:255',
-            'adresse'     => 'nullable|string|max:255',
-            'code_postal' => 'nullable|string|max:20',
-            'ville'       => 'nullable|string|max:100',
-            'pays'        => 'nullable|string|max:100',
-            'siren'       => 'nullable|regex:/^\d{9}(\d{5})?$/',
+            'nom'               => 'required|string|max:255',
+            'adresse'           => 'nullable|string|max:255',
+            'code_postal'       => 'nullable|string|max:20',
+            'ville'             => 'nullable|string|max:100',
+            'pays'              => 'nullable|string|max:100',
+            'siren'             => 'nullable|regex:/^\d{9}(\d{5})?$/',
+            'afficher_horaires' => 'sometimes|boolean',
         ];
     }
 

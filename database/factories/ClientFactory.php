@@ -19,6 +19,7 @@ class ClientFactory extends Factory
             'ville'       => $this->faker->city(),
             'pays'        => 'France',
             'siren'       => (string) $this->faker->numberBetween(100000000, 999999999),
+            'afficher_horaires' => true,
             'user_id'     => User::factory(),
         ];
     }

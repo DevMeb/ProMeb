@@ -104,7 +104,23 @@
               {{ errors.validationErrors.siren.join(', ') }}
             </p>
           </div>
-  
+
+          <!-- Affichage des horaires sur la facture PDF -->
+          <div class="flex items-start gap-2 pt-2 border-t">
+            <input
+              type="checkbox"
+              id="afficher_horaires"
+              v-model="clientData.afficher_horaires"
+              class="mt-1 h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-2 focus:ring-indigo-500"
+            />
+            <label for="afficher_horaires" class="text-sm text-gray-700">
+              Afficher la colonne « Horaires » sur les factures PDF
+              <span class="block text-xs text-gray-500">
+                Décochez si ce client ne souhaite pas voir le détail des plages horaires.
+              </span>
+            </label>
+          </div>
+
           <!-- Boutons -->
           <div class="flex justify-end space-x-3 mt-4">
             <button type="button" @click="closeModal" class="px-4 py-2 border border-gray-300 rounded hover:bg-gray-100 transition">
@@ -149,8 +165,9 @@
     ville: '',
     pays: '',
     siren: '',
+    afficher_horaires: true,
   });
-  
+
   // Initialiser les données avec les props si elles existent (édition) ou avec des valeurs par défaut
   watchEffect(() => {
     clientData.value = props.client
@@ -163,6 +180,7 @@
           ville: '',
           pays: '',
           siren: '',
+          afficher_horaires: true,
         };
   });
   

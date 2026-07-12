@@ -114,10 +114,11 @@ class FactureService extends BaseService
             }
 
             $pdf = Pdf::loadView('invoices.pdf', [
-                'facture' => $facture,
-                'prestations' => $prestations,
-                'client' => $client,
-                'user' => $user,
+                'facture'          => $facture,
+                'prestations'      => $prestations,
+                'client'           => $client,
+                'user'             => $user,
+                'afficherHoraires' => (bool) $client->afficher_horaires,
             ]);
 
             return $pdf->output();
