@@ -95,4 +95,43 @@ describe('store clients — apiCall (le comportement de référence)', () => {
 
     expect(store.errors.add).toBeNull();
   });
+
+  it('monte le chargement a true PENDANT la requete', async () => {
+    // clearErrors/setLoading(operation, true) sont a l'INTERIEUR de apiCall :
+    // c'est precisement le code que ce filet doit proteger avant extraction.
+    // Les tests "redescend a false" ne suffisent pas : le `finally` pose false
+    // de toute facon, meme si la montee a true disparait du store.
+    let resoudre;
+    axios.get.mockReturnValue(new Promise((r) => { resoudre = r; }));
+    const store = useClientsStore();
+
+    const promesse = store.fetchClients();
+    // La requête est en vol : le drapeau doit être levé.
+    expect(store.loading.fetch).toBe(true);
+
+    resoudre({ data: { clients: [] } });
+    await promesse;
+
+    expect(store.loading.fetch).toBe(false);
+  });
+
+  it('DETTE FIGEE (non corrigee) : errors.validationErrors n\'est jamais vide, meme apres un succes ulterieur', async () => {
+    // clearErrors(operation) ne remet a null que errors[operation]. errors.validationErrors
+    // n'est jamais reinitialise nulle part. Un 422 laisse donc validationErrors pose
+    // indefiniment, y compris apres un appel reussi qui suit — un scenario reel : 422 sur
+    // addClient, l'utilisateur corrige, reenregistre avec succes, et validationErrors peut
+    // encore rejouer des erreurs de champ perimees.
+    // Ce test fige le comportement REEL comme une dette ; il ne doit PAS etre "corrige" ici.
+    const store = useClientsStore();
+
+    axios.post.mockRejectedValueOnce(erreurAxios(422, { errors: { nom: ['Le nom est obligatoire.'] } }));
+    await store.addClient({ nom: '' });
+    expect(store.errors.validationErrors).toEqual({ nom: ['Le nom est obligatoire.'] });
+
+    axios.post.mockResolvedValueOnce({ data: { client: { id: 1 }, message: 'Créé' } });
+    await store.addClient({ nom: 'EBS' });
+
+    // Le succes suivant N'A PAS vide validationErrors : la dette est figee ici.
+    expect(store.errors.validationErrors).toEqual({ nom: ['Le nom est obligatoire.'] });
+  });
 });
