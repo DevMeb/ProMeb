@@ -98,12 +98,17 @@ export const useInvoicesStore = defineStore('invoices', () => {
       request: () => axios.post('/api/factures', invoice),
       onSuccess: (response) => {
         invoices.value.push(response.data.facture);
-        
+
         if(dashboardStore.dashboardData) {
           dashboardStore.fetchDashboard();
         }
 
         notify('success', response.data.message);
+
+        // Signale explicitement le succès : apiCall renvoie ce que retourne
+        // onSuccess. Sans ce `true`, l'appelant reçoit `undefined` et ne peut
+        // pas distinguer une création réussie d'un échec.
+        return true;
       },
     });
   }
