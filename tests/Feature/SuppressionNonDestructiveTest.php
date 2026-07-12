@@ -128,6 +128,7 @@ it('ne revele rien a un intrus dans le message de refus', function () {
 
     $response->assertForbidden();
 
-    // Le refus ne doit PAS trahir le volume d'activité du propriétaire.
-    expect($response->json('message'))->not->toContain('25');
+    // Le refus ne doit PAS trahir le volume d'activité du propriétaire,
+    // quel que soit le nombre de prestations du fixture.
+    expect($response->json('message'))->not->toMatch('/\d/');
 });
