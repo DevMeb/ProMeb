@@ -70,3 +70,23 @@ jobs:
 
       - name: Exécution des tests
         run: php artisan test
+
+  tests-front:
+    name: Tests (front)
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout du code
+        uses: actions/checkout@v4
+
+      - name: Installation de Node 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+
+      - name: Installation des dépendances npm
+        run: npm ci
+
+      - name: Exécution des tests front
+        run: npm run test
