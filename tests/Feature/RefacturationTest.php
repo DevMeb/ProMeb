@@ -108,3 +108,30 @@ it('facture normalement des prestations libres', function () {
     expect($prestation->fresh()->facture_id)->not->toBeNull();
     expect((float) Facture::first()->montant_total)->toBe(500.0);
 });
+
+it('annule la facture si une prestation est rattachee entre la verification et le rattachement', function () {
+    [$user, $prestation] = contexteFacturation();
+
+    // Une autre facture, déjà en base, qui va « voler » la prestation.
+    $autreFacture = Facture::factory()->create(['user_id' => $user->id]);
+
+    // On simule la course au point exact où elle peut se produire :
+    // FactureService::create() vérifie les prestations, PUIS crée la facture,
+    // PUIS rattache les prestations. L'événement `created` de la facture tombe
+    // donc précisément dans la fenêtre — entre la vérification et le rattachement.
+    Facture::created(function (Facture $facture) use ($prestation, $autreFacture) {
+        if ($facture->id !== $autreFacture->id) {
+            Prestation::where('id', $prestation->id)
+                ->update(['facture_id' => $autreFacture->id]);
+        }
+    });
+
+    $this->actingAs($user)
+        ->postJson('/api/factures', ['prestations' => [$prestation->id]])
+        ->assertStatus(422);
+
+    // La facture qui venait d'être créée doit avoir été annulée par le rollback :
+    // il ne reste que $autreFacture.
+    expect(Facture::count())->toBe(1);
+    expect(Facture::first()->id)->toBe($autreFacture->id);
+});

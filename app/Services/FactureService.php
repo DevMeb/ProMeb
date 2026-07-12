@@ -58,9 +58,20 @@ class FactureService extends BaseService
                     'statut'        => FactureStatut::EnAttentePaiement,
                 ]);
 
-                Prestation::whereIn('id', $ids)
+                // Le rattachement ne touche QUE les prestations encore libres.
+                // Si une autre requête en a rattaché une entre-temps (deux onglets),
+                // le nombre de lignes affectées ne correspondra pas : on annule tout
+                // plutôt que d'écraser sa facture — ce qui la viderait silencieusement.
+                $affectees = Prestation::whereIn('id', $ids)
                     ->where('user_id', Auth::id())
+                    ->whereNull('facture_id')
                     ->update(['facture_id' => $facture->id]);
+
+                if ($affectees !== count(array_unique($ids))) {
+                    throw ValidationException::withMessages([
+                        'prestations' => "Une ou plusieurs prestations viennent d'être rattachées à une autre facture. Rechargez la page et réessayez.",
+                    ]);
+                }
 
                 return $facture->refresh()->load('prestations.client', 'prestations.tauxHoraire');
             });
