@@ -2,13 +2,13 @@
   <div class="border-b border-gray-700 last:border-b-0" :class="{ 'bg-indigo-500/5': estDeplie }">
     <!-- Ligne -->
     <div
-      class="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-0 px-4 py-3 hover:bg-white/[.02] transition cursor-pointer"
+      class="flex flex-col lg:flex-row lg:items-center gap-3 lg:gap-0 px-4 py-3 hover:bg-white/[.02] transition cursor-pointer"
       @click="basculer"
     >
       <!-- Chevron + numéro -->
       <button
         type="button"
-        class="flex items-center gap-2 text-left sm:w-[100px] shrink-0 text-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 rounded"
+        class="flex items-center gap-2 text-left lg:w-[100px] shrink-0 text-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 rounded"
         :aria-expanded="estDeplie"
         :aria-controls="`facture-detail-${invoice.id}`"
         @click.stop="basculer"
@@ -23,38 +23,38 @@
 
       <!-- Client -->
       <div class="flex-1 min-w-0 overflow-hidden">
-        <span class="sm:hidden text-xs uppercase tracking-wide text-gray-400 mr-2">Client</span>
+        <span class="lg:hidden text-xs uppercase tracking-wide text-gray-400 mr-2">Client</span>
         <span class="block truncate font-semibold text-white">{{ nomClient }}</span>
       </div>
 
       <!-- Heures -->
-      <div class="sm:w-[100px] sm:text-right flex justify-between sm:block">
-        <span class="sm:hidden text-xs uppercase tracking-wide text-gray-400">Heures</span>
+      <div class="lg:w-[100px] lg:text-right flex justify-between lg:block">
+        <span class="lg:hidden text-xs uppercase tracking-wide text-gray-400">Heures</span>
         <span class="text-gray-200 tabular-nums">{{ formatNombre(invoice.heures_total) }} h</span>
       </div>
 
       <!-- Montant -->
-      <div class="sm:w-[130px] sm:text-right flex justify-between sm:block">
-        <span class="sm:hidden text-xs uppercase tracking-wide text-gray-400">Montant</span>
+      <div class="lg:w-[130px] lg:text-right flex justify-between lg:block">
+        <span class="lg:hidden text-xs uppercase tracking-wide text-gray-400">Montant</span>
         <span class="font-semibold text-white tabular-nums">{{ formatEuros(invoice.montant_total) }}</span>
       </div>
 
       <!-- Statut -->
-      <div class="sm:w-[160px] sm:pl-4 flex justify-between sm:block">
-        <span class="sm:hidden text-xs uppercase tracking-wide text-gray-400">Statut</span>
+      <div class="lg:w-[180px] lg:pl-4 flex justify-between lg:block">
+        <span class="lg:hidden text-xs uppercase tracking-wide text-gray-400">Statut</span>
         <span :class="getStatusBadge(invoice.statut)">{{ getStatusText(invoice.statut) }}</span>
       </div>
 
       <!-- Actions : ne doivent pas déplier la ligne -->
-      <div class="flex gap-2 sm:justify-end sm:w-[200px]" @click.stop>
-        <button @click="showPdfModal = true" class="btn-action bg-gray-600 flex-1 sm:flex-none justify-center">
-          📄 <span class="sm:hidden lg:inline">PDF</span>
+      <div class="flex gap-2 lg:justify-end lg:w-[240px]" @click.stop>
+        <button @click="showPdfModal = true" class="btn-action bg-gray-600 flex-1 lg:flex-none justify-center">
+          📄 <span>PDF</span>
         </button>
 
         <button
           v-if="invoice.statut === 'en_attente_paiement'"
           @click="showDeleteModal = true"
-          class="btn-action bg-red-500 flex-1 sm:flex-none justify-center"
+          class="btn-action bg-red-500 flex-1 lg:flex-none justify-center"
           aria-label="Supprimer la facture"
         >
           🗑️
@@ -64,11 +64,11 @@
           v-if="invoice.statut === 'en_attente_paiement'"
           @click="markAsPaid(invoice)"
           :disabled="loading.paid"
-          class="btn-action bg-green-500 disabled:opacity-50 flex-1 sm:flex-none justify-center"
+          class="btn-action bg-green-500 disabled:opacity-50 flex-1 lg:flex-none justify-center"
         >
           <span v-if="loading.paid" class="animate-spin border-2 border-white border-t-transparent rounded-full w-3 h-3"></span>
           <span v-else>✅</span>
-          <span class="sm:hidden lg:inline">Payé</span>
+          <span>Payé</span>
         </button>
       </div>
     </div>
@@ -82,7 +82,7 @@
       leave-from-class="opacity-100"
       leave-to-class="opacity-0"
     >
-      <div v-show="estDeplie" :id="`facture-detail-${invoice.id}`" class="px-4 pb-4 sm:pl-14">
+      <div v-show="estDeplie" :id="`facture-detail-${invoice.id}`" class="px-4 pb-4 lg:pl-14">
         <FacturePrestationsTable :invoice="invoice" />
       </div>
     </Transition>

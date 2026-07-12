@@ -38,13 +38,13 @@
     <!-- La liste -->
     <div v-else class="mt-6 bg-gray-800 rounded-lg ring-1 ring-gray-700 overflow-hidden">
       <!-- En-tête de colonnes : masqué sur mobile, où chaque ligne devient une carte -->
-      <div class="hidden sm:flex items-center px-4 py-2 border-b border-gray-700 text-xs uppercase tracking-wide text-gray-400">
+      <div class="hidden lg:flex items-center px-4 py-2 border-b border-gray-700 text-xs uppercase tracking-wide text-gray-400">
         <span class="w-[100px] shrink-0">N°</span>
         <span class="flex-1">Client</span>
         <span class="w-[100px] text-right">Heures</span>
         <span class="w-[130px] text-right">Montant</span>
-        <span class="w-[160px] pl-4">Statut</span>
-        <span class="w-[200px]"></span>
+        <span class="w-[180px] pl-4">Statut</span>
+        <span class="w-[240px]"></span>
       </div>
 
       <FactureListItem
