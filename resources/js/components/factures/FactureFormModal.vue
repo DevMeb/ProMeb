@@ -149,10 +149,10 @@
 
         <!-- L'erreur s'affiche DANS la modale : la sélection n'est jamais perdue. -->
         <div
-          v-if="errors.add"
+          v-if="messageErreur"
           class="mt-4 p-3 bg-red-500/10 text-red-400 rounded-lg border border-red-500/30"
         >
-          ⚠️ {{ errors.add }}
+          ⚠️ {{ messageErreur }}
         </div>
 
         <!-- Actions -->
@@ -272,6 +272,22 @@ const totalHT = computed(() =>
   )
 );
 
+/**
+ * L'erreur vient de deux endroits selon le code HTTP, et c'est un piège :
+ * apiCall range un 422 dans `errors.validationErrors` (SANS déclencher de toast),
+ * et tout le reste dans `errors.add` (avec toast). Or 422 est justement le cas
+ * nominal ici — prestation déjà facturée, clients différents. N'afficher que
+ * `errors.add` laisserait l'utilisateur devant un bouton qui ne fait « rien ».
+ */
+const messageErreur = computed(() =>
+  errors.value.validationErrors?.prestations?.[0] ?? errors.value.add ?? null
+);
+
+function nettoyerErreurs() {
+  clearErrors('add');
+  clearErrors('validationErrors');
+}
+
 function libelleMois(mois) {
   const [annee, m] = mois.split('-');
   const nom = new Intl.DateTimeFormat('fr-FR', { month: 'long' })
@@ -283,14 +299,14 @@ function choisirClient(client) {
   clientChoisi.value = client;
   idsSelectionnes.value = [];
   moisFiltre.value = '';
-  clearErrors('add');
+  nettoyerErreurs();
 }
 
 function revenirAuxClients() {
   clientChoisi.value = null;
   idsSelectionnes.value = [];
   moisFiltre.value = '';
-  clearErrors('add');
+  nettoyerErreurs();
 }
 
 // Ne bascule que les prestations visibles : un filtre de mois actif ne doit pas
@@ -318,7 +334,7 @@ async function creerLaFacture() {
 }
 
 const close = () => {
-  clearErrors('add');
+  nettoyerErreurs();
   emit('close');
 };
 </script>
