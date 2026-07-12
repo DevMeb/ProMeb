@@ -6,6 +6,7 @@ use App\Models\Prestation;
 use App\Models\TauxHoraire;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Event;
 
 uses(RefreshDatabase::class);
 
@@ -126,17 +127,29 @@ function creerFactureAvecHoraires(bool $afficherHoraires): array
 it('télécharge un PDF valide pour une facture dont le client affiche les horaires', function () {
     ['user' => $user, 'facture' => $facture] = creerFactureAvecHoraires(true);
 
+    $donneesVue = [];
+    Event::listen('composing: invoices.pdf', function ($view) use (&$donneesVue) {
+        $donneesVue = $view->getData();
+    });
+
     $response = $this->actingAs($user)->getJson(route('factures.pdf', $facture));
 
     $response->assertOk();
     expect($response->streamedContent())->toStartWith('%PDF-');
+    expect($donneesVue['afficherHoraires'])->toBe(true);
 });
 
 it('télécharge un PDF valide pour une facture dont le client masque les horaires', function () {
     ['user' => $user, 'facture' => $facture] = creerFactureAvecHoraires(false);
 
+    $donneesVue = [];
+    Event::listen('composing: invoices.pdf', function ($view) use (&$donneesVue) {
+        $donneesVue = $view->getData();
+    });
+
     $response = $this->actingAs($user)->getJson(route('factures.pdf', $facture));
 
     $response->assertOk();
     expect($response->streamedContent())->toStartWith('%PDF-');
+    expect($donneesVue['afficherHoraires'])->toBe(false);
 });
