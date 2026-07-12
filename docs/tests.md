@@ -3,13 +3,15 @@
 ## Par défaut — SQLite en mémoire (rapide)
 
 ```bash
-php artisan test --testsuite=Feature
+php artisan test
 ```
 
-Environ 1,4 s. C'est ce que fait `phpunit.xml`, et c'est ce qu'il faut pour itérer.
+Environ 2 s. Lance les deux suites :
 
-> `php artisan test` **sans** `--testsuite=Feature` échoue : `phpunit.xml` déclare
-> une suite `Unit` alors que `tests/Unit/` n'existe pas.
+- **`tests/Unit/`** — logique pure, sans base ni application Laravel (le parser de
+  relevés, par exemple). Ces tests ne passent pas par `Tests\TestCase`.
+- **`tests/Feature/`** — tout le reste : API, policies, services, PDF. Base SQLite
+  en mémoire, d'où la rapidité.
 
 ## Sur MySQL — le moteur de la production (fidèle)
 
