@@ -3,7 +3,6 @@
 namespace App\Observers;
 
 use App\Models\User;
-use Illuminate\Support\Facades\DB;
 
 class UserObserver
 {
@@ -31,11 +30,19 @@ class UserObserver
      * native sur clients, taux_horaires, factures puis users peut ensuite
      * s'exécuter sans obstacle. prestations.facture_id est en
      * nullOnDelete et ne bloque de toute façon jamais une suppression.
+     *
+     * IMPORTANT : cette méthode n'ouvre volontairement AUCUNE transaction.
+     * `Model::delete()` ne s'exécute pas lui-même dans une transaction : il
+     * déclenche l'event `deleting` (donc cette méthode), PUIS exécute le
+     * `DELETE` du user. Une transaction ouverte ici committerait dès la fin
+     * de cette méthode, indépendamment du succès de la suppression du user
+     * qui suit — les prestations seraient perdues même si la suppression du
+     * user échoue ensuite. L'atomicité est garantie par l'appelant : voir
+     * `App\Actions\DeleteUser`, le seul point d'entrée à utiliser pour
+     * supprimer un compte.
      */
     public function deleting(User $user): void
     {
-        DB::transaction(function () use ($user) {
-            $user->prestations()->delete();
-        });
+        $user->prestations()->delete();
     }
 }

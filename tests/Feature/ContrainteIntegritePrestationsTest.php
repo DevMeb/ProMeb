@@ -1,5 +1,6 @@
 <?php
 
+use App\Actions\DeleteUser;
 use App\Models\Client;
 use App\Models\Facture;
 use App\Models\Prestation;
@@ -68,7 +69,10 @@ it('la suppression d\'un utilisateur emporte toujours ses donnees', function () 
     // Depuis le correctif, UserObserver::deleting() supprime explicitement
     // les prestations de l'utilisateur avant que la cascade native ne
     // s'attaque à ses clients, taux horaires et factures.
-    $user->delete();
+    //
+    // Passe par App\Actions\DeleteUser, seul point d'entrée valide pour
+    // supprimer un compte (voir son docblock).
+    (new DeleteUser())->execute($user);
 
     expect(Prestation::find($prestation->id))->toBeNull();
     expect(Client::find($client->id))->toBeNull();
