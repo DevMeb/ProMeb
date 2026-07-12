@@ -4,6 +4,7 @@ import { useRouter } from "vue-router";
 import axios from "axios";
 import { useToast } from "vue-toastification";
 import { notify } from "@/utils";
+import { creerApiCall } from "@/stores/apiCall";
 
 export const useAuthStore = defineStore("auth", () => {
   const user = ref(null);
@@ -11,6 +12,15 @@ export const useAuthStore = defineStore("auth", () => {
   const loading = ref({});
   const router = useRouter();
   const toast = useToast();
+
+  // relancerLesErreurs : ce store relance l'erreur après l'avoir traitée.
+  // C'est updateUser() — la seule opération de ce store qui passe par apiCall —
+  // qui en dépend. login() a son propre try/catch et ne passe pas par ici.
+  const { apiCall, clearErrors, setLoading } = creerApiCall({
+    errors,
+    loading,
+    relancerLesErreurs: true,
+  });
 
   const isAuthenticated = computed(() => !!user.value);
 
@@ -53,38 +63,6 @@ export const useAuthStore = defineStore("auth", () => {
     user.value = null;
     toast.info("Déconnexion réussie.");
     await router.push("/login");
-  }
-
-  function clearErrors(operation) {
-    if (operation) {
-      errors.value[operation] = null;
-    } else {
-      errors.value = {};
-    }
-  }
-
-  function setLoading(operation, state) {
-    loading.value[operation] = state;
-  }
-
-  async function apiCall({ operation, request, onSuccess }) {
-      clearErrors(operation);
-      setLoading(operation, true);
-      try {
-        const response = await request();
-        if (onSuccess) onSuccess(response);
-        return response;
-      } catch (err) {
-        if (err.response?.status === 422) {
-          errors.value.validationErrors = err.response.data.errors;
-        } else {
-          errors.value[operation] = err.response?.data?.message || "Une erreur est survenue.";
-          notify('error', errors.value[operation]);
-        }
-        throw err;
-      } finally {
-        setLoading(operation, false);
-      }
   }
 
   async function updateUser(user) {
