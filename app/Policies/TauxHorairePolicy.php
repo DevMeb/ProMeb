@@ -70,7 +70,8 @@ class TauxHorairePolicy
             return Response::deny(
                 "Ce taux horaire est utilisé par {$facturees} prestation" . ($facturees > 1 ? 's' : '')
                 . ' facturée' . ($facturees > 1 ? 's' : '') . '. '
-                . 'Supprimez d\'abord la ou les factures correspondantes avant de supprimer ce taux horaire.'
+                . 'Supprimez d\'abord la ou les factures correspondantes, puis modifiez le taux de la ou '
+                . 'des prestations ainsi détachées ou supprimez-les, avant de supprimer ce taux horaire.'
             );
         }
 
@@ -78,8 +79,9 @@ class TauxHorairePolicy
             "Ce taux horaire est utilisé par {$nonFacturees} prestation" . ($nonFacturees > 1 ? 's' : '')
             . ' non facturée' . ($nonFacturees > 1 ? 's' : '') . " et {$facturees} prestation"
             . ($facturees > 1 ? 's' : '') . ' facturée' . ($facturees > 1 ? 's' : '') . '. '
-            . 'Modifiez le taux des prestations non facturées ou supprimez-les, et supprimez d\'abord '
-            . 'la ou les factures correspondantes aux prestations facturées, avant de supprimer ce taux horaire.'
+            . 'Modifiez le taux de la ou des prestations non facturées ou supprimez-les, puis supprimez '
+            . 'la ou les factures correspondant aux prestations facturées ainsi que la ou les prestations '
+            . 'ainsi détachées, avant de supprimer ce taux horaire.'
         );
     }
 }

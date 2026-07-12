@@ -48,7 +48,8 @@ class ClientPolicy
             return Response::deny(
                 "Ce client a {$facturees} prestation" . ($facturees > 1 ? 's' : '') . ' facturée'
                 . ($facturees > 1 ? 's' : '') . '. '
-                . 'Supprimez d\'abord la ou les factures correspondantes avant de supprimer le client.'
+                . 'Supprimez d\'abord la ou les factures correspondantes, puis supprimez la ou les '
+                . 'prestations ainsi détachées, avant de supprimer le client.'
             );
         }
 
@@ -56,8 +57,9 @@ class ClientPolicy
             "Ce client a {$nonFacturees} prestation" . ($nonFacturees > 1 ? 's' : '') . ' non facturée'
             . ($nonFacturees > 1 ? 's' : '') . " et {$facturees} prestation" . ($facturees > 1 ? 's' : '')
             . ' facturée' . ($facturees > 1 ? 's' : '') . '. '
-            . 'Supprimez d\'abord les prestations non facturées, ainsi que la ou les factures '
-            . 'correspondantes aux prestations facturées, avant de supprimer le client.'
+            . 'Supprimez d\'abord la ou les prestations non facturées, puis supprimez la ou les factures '
+            . 'correspondant aux prestations facturées ainsi que la ou les prestations ainsi détachées, '
+            . 'avant de supprimer le client.'
         );
     }
 }
