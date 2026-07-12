@@ -69,4 +69,4 @@ jobs:
         run: php artisan db:show
 
       - name: Exécution des tests
-        run: php artisan test --testsuite=Feature
+        run: php artisan test

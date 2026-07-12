@@ -58,4 +58,4 @@ docker compose exec -T \
     -e DB_DATABASE="${BASE_DE_TEST}" \
     -e DB_USERNAME=laravel \
     -e DB_PASSWORD=secret \
-    app php artisan test --testsuite=Feature "$@"
+    app php artisan test "$@"
