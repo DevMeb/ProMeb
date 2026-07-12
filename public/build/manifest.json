@@ -1,28 +1,36 @@
 {
-  "_ClientFormModal-5-5Qj3yv.js": {
-    "file": "assets/ClientFormModal-5-5Qj3yv.js",
+  "_ClientFormModal-rlFfuo06.js": {
+    "file": "assets/ClientFormModal-rlFfuo06.js",
     "name": "ClientFormModal",
     "imports": [
-      "resources/js/app.js"
+      "resources/js/app.js",
+      "_clients-DefvV8wt.js"
     ]
   },
-  "_FactureFormModal-Bkfy8YDB.js": {
-    "file": "assets/FactureFormModal-Bkfy8YDB.js",
+  "_FactureFormModal-CaxtkXzi.js": {
+    "file": "assets/FactureFormModal-CaxtkXzi.js",
     "name": "FactureFormModal",
     "imports": [
       "resources/js/app.js",
-      "_prestations-D19PXJVM.js"
+      "_prestations-BmbIFofF.js"
     ]
   },
-  "_TauxHoraireFormModal-Ck41p_W9.js": {
-    "file": "assets/TauxHoraireFormModal-Ck41p_W9.js",
+  "_TauxHoraireFormModal-Cf2huaZ5.js": {
+    "file": "assets/TauxHoraireFormModal-Cf2huaZ5.js",
     "name": "TauxHoraireFormModal",
     "imports": [
       "resources/js/app.js"
     ]
   },
-  "_prestations-D19PXJVM.js": {
-    "file": "assets/prestations-D19PXJVM.js",
+  "_clients-DefvV8wt.js": {
+    "file": "assets/clients-DefvV8wt.js",
+    "name": "clients",
+    "imports": [
+      "resources/js/app.js"
+    ]
+  },
+  "_prestations-BmbIFofF.js": {
+    "file": "assets/prestations-BmbIFofF.js",
     "name": "prestations",
     "imports": [
       "resources/js/app.js"
@@ -48,7 +56,7 @@
     "src": "resources/images/hills.jpg"
   },
   "resources/js/app.js": {
-    "file": "assets/app-BGMfvhVI.js",
+    "file": "assets/app-DD3sBOU2.js",
     "name": "app",
     "src": "resources/js/app.js",
     "isEntry": true,
@@ -70,48 +78,50 @@
     ]
   },
   "resources/js/views/Client.vue": {
-    "file": "assets/Client-DclmB6EX.js",
+    "file": "assets/Client-xdXV3Sxd.js",
     "name": "Client",
     "src": "resources/js/views/Client.vue",
     "isDynamicEntry": true,
     "imports": [
       "resources/js/app.js",
-      "_ClientFormModal-5-5Qj3yv.js"
+      "_clients-DefvV8wt.js",
+      "_ClientFormModal-rlFfuo06.js"
     ],
     "css": [
       "assets/app-wl3FAOQf.css"
     ]
   },
   "resources/js/views/Dashboard.vue": {
-    "file": "assets/Dashboard-BPgrGwOG.js",
+    "file": "assets/Dashboard-DMnIMhSt.js",
     "name": "Dashboard",
     "src": "resources/js/views/Dashboard.vue",
     "isDynamicEntry": true,
     "imports": [
       "resources/js/app.js",
-      "_FactureFormModal-Bkfy8YDB.js",
-      "_prestations-D19PXJVM.js"
+      "_FactureFormModal-CaxtkXzi.js",
+      "_prestations-BmbIFofF.js"
     ],
     "css": [
       "assets/app-wl3FAOQf.css"
     ]
   },
   "resources/js/views/Facture.vue": {
-    "file": "assets/Facture-Cu2CHPpW.js",
+    "file": "assets/Facture-ZOHv7Rx6.js",
     "name": "Facture",
     "src": "resources/js/views/Facture.vue",
     "isDynamicEntry": true,
     "imports": [
-      "_FactureFormModal-Bkfy8YDB.js",
       "resources/js/app.js",
-      "_prestations-D19PXJVM.js"
+      "_FactureFormModal-CaxtkXzi.js",
+      "_clients-DefvV8wt.js",
+      "_prestations-BmbIFofF.js"
     ],
     "css": [
       "assets/app-wl3FAOQf.css"
     ]
   },
   "resources/js/views/Login.vue": {
-    "file": "assets/Login-C_wymkZw.js",
+    "file": "assets/Login-CYiv2c9s.js",
     "name": "Login",
     "src": "resources/js/views/Login.vue",
     "isDynamicEntry": true,
@@ -123,7 +133,7 @@
     ]
   },
   "resources/js/views/NotFound.vue": {
-    "file": "assets/NotFound-BFmZrG6b.js",
+    "file": "assets/NotFound-mp916j2C.js",
     "name": "NotFound",
     "src": "resources/js/views/NotFound.vue",
     "isDynamicEntry": true,
@@ -135,22 +145,23 @@
     ]
   },
   "resources/js/views/Prestation.vue": {
-    "file": "assets/Prestation-YnDJEybB.js",
+    "file": "assets/Prestation-BJD8EdO3.js",
     "name": "Prestation",
     "src": "resources/js/views/Prestation.vue",
     "isDynamicEntry": true,
     "imports": [
       "resources/js/app.js",
-      "_prestations-D19PXJVM.js",
-      "_ClientFormModal-5-5Qj3yv.js",
-      "_TauxHoraireFormModal-Ck41p_W9.js"
+      "_prestations-BmbIFofF.js",
+      "_clients-DefvV8wt.js",
+      "_TauxHoraireFormModal-Cf2huaZ5.js",
+      "_ClientFormModal-rlFfuo06.js"
     ],
     "css": [
       "assets/app-wl3FAOQf.css"
     ]
   },
   "resources/js/views/Profile.vue": {
-    "file": "assets/Profile-D_2RTsxk.js",
+    "file": "assets/Profile-kaSxKZrD.js",
     "name": "Profile",
     "src": "resources/js/views/Profile.vue",
     "isDynamicEntry": true,
@@ -163,7 +174,7 @@
     ]
   },
   "resources/js/views/PwaStatus.vue": {
-    "file": "assets/PwaStatus-C5nyIZZW.js",
+    "file": "assets/PwaStatus-BNDx-jYh.js",
     "name": "PwaStatus",
     "src": "resources/js/views/PwaStatus.vue",
     "isDynamicEntry": true,
@@ -179,13 +190,13 @@
     ]
   },
   "resources/js/views/TauxHoraire.vue": {
-    "file": "assets/TauxHoraire-Bk_9Pt5d.js",
+    "file": "assets/TauxHoraire-chlsZJlU.js",
     "name": "TauxHoraire",
     "src": "resources/js/views/TauxHoraire.vue",
     "isDynamicEntry": true,
     "imports": [
       "resources/js/app.js",
-      "_TauxHoraireFormModal-Ck41p_W9.js"
+      "_TauxHoraireFormModal-Cf2huaZ5.js"
     ],
     "css": [
       "assets/app-wl3FAOQf.css"

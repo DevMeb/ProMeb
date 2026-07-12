@@ -15,7 +15,7 @@
               </div>
             </div>
             <!-- 📋 Liste des factures -->
-            <FacturesList />
+            <FacturesList @create="showFormModal = true" />
             <FactureFormModal v-if="showFormModal" @close="showFormModal = false" />
           </div>
         </div>
