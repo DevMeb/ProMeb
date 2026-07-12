@@ -18,7 +18,7 @@ class ClientService extends BaseService
     {
         return $this->handleExceptions(function () use ($data) {
             $data['user_id'] = Auth::id();
-            return Client::create($data);
+            return Client::create($data)->refresh();
         }, "Erreur lors de la création du client", "client");
     }
 
