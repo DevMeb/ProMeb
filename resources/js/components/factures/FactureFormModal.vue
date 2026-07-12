@@ -20,6 +20,17 @@
         <div v-for="n in 3" :key="n" class="h-16 bg-gray-800 rounded-xl animate-pulse"></div>
       </div>
 
+      <!-- Le chargement a échoué : surtout ne pas afficher « tout est facturé »,
+           qui serait un mensonge rassurant. -->
+      <div
+        v-else-if="errorsPrestations.fetch"
+        class="mt-8 p-6 text-center rounded-xl bg-red-500/10 border border-red-500/30"
+      >
+        <div class="text-3xl mb-2">⚠️</div>
+        <p class="text-red-400 font-semibold mb-1">Chargement impossible</p>
+        <p class="text-red-400/80 text-sm">{{ errorsPrestations.fetch }}</p>
+      </div>
+
       <!-- Aucune prestation à facturer, tous clients confondus -->
       <div
         v-else-if="unbilledPrestations.length === 0"
@@ -188,7 +199,11 @@ import { formatDate, formatNombre, formatEuros } from '@/utils';
 const emit = defineEmits(['close']);
 
 const prestationsStore = usePrestationsStore();
-const { unbilledPrestations, loading: loadingPrestations } = storeToRefs(prestationsStore);
+const {
+  unbilledPrestations,
+  loading: loadingPrestations,
+  errors: errorsPrestations,
+} = storeToRefs(prestationsStore);
 const { fetchPrestations } = prestationsStore;
 
 const invoicesStore = useInvoicesStore();
@@ -323,6 +338,12 @@ function basculerTout() {
 
 async function creerLaFacture() {
   if (!idsSelectionnes.value.length) return;
+
+  // Indispensable avant chaque tentative : apiCall ne vide que la clé de
+  // l'opération ('add'), jamais 'validationErrors'. Sans ce nettoyage, un 422
+  // suivi d'une erreur réseau laisserait le bandeau afficher l'ancien message
+  // (prioritaire) pendant que le toast en annonce un autre.
+  nettoyerErreurs();
 
   const succes = await addInvoice({ prestations: [...idsSelectionnes.value] });
 
