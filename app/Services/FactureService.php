@@ -6,7 +6,6 @@ use App\Enums\FactureStatut;
 use App\Models\Facture;
 use App\Models\Prestation;
 use Barryvdh\DomPDF\Facade\Pdf;
-use Exception;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
@@ -42,10 +41,14 @@ class FactureService extends BaseService
                     ]);
                 }
 
-                // Vérifier si toutes les prestations appartiennent au même client
+                // Une facture ne peut concerner qu'un seul client.
+                // ValidationException (et non Exception) : c'est une erreur métier,
+                // que l'utilisateur doit lire — pas un plantage serveur en 500.
                 $clients = $prestations->groupBy('client_id');
                 if ($clients->count() > 1) {
-                    throw new Exception("Toutes les prestations doivent appartenir au même client.");
+                    throw ValidationException::withMessages([
+                        'prestations' => 'Toutes les prestations doivent concerner le même client. Créez une facture par client.',
+                    ]);
                 }
 
                 $heuresTotal = $prestations->sum('heures');
