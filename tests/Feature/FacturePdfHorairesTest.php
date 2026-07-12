@@ -73,4 +73,70 @@ it('conserve les autres colonnes quand les horaires sont masqués', function () 
     expect($html)->toContain('Qté');
     expect($html)->toContain('PU HT');
     expect($html)->toContain('Total HT');
+
+    // Et les lignes du tableau des prestations comptent bien 5 cellules, pas 6.
+    // On isole le <tbody> : c'est le seul de tout le document (le tableau
+    // d'en-tête N° facture / date / lieu n'utilise que des <tr> bruts).
+    preg_match('/<tbody>(.*?)<\/tbody>/s', $html, $tbodyMatch);
+    expect($tbodyMatch)->toHaveCount(2);
+
+    preg_match('/<tr>(.*?)<\/tr>/s', $tbodyMatch[1], $rowMatch);
+    expect($rowMatch)->toHaveCount(2);
+
+    $nbCellules = substr_count($rowMatch[1], '<td>');
+    expect($nbCellules)->toBe(5);
+});
+
+/**
+ * Crée un jeu de données complet (utilisateur au profil complet, client,
+ * taux horaire, facture et prestation) prêt pour appeler le vrai endpoint
+ * GET /api/factures/{id}/pdf.
+ */
+function creerFactureAvecHoraires(bool $afficherHoraires): array
+{
+    $user = User::factory()->create([
+        'iban'        => 'FR7630006000011234567890189',
+        'name'        => 'Dupont',
+        'prenom'      => 'Jean',
+        'adresse'     => '1 rue de Paris',
+        'ville'       => 'Paris',
+        'code_postal' => '75001',
+        'siren'       => '123456789',
+        'nom_societe' => 'Jean Dupont Freelance',
+    ]);
+    $client = Client::factory()->create([
+        'user_id'           => $user->id,
+        'afficher_horaires' => $afficherHoraires,
+    ]);
+    $taux    = TauxHoraire::factory()->create(['user_id' => $user->id, 'taux' => 25]);
+    $facture = Facture::factory()->create(['user_id' => $user->id]);
+
+    Prestation::factory()->create([
+        'user_id'         => $user->id,
+        'client_id'       => $client->id,
+        'taux_horaire_id' => $taux->id,
+        'facture_id'      => $facture->id,
+        'horaires'        => '11h45-15h 18h45-2h',
+        'heures'          => 9.25,
+    ]);
+
+    return ['user' => $user, 'facture' => $facture];
+}
+
+it('télécharge un PDF valide pour une facture dont le client affiche les horaires', function () {
+    ['user' => $user, 'facture' => $facture] = creerFactureAvecHoraires(true);
+
+    $response = $this->actingAs($user)->getJson(route('factures.pdf', $facture));
+
+    $response->assertOk();
+    expect($response->streamedContent())->toStartWith('%PDF-');
+});
+
+it('télécharge un PDF valide pour une facture dont le client masque les horaires', function () {
+    ['user' => $user, 'facture' => $facture] = creerFactureAvecHoraires(false);
+
+    $response = $this->actingAs($user)->getJson(route('factures.pdf', $facture));
+
+    $response->assertOk();
+    expect($response->streamedContent())->toStartWith('%PDF-');
 });
