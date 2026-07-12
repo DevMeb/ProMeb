@@ -29,7 +29,6 @@ export const useAuthStore = defineStore("auth", () => {
 
   /** Connexion utilisateur */
   async function login(email, password) {
-    console.log('LOGIN VALUE', loading.value);
     loading.value['login'] = true;
     errors.value['login'] = null;
     try {
