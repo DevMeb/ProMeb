@@ -151,7 +151,9 @@
                     <tr>
                         <th>Réf.</th>
                         <th>Date</th>
+                        @if ($afficherHoraires)
                         <th>Horaires</th>
+                        @endif
                         <th>Qté</th>
                         <th>PU HT</th>
                         <th>Total HT</th>
@@ -162,7 +164,9 @@
                     <tr>
                         <td>{{ $prestation->id }}</td>
                         <td>{{ \Carbon\Carbon::parse($prestation->date)->format('d/m/Y') }}</td>
+                        @if ($afficherHoraires)
                         <td>{{ $prestation->horaires }}</td>
+                        @endif
                         <td>{{ number_format($prestation->heures, 2, ',', ' ') }}</td>
                         <td>{{ number_format($prestation->tauxHoraire->taux ?? 20, 2, ',', ' ') }} €</td>
                         <td>{{ number_format($prestation->heures * ($prestation->tauxHoraire->taux ?? 20), 2, ',', ' ') }} €</td>
