@@ -62,6 +62,12 @@ class FactureService extends BaseService
                 // Si une autre requête en a rattaché une entre-temps (deux onglets),
                 // le nombre de lignes affectées ne correspondra pas : on annule tout
                 // plutôt que d'écraser sa facture — ce qui la viderait silencieusement.
+                //
+                // Attention : sur MySQL, update() renvoie le nombre de lignes *changées*,
+                // pas *appariées*. Le décompte ci-dessous n'est juste que parce que
+                // facture_id passe forcément de NULL à une valeur. Rendre cette écriture
+                // idempotente (réattacher à la même facture) ferait lire 0 et rejetterait
+                // une facture pourtant légitime.
                 $affectees = Prestation::whereIn('id', $ids)
                     ->where('user_id', Auth::id())
                     ->whereNull('facture_id')
