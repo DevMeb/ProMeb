@@ -46,3 +46,19 @@ it('persiste afficher_horaires à la mise à jour via l\'API', function () {
     $response->assertOk();
     expect($client->fresh()->afficher_horaires)->toBeFalse();
 });
+
+it('conserve afficher_horaires à false quand la mise à jour ne l\'envoie pas', function () {
+    $user   = User::factory()->create();
+    $client = Client::factory()->create([
+        'user_id'           => $user->id,
+        'afficher_horaires' => false,
+    ]);
+
+    $response = $this->actingAs($user)->putJson("/api/clients/{$client->id}", [
+        'nom' => 'Nouveau nom du client',
+    ]);
+
+    $response->assertOk();
+    expect($client->fresh()->nom)->toBe('Nouveau nom du client');
+    expect($client->fresh()->afficher_horaires)->toBeFalse();
+});
