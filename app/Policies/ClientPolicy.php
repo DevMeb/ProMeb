@@ -29,15 +29,35 @@ class ClientPolicy
             return false;
         }
 
-        $nombre = $client->prestations()->count();
+        $nonFacturees = $client->prestations()->whereNull('facture_id')->count();
+        $facturees = $client->prestations()->whereNotNull('facture_id')->count();
 
-        if ($nombre > 0) {
+        if ($nonFacturees === 0 && $facturees === 0) {
+            return true;
+        }
+
+        if ($facturees === 0) {
             return Response::deny(
-                "Ce client a {$nombre} prestation" . ($nombre > 1 ? 's' : '') . '. '
-                . 'Supprimez-les avant de supprimer le client.'
+                "Ce client a {$nonFacturees} prestation" . ($nonFacturees > 1 ? 's' : '') . ' non facturée'
+                . ($nonFacturees > 1 ? 's' : '') . '. '
+                . 'Supprimez-l' . ($nonFacturees > 1 ? 'es' : 'a') . ' avant de supprimer le client.'
             );
         }
 
-        return true;
+        if ($nonFacturees === 0) {
+            return Response::deny(
+                "Ce client a {$facturees} prestation" . ($facturees > 1 ? 's' : '') . ' facturée'
+                . ($facturees > 1 ? 's' : '') . '. '
+                . 'Supprimez d\'abord la ou les factures correspondantes avant de supprimer le client.'
+            );
+        }
+
+        return Response::deny(
+            "Ce client a {$nonFacturees} prestation" . ($nonFacturees > 1 ? 's' : '') . ' non facturée'
+            . ($nonFacturees > 1 ? 's' : '') . " et {$facturees} prestation" . ($facturees > 1 ? 's' : '')
+            . ' facturée' . ($facturees > 1 ? 's' : '') . '. '
+            . 'Supprimez d\'abord les prestations non facturées, ainsi que la ou les factures '
+            . 'correspondantes aux prestations facturées, avant de supprimer le client.'
+        );
     }
 }
