@@ -192,9 +192,12 @@ describe('store factures — logique metier', () => {
       ];
       await nextTick();
 
-      expect(() => {
-        store.updateFilters({ statut: '', client_id: 1, month_year: '2026-04' });
-      }).not.toThrow();
+      // Pas d'assertion `.not.toThrow()` ici : updateFilters ne fait qu'une
+      // affectation, le filtrage a lieu plus tard dans le watcher — une telle
+      // assertion ne pourrait jamais echouer (tautologie). La regression est
+      // attrapee par l'assertion finale ci-dessous, qui exerce reellement le
+      // filtrage sur les factures 4 et 5.
+      store.updateFilters({ statut: '', client_id: 1, month_year: '2026-04' });
       await nextTick();
 
       // Ni la 4 (prestations vide) ni la 5 (prestations absent) ne matchent
