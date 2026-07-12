@@ -15,7 +15,7 @@
 - Nom de la variable de vue Blade : `$afficherHoraires`.
 - Défaut : `true`. Un client existant, ou créé sans le champ, affiche les horaires.
 - La donnée `horaires` de la prestation reste saisie et stockée : seul son affichage sur le PDF est conditionné.
-- Les tests PHP tournent dans le container : `docker compose exec app php artisan test`. Lancés depuis l'hôte, ils échouent sur `getaddrinfo for db failed`.
+- Les tests tournent en local, en SQLite en mémoire (cf. `phpunit.xml`) : `php artisan test --testsuite=Feature`. Ni Docker ni MySQL requis. (`php artisan test` sans argument échoue : `phpunit.xml` déclare une suite `Unit` alors que `tests/Unit/` n'existe pas — préexistant, hors périmètre.)
 - Commits en français, format `type: description`.
 
 ---
@@ -62,12 +62,12 @@ it('permet de masquer les horaires sur un client', function () {
 
 - [ ] **Step 2: Lancer le test et vérifier qu'il échoue**
 
-Run: `docker compose exec app php artisan test tests/Feature/ClientAfficherHorairesTest.php`
+Run: `php artisan test --testsuite=Feature tests/Feature/ClientAfficherHorairesTest.php`
 Expected: FAIL — colonne `afficher_horaires` inconnue (`SQLSTATE ... Unknown column`).
 
 - [ ] **Step 3: Créer la migration**
 
-Run: `docker compose exec app php artisan make:migration add_afficher_horaires_to_clients_table --table=clients`
+Run: `php artisan make:migration add_afficher_horaires_to_clients_table --table=clients`
 
 Puis remplacer le corps du fichier généré par :
 
@@ -122,7 +122,7 @@ Dans `app/Models/Client.php`, ajouter `'afficher_horaires'` à `$fillable` (apr�
 
 - [ ] **Step 5: Lancer le test et vérifier qu'il passe**
 
-Run: `docker compose exec app php artisan test tests/Feature/ClientAfficherHorairesTest.php`
+Run: `php artisan test --testsuite=Feature tests/Feature/ClientAfficherHorairesTest.php`
 Expected: PASS — 2 tests.
 
 - [ ] **Step 6: Commit**
@@ -181,7 +181,7 @@ it('persiste afficher_horaires à la mise à jour via l\'API', function () {
 
 - [ ] **Step 2: Lancer les tests et vérifier qu'ils échouent**
 
-Run: `docker compose exec app php artisan test tests/Feature/ClientAfficherHorairesTest.php`
+Run: `php artisan test --testsuite=Feature tests/Feature/ClientAfficherHorairesTest.php`
 Expected: FAIL sur les 2 nouveaux tests — le champ n'est pas validé donc jamais passé au modèle, `afficher_horaires` reste à `true`.
 
 - [ ] **Step 3: Autoriser le champ dans la validation**
@@ -206,7 +206,7 @@ Dans `app/Http/Resources/ClientResource.php`, ajouter la clé après `siren` :
 
 - [ ] **Step 5: Lancer les tests et vérifier qu'ils passent**
 
-Run: `docker compose exec app php artisan test tests/Feature/ClientAfficherHorairesTest.php`
+Run: `php artisan test --testsuite=Feature tests/Feature/ClientAfficherHorairesTest.php`
 Expected: PASS — 4 tests.
 
 - [ ] **Step 6: Commit**
@@ -309,7 +309,7 @@ it('conserve les autres colonnes quand les horaires sont masqués', function () 
 
 - [ ] **Step 2: Lancer les tests et vérifier qu'ils échouent**
 
-Run: `docker compose exec app php artisan test tests/Feature/FacturePdfHorairesTest.php`
+Run: `php artisan test --testsuite=Feature tests/Feature/FacturePdfHorairesTest.php`
 Expected: le test « affiche » PASSE déjà (la colonne est en dur), les tests « masque » et « conserve » ÉCHOUENT — le HTML contient toujours « Horaires » alors qu'on ne veut plus le voir.
 
 - [ ] **Step 3: Conditionner la colonne dans la vue**
@@ -363,12 +363,12 @@ Dans `app/Services/FactureService.php`, méthode `getPdf()`, compléter l'appel 
 
 - [ ] **Step 5: Lancer les tests et vérifier qu'ils passent**
 
-Run: `docker compose exec app php artisan test tests/Feature/FacturePdfHorairesTest.php`
+Run: `php artisan test --testsuite=Feature tests/Feature/FacturePdfHorairesTest.php`
 Expected: PASS — 3 tests.
 
 - [ ] **Step 6: Lancer toute la suite pour vérifier qu'aucun appelant de la vue n'a été oublié**
 
-Run: `docker compose exec app php artisan test`
+Run: `php artisan test --testsuite=Feature`
 Expected: PASS — toute la suite. Un échec ici signalerait un autre appel à `view('invoices.pdf')` sans `$afficherHoraires`.
 
 - [ ] **Step 7: Commit**
@@ -465,6 +465,6 @@ git commit -m "feat: case a cocher pour l'affichage des horaires dans la fiche c
 
 ## Vérification finale
 
-- [ ] `docker compose exec app php artisan test` — toute la suite passe.
+- [ ] `php artisan test --testsuite=Feature` — toute la suite passe.
 - [ ] Un client existant, jamais touché, produit un PDF identique à avant (colonne Horaires présente).
 - [ ] Un client avec la case décochée produit un PDF sans la colonne.
