@@ -3,11 +3,14 @@ import { ref, computed, watch } from 'vue';
 import axios from 'axios';
 import { notify } from '@/utils';
 import dayjs from 'dayjs';
+import { creerApiCall } from '@/stores/apiCall';
 
 export const usePrestationsStore = defineStore('prestations', () => {
   const prestations = ref([]);
   const errors = ref({});
   const loading = ref({});
+
+  const { apiCall, clearErrors, setLoading } = creerApiCall({ errors, loading });
 
   // Filtres pour les prestations (par exemple, filtrer par date et adresse)
   const activeFilters = ref({
@@ -53,37 +56,6 @@ export const usePrestationsStore = defineStore('prestations', () => {
   const unbilledPrestations = computed(() => {
     return prestations.value.filter((prestation) => prestation.facture_id == null);
   });
-
-  function clearErrors(operation) {
-    if (operation) {
-      errors.value[operation] = null;
-    } else {
-      errors.value = {};
-    }
-  }
-
-  function setLoading(operation, state) {
-    loading.value[operation] = state;
-  }
-
-  async function apiCall({ operation, request, onSuccess }) {
-    clearErrors(operation);
-    setLoading(operation, true);
-    try {
-      const response = await request();
-      if (onSuccess) onSuccess(response);
-      return response;
-    } catch (err) {
-      if (err.response?.status === 422) {
-        errors.value.validationErrors = err.response.data.errors;
-      } else {
-        errors.value[operation] = err.response?.data?.message || "Une erreur est survenue.";
-        notify('error', errors.value[operation]);
-      }
-    } finally {
-      setLoading(operation, false);
-    }
-  }
 
   async function fetchPrestations() {
     return apiCall({
