@@ -121,6 +121,40 @@ describe('store factures — apiCall (la divergence)', () => {
     expect(store.loading.paid).toBeUndefined(); // et surtout : PAS de clé globale
   });
 
+  it('monte le chargement a true PENDANT la requete (fetch)', async () => {
+    // Meme lacune que sur le store clients : les tests "redescend a false"
+    // n'attrapent pas la disparition de setLoading(operation, true), qui vit
+    // a l'interieur d'apiCall, en amont du try/finally.
+    let resoudre;
+    axios.get.mockReturnValue(new Promise((r) => { resoudre = r; }));
+    const store = useInvoicesStore();
+
+    const promesse = store.fetchInvoices();
+    expect(store.loading.fetch).toBe(true);
+
+    resoudre({ data: { factures: [] } });
+    await promesse;
+
+    expect(store.loading.fetch).toBe(false);
+  });
+
+  it('monte loading.paid_<id> (cle indexee) a true PENDANT la requete', async () => {
+    // Le composant teste `loading[\`paid_${id}\`] === true` : c'est bien cette
+    // cle indexee, et non une cle globale "paid", qui doit monter a true en vol.
+    let resoudre;
+    axios.patch.mockReturnValue(new Promise((r) => { resoudre = r; }));
+    const store = useInvoicesStore();
+
+    const promesse = store.paid(12);
+    expect(store.loading.paid_12).toBe(true);
+    expect(store.loading.paid).toBeUndefined();
+
+    resoudre({ data: { facture: { id: 12, statut: 'payé' }, message: 'Payée' } });
+    await promesse;
+
+    expect(store.loading.paid_12).toBe(false);
+  });
+
   it('getInvoicePdf gere ses erreurs via son propre onError, pas la branche generique de apiCall', async () => {
     // getInvoicePdf fournit un onError dédié : la branche générique
     // (validationErrors / errors[operation] + notify) est donc court-circuitée.
