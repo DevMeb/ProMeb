@@ -36,12 +36,12 @@
                 📄 Voir PDF
               </button>
 
-              <button 
-                v-if="invoice.statut === 'en_attente_paiement'" 
-                @click="markAsPaid(invoice)" 
-                :disabled="loading.paid"
+              <button
+                v-if="invoice.statut === 'en_attente_paiement'"
+                @click="markAsPaid(invoice)"
+                :disabled="enCoursDePaiement(invoice)"
                 class="btn-action bg-green-500 disabled:opacity-50">
-              <span v-if="loading.paid" class="animate-spin border-4 border-white border-t-transparent rounded-full w-4 h-4"></span>
+              <span v-if="enCoursDePaiement(invoice)" class="animate-spin border-4 border-white border-t-transparent rounded-full w-4 h-4"></span>
               ✅ Payé
           </button>
             </div>
@@ -127,6 +127,11 @@ const { loading } = storeToRefs(invoiceStore)
 const { paid } = invoiceStore
 
 const showPdfModal = ref(null);
+
+// Chaque facture n'observe que SON propre état de chargement : la clé du store
+// est indexée par facture. Avec une clé unique, marquer une facture payée
+// désactivait le bouton de toutes les autres lignes en attente de paiement.
+const enCoursDePaiement = (invoice) => loading.value[`paid_${invoice.id}`] === true;
 
 // Calcul du total des heures et du montant HT
 const totalHeures = computed(() => {

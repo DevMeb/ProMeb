@@ -63,10 +63,10 @@
         <button
           v-if="invoice.statut === 'en_attente_paiement'"
           @click="markAsPaid(invoice)"
-          :disabled="loading.paid"
+          :disabled="enCoursDePaiement"
           class="btn-action bg-green-500 disabled:opacity-50 flex-1 lg:flex-none justify-center"
         >
-          <span v-if="loading.paid" class="animate-spin border-2 border-white border-t-transparent rounded-full w-3 h-3"></span>
+          <span v-if="enCoursDePaiement" class="animate-spin border-2 border-white border-t-transparent rounded-full w-3 h-3"></span>
           <span v-else>✅</span>
           <span>Payé</span>
         </button>
@@ -115,6 +115,11 @@ const props = defineProps({
     required: true,
   },
 });
+
+// Chaque ligne n'observe que SON propre état de chargement : la clé du store est
+// indexée par facture. Avec une clé unique, cliquer « Payé » sur une facture
+// désactivait le bouton de toutes les autres lignes en attente de paiement.
+const enCoursDePaiement = computed(() => loading.value[`paid_${props.invoice.id}`] === true);
 
 const estDeplie = ref(false);
 const showDeleteModal = ref(false);

@@ -182,7 +182,10 @@ export const useInvoicesStore = defineStore('invoices', () => {
 
   async function paid(invoiceId) {
     return apiCall({
-      operation: "paid",
+      // La clé est indexée par facture : une clé unique ("paid") ferait réagir
+      // le bouton de TOUTES les lignes en attente de paiement, pas seulement
+      // celle sur laquelle on a cliqué.
+      operation: `paid_${invoiceId}`,
       request: () => axios.patch(`/api/factures/${invoiceId}/paid`),
       onSuccess: (response) => {
         if (dashboardStore.dashboardData) {
