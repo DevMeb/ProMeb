@@ -22,9 +22,9 @@
       </button>
 
       <!-- Client -->
-      <div class="flex-1 min-w-0">
+      <div class="flex-1 min-w-0 overflow-hidden">
         <span class="sm:hidden text-xs uppercase tracking-wide text-gray-400 mr-2">Client</span>
-        <span class="font-semibold text-white truncate">{{ nomClient }}</span>
+        <span class="block truncate font-semibold text-white">{{ nomClient }}</span>
       </div>
 
       <!-- Heures -->
@@ -48,7 +48,7 @@
       <!-- Actions : ne doivent pas déplier la ligne -->
       <div class="flex gap-2 sm:justify-end sm:w-[200px]" @click.stop>
         <button @click="showPdfModal = true" class="btn-action bg-gray-600 flex-1 sm:flex-none justify-center">
-          📄 <span class="sm:hidden md:inline">PDF</span>
+          📄 <span class="sm:hidden lg:inline">PDF</span>
         </button>
 
         <button
@@ -68,7 +68,7 @@
         >
           <span v-if="loading.paid" class="animate-spin border-2 border-white border-t-transparent rounded-full w-3 h-3"></span>
           <span v-else>✅</span>
-          <span class="sm:hidden md:inline">Payé</span>
+          <span class="sm:hidden lg:inline">Payé</span>
         </button>
       </div>
     </div>
@@ -82,8 +82,8 @@
       leave-from-class="opacity-100"
       leave-to-class="opacity-0"
     >
-      <div v-if="estDeplie" :id="`facture-detail-${invoice.id}`" class="px-4 pb-4 sm:pl-14">
-        <FacturePrestationsTable :prestations="invoice.prestations ?? []" />
+      <div v-show="estDeplie" :id="`facture-detail-${invoice.id}`" class="px-4 pb-4 sm:pl-14">
+        <FacturePrestationsTable :invoice="invoice" />
       </div>
     </Transition>
   </div>
