@@ -76,13 +76,11 @@
   <!-- Modals -->
   <PrestationFormModal v-if="showFormModal" :prestation="prestation" @close="closeFormModal" />
   <PrestationDeleteModal v-if="showDeleteModal" :prestation="prestation" @close="closeDeleteModal" />
-  <ClientFormModal v-if="showClientModal" :client="prestation.client" @close="closeClientModal" />
 </template>
 
 <script setup>
 import { ref } from "vue";
 import { PrestationFormModal, PrestationDeleteModal } from "@/components/prestations/";
-import { ClientFormModal } from "@/components/clients/";
 import { formatDate } from "@/utils";
 
 const props = defineProps({
@@ -96,7 +94,6 @@ const emit = defineEmits(["close"]);
 
 const showFormModal = ref(false);
 const showDeleteModal = ref(false);
-const showClientModal = ref(false);
 
 function openFormModal() {
   showFormModal.value = true;
@@ -112,13 +109,5 @@ function openDeleteModal() {
 
 function closeDeleteModal() {
   showDeleteModal.value = false;
-}
-
-function openClientModal() {
-  showClientModal.value = true;
-}
-
-function closeClientModal() {
-  showClientModal.value = false;
 }
 </script>
