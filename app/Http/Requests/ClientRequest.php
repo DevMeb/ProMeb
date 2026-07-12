@@ -26,7 +26,8 @@ class ClientRequest extends FormRequest
             'code_postal' => 'nullable|string|max:20',
             'ville'       => 'nullable|string|max:100',
             'pays'        => 'nullable|string|max:100',
-            'siren'       => 'nullable|regex:/^\d{9}(\d{5})?$/',
+            'siren'             => 'nullable|regex:/^\d{9}(\d{5})?$/',
+            'afficher_horaires' => 'sometimes|boolean',
         ];
     }
 
