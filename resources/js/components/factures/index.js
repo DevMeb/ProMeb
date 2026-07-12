@@ -4,6 +4,8 @@ import FactureDeleteModal from './FactureDeleteModal.vue';
 import FacturePdfModal from './FacturePdfModal.vue';
 import FactureFormModal from './FactureFormModal.vue';
 import FactureMailModal from './FactureMailModal.vue';
+import FacturePrestationsTable from './FacturePrestationsTable.vue';
+import FactureFilters from './FactureFilters.vue';
 
 export {
     FacturesList,
@@ -12,4 +14,6 @@ export {
     FacturePdfModal,
     FactureFormModal,
     FactureMailModal,
+    FacturePrestationsTable,
+    FactureFilters,
 };

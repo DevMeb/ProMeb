@@ -1,6 +1,6 @@
 // src/stores/invoices.js
 import { defineStore } from 'pinia';
-import { ref } from 'vue';
+import { ref, computed, watch } from 'vue';
 import axios from 'axios';
 import { notify } from '@/utils';
 import { useDashboardStore } from "@/stores/dashboard";
@@ -10,6 +10,43 @@ export const useInvoicesStore = defineStore('invoices', () => {
   const invoices = ref([]);
   const errors = ref({});
   const loading = ref({});
+
+  // Filtres de la liste des factures (appliqués côté client)
+  const activeFilters = ref({
+    statut: '',
+    client_id: '',
+    month_year: '',
+  });
+
+  function updateFilters(filters) {
+    activeFilters.value = filters;
+  }
+
+  const isAnyFilterActive = computed(() => {
+    return Object.values(activeFilters.value).some(value => value !== "");
+  });
+
+  // Factures filtrées, les plus récentes en tête.
+  // Le tri se fait sur l'id : created_at arrive au format d/m/Y H:i:s,
+  // que JavaScript ne sait pas trier.
+  const filteredInvoices = ref([]);
+  watch([invoices, activeFilters], () => {
+    filteredInvoices.value = invoices.value
+      .filter(invoice => {
+        const { statut, client_id, month_year } = activeFilters.value;
+
+        if (statut && invoice.statut !== statut) return false;
+
+        if (client_id && invoice.prestations?.[0]?.client_id !== client_id) return false;
+
+        // La facture est retenue si au moins une de ses prestations
+        // tombe dans le mois demandé. prestation.date est au format Y-m-d.
+        if (month_year && !invoice.prestations?.some(p => p.date?.startsWith(month_year))) return false;
+
+        return true;
+      })
+      .sort((a, b) => b.id - a.id);
+  }, { deep: true, immediate: true });
 
   const dashboardStore = useDashboardStore();
 
@@ -163,13 +200,17 @@ export const useInvoicesStore = defineStore('invoices', () => {
   }
 
 
-  return { 
-    invoices, 
-    errors, 
-    loading, 
+  return {
+    invoices,
+    filteredInvoices,
+    activeFilters,
+    updateFilters,
+    isAnyFilterActive,
+    errors,
+    loading,
     fetchInvoices,
-    addInvoice, 
-    deleteInvoice, 
+    addInvoice,
+    deleteInvoice,
     clearErrors,
     getInvoicePdf,
     paid,
