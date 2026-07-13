@@ -180,4 +180,23 @@ describe('store factures — apiCall (alignee sur la fabrique partagee)', () => 
     expect(store.errors.validationErrors).toBeUndefined();
     expect(notify).toHaveBeenCalledWith('error', store.errors.pdf);
   });
+
+  it('onError est attendu : errors.pdf est pose AVANT que getInvoicePdf resolve', async () => {
+    // Un vrai Blob.text() ne resout pas en une microtache. Sans `await onError`,
+    // apiCall resout avant qu'onError ait lu le blob : la modale s'affiche vide
+    // (ni message, ni spinner), puis l'erreur surgit apres coup.
+    axios.get.mockRejectedValue({
+      response: {
+        status: 403,
+        headers: { 'content-type': 'application/json' },
+        data: { text: () => new Promise((r) =>
+          setTimeout(() => r(JSON.stringify({ message: 'Profil incomplet.' })), 0)) },
+      },
+    });
+    const store = useInvoicesStore();
+
+    await store.getInvoicePdf(1);
+
+    expect(store.errors.pdf).toBe('Profil incomplet.');
+  });
 });
