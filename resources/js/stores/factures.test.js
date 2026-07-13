@@ -179,7 +179,7 @@ describe('store factures — apiCall (alignee sur la fabrique partagee)', () => 
     // La branche générique n'est jamais atteinte : pas de validationErrors.
     // apiCall vide désormais systématiquement validationErrors (mis à `null`)
     // avant chaque appel, donc la clé existe mais ne porte aucune erreur.
-    expect(store.errors.validationErrors).toBeFalsy();
+    expect(store.errors.validationErrors).toBeNull();
     expect(notify).toHaveBeenCalledWith('error', store.errors.pdf);
   });
 
