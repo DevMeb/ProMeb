@@ -4,6 +4,7 @@ import axios from 'axios';
 import { notify } from '@/utils';
 import { useStorage } from '@vueuse/core';
 import dayjs from 'dayjs';
+import { creerApiCall } from '@/stores/apiCall';
 
 export const useClientsStore = defineStore('clients', () => {
   const clients = ref([]);
@@ -47,36 +48,7 @@ export const useClientsStore = defineStore('clients', () => {
   });
   */
 
-  function clearErrors(operation) {
-    if (operation) {
-      errors.value[operation] = null;
-    } else {
-      errors.value = {};
-    }
-  }
-
-  function setLoading(operation, state) {
-    loading.value[operation] = state;
-  }
-
-  async function apiCall({ operation, request, onSuccess }) {
-    clearErrors(operation);
-    setLoading(operation, true);
-    try {
-      const response = await request();
-      if (onSuccess) onSuccess(response);
-      return response;
-    } catch (err) {
-      if (err.response?.status === 422) {
-        errors.value.validationErrors = err.response.data.errors;
-      } else {
-        errors.value[operation] = err.response?.data?.message || "Une erreur est survenue.";
-        notify('error', errors.value[operation]);
-      }
-    } finally {
-      setLoading(operation, false);
-    }
-  }
+  const { apiCall, clearErrors } = creerApiCall({ errors, loading });
 
   async function fetchClients() {
     return apiCall({

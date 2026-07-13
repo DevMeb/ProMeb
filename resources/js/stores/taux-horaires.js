@@ -2,11 +2,14 @@ import { defineStore } from 'pinia';
 import { ref, computed, watch } from 'vue';
 import axios from 'axios';
 import { notify } from '@/utils';
+import { creerApiCall } from '@/stores/apiCall';
 
 export const useTauxHorairesStore = defineStore('taux-horaires', () => {
   const tauxHoraires = ref([]);
   const errors = ref({});
   const loading = ref({});
+
+  const { apiCall, clearErrors } = creerApiCall({ errors, loading });
 
   /*
   const activeFilters = useStorage("prestation-filters", {
@@ -44,37 +47,6 @@ export const useTauxHorairesStore = defineStore('taux-horaires', () => {
     return prestations.value.filter((prestation) => !prestation.facture_id);
   });
   */
-
-  function clearErrors(operation) {
-    if (operation) {
-      errors.value[operation] = null;
-    } else {
-      errors.value = {};
-    }
-  }
-
-  function setLoading(operation, state) {
-    loading.value[operation] = state;
-  }
-
-  async function apiCall({ operation, request, onSuccess }) {
-    clearErrors(operation);
-    setLoading(operation, true);
-    try {
-      const response = await request();
-      if (onSuccess) onSuccess(response);
-      return response;
-    } catch (err) {
-      if (err.response?.status === 422) {
-        errors.value.validationErrors = err.response.data.errors;
-      } else {
-        errors.value[operation] = err.response?.data?.message || "Une erreur est survenue.";
-        notify('error', errors.value[operation]);
-      }
-    } finally {
-      setLoading(operation, false);
-    }
-  }
 
   async function fetchTauxHoraires() {
     return apiCall({
