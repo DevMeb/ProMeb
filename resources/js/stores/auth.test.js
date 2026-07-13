@@ -154,14 +154,13 @@ describe('store auth — apiCall (via updateUser, la seule operation qui l\'util
     expect(notify).toHaveBeenCalledWith('error', 'Erreur serveur');
   });
 
-  it('BUG CONNU (fige, non corrige) : updateUser ne met jamais a jour store.user', async () => {
-    // Dans updateUser(user), le parametre `user` masque la ref `user` du store.
-    // onSuccess fait `user.value = response.data.user` : ça pose .value sur le
-    // PARAMETRE (un objet simple sans .value observable), pas sur la ref du
-    // store. store.user reste donc inchange apres un updateUser reussi.
-    // Ce test fige ce comportement REEL — bugue — pour proteger le refactor.
-    // Il ne doit PAS etre "corrige" ici : le jour ou le parametre sera renomme
-    // (le vrai fix), ce test devra etre mis a jour pour affirmer l'inverse.
+  it('updateUser met a jour store.user', async () => {
+    // Ancien bug : dans updateUser(user), le parametre `user` masquait la ref
+    // `user` du store. onSuccess faisait `user.value = response.data.user` :
+    // ça posait .value sur le PARAMETRE (un objet simple sans .value
+    // observable), pas sur la ref du store. store.user restait donc inchange
+    // apres un updateUser reussi. Le parametre a ete renomme pour ne plus
+    // masquer la ref : ce test verifie desormais le comportement corrige.
     axios.put.mockResolvedValue({ data: { user: { id: 1, email: 'nouveau@mail.c' }, message: 'Mis à jour' } });
     const { useAuthStore } = await import('@/stores/auth');
     const store = useAuthStore();
@@ -169,7 +168,7 @@ describe('store auth — apiCall (via updateUser, la seule operation qui l\'util
 
     await store.updateUser({ id: 1, email: 'nouveau@mail.c' });
 
-    // store.user reste l'ANCIEN objet : la mise a jour n'a jamais eu lieu.
-    expect(store.user).toEqual({ id: 1, email: 'ancien@mail.c' });
+    // store.user reflete le NOUVEL objet renvoye par l'API.
+    expect(store.user).toEqual({ id: 1, email: 'nouveau@mail.c' });
   });
 });

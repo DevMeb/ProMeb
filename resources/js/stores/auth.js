@@ -65,10 +65,10 @@ export const useAuthStore = defineStore("auth", () => {
     await router.push("/login");
   }
 
-  async function updateUser(user) {
+  async function updateUser(donnees) {
     return apiCall({
       operation: 'update',
-      request: () => axios.put(`/api/user/`, user),
+      request: () => axios.put(`/api/user/`, donnees),
       onSuccess: (response) => {
         user.value = response.data.user;
         notify('success', response.data.message);
