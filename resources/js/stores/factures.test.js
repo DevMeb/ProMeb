@@ -24,23 +24,24 @@ function erreurAxios(status, data = {}) {
 // factures.js importe useDashboardStore : setActivePinia(createPinia()) suffit
 // a le faire s'instancier normalement, pas besoin de le mocker.
 
-describe('store factures — apiCall (la divergence)', () => {
+describe('store factures — apiCall (alignee sur la fabrique partagee)', () => {
   beforeEach(() => {
     setActivePinia(createPinia());
     vi.clearAllMocks();
   });
 
-  it('fetchInvoices retourne la reponse au succes (comportement standard, comme onSuccess ne retourne rien)', async () => {
+  it('fetchInvoices retourne la reponse axios (alignee sur la fabrique, la valeur de retour de onSuccess est ignoree)', async () => {
+    // Avant l'alignement, apiCall(factures) faisait
+    // `return onSuccess ? onSuccess(response) : response;`. Comme le onSuccess
+    // de fetchInvoices ne retournait rien, le resultat etait `undefined`, pas
+    // la réponse axios — une trace de la divergence. Desormais apiCall
+    // retourne toujours la réponse, comme dans les quatre autres stores.
     axios.get.mockResolvedValue({ data: { factures: [{ id: 1 }] } });
     const store = useInvoicesStore();
 
     const resultat = await store.fetchInvoices();
 
-    // fetchInvoices : onSuccess ne retourne rien (undefined), donc apiCall
-    // renvoie `onSuccess(response)` = undefined, PAS la réponse axios.
-    // C'est déjà une trace de la divergence : seule addInvoice s'en sort
-    // grâce à son `return true` explicite.
-    expect(resultat).toBeUndefined();
+    expect(resultat).toEqual({ data: { factures: [{ id: 1 }] } });
     expect(store.invoices).toHaveLength(1);
   });
 
@@ -85,18 +86,21 @@ describe('store factures — apiCall (la divergence)', () => {
     expect(resultat).toBeFalsy();
   });
 
-  it('DIVERGENCE : apiCall retourne le resultat de onSuccess, pas la reponse', async () => {
-    // Les quatre autres stores font `if (onSuccess) onSuccess(response); return response;`
-    // Celui-ci fait `return onSuccess ? onSuccess(response) : response;`
-    // addInvoice retourne donc ce que retourne SON onSuccess — un `true` explicite,
-    // ajouté précisément parce que sans lui l'appelant recevait `undefined` et ne
-    // pouvait pas distinguer un succès d'un échec.
+  it('apiCall retourne la reponse (alignee sur la fabrique) : addInvoice n\'a plus besoin d\'un `return true` explicite', async () => {
+    // Avant : apiCall(factures) faisait `return onSuccess ? onSuccess(response) : response;`.
+    // addInvoice retournait donc ce que retournait SON onSuccess — d'où un `return true`
+    // explicite ajouté en pansement, sans lequel l'appelant recevait `undefined` et
+    // FactureFormModal ne pouvait pas distinguer un succès d'un échec : elle se
+    // fermait dans les deux cas, effaçant la sélection de prestations de l'utilisateur.
+    // Désormais apiCall retourne toujours la réponse — truthy au succès — ce qui
+    // suffit à `if (succes) close()`.
     axios.post.mockResolvedValue({ data: { facture: { id: 1 }, message: 'Créée' } });
     const store = useInvoicesStore();
 
     const resultat = await store.addInvoice({ prestations: [1] });
 
-    expect(resultat).toBe(true); // et NON la réponse axios
+    expect(resultat).toEqual({ data: { facture: { id: 1 }, message: 'Créée' } });
+    expect(resultat).toBeTruthy();
   });
 
   it('addInvoice retourne une valeur falsy en cas d\'echec', async () => {
@@ -163,15 +167,14 @@ describe('store factures — apiCall (la divergence)', () => {
     });
     const store = useInvoicesStore();
 
-    // Autre bizarrerie propre a apiCall(factures) : dans le catch, `onError(err)`
-    // est appelé SANS await. Le message d'erreur qu'il calcule (via un `await`
-    // interne) finit bien dans errors.pdf/notify, mais la valeur de retour de
-    // ce onError ('') n'est elle-même jamais renvoyée par apiCall : le catch ne
-    // fait rien de son résultat. getInvoicePdf résout donc à `undefined` sur
-    // échec, pas à la chaîne '' que onError retourne.
+    // apiCall (fabrique) attend `onError` : son message d'erreur (calculé via
+    // un `await` interne, lecture d'un blob JSON) finit dans errors.pdf/notify
+    // avant qu'apiCall ne résolve. apiCall lui-même ne renvoie rien sur échec
+    // (`undefined`) ; c'est getInvoicePdf qui traduit cette absence de réponse
+    // en chaîne vide, après l'appel.
     const resultat = await store.getInvoicePdf(1);
 
-    expect(resultat).toBeUndefined();
+    expect(resultat).toBe('');
     expect(store.errors.pdf).toBe('Votre profil est incomplet. Complétez vos informations dans les paramètres.');
     // La branche générique n'est jamais atteinte : pas de validationErrors.
     expect(store.errors.validationErrors).toBeUndefined();

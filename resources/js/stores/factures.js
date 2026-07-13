@@ -4,6 +4,7 @@ import { ref, computed, watch } from 'vue';
 import axios from 'axios';
 import { notify } from '@/utils';
 import { useDashboardStore } from "@/stores/dashboard";
+import { creerApiCall } from '@/stores/apiCall';
 
 
 export const useInvoicesStore = defineStore('invoices', () => {
@@ -50,37 +51,7 @@ export const useInvoicesStore = defineStore('invoices', () => {
 
   const dashboardStore = useDashboardStore();
 
-  function clearErrors(operation) {
-    if (operation) {
-      errors.value[operation] = null;
-    } else {
-      errors.value = {};
-    }
-  }
-
-  function setLoading(operation, state) {
-    loading.value[operation] = state;
-  }
-
-  async function apiCall({ operation, request, onSuccess, onError }) {
-    clearErrors(operation);
-    setLoading(operation, true);
-    try {
-      const response = await request();
-      return onSuccess ? onSuccess(response) : response;
-    } catch (err) {
-      if (onError) {
-        onError(err);
-      } else if (err.response?.status === 422) {
-        errors.value.validationErrors = err.response.data.errors;
-      } else {
-        errors.value[operation] = err.response?.data?.message || "Une erreur est survenue.";
-        notify('error', errors.value[operation]);
-      }
-    } finally {
-      setLoading(operation, false);
-    }
-  }
+  const { apiCall, clearErrors, setLoading } = creerApiCall({ errors, loading });
 
   async function fetchInvoices() {
     return apiCall({
@@ -104,11 +75,6 @@ export const useInvoicesStore = defineStore('invoices', () => {
         }
 
         notify('success', response.data.message);
-
-        // Signale explicitement le succès : apiCall renvoie ce que retourne
-        // onSuccess. Sans ce `true`, l'appelant reçoit `undefined` et ne peut
-        // pas distinguer une création réussie d'un échec.
-        return true;
       },
     });
   }
@@ -126,63 +92,64 @@ export const useInvoicesStore = defineStore('invoices', () => {
 
   // Récupère et affiche le PDF d'une facture
   async function getInvoicePdf(invoiceId) {
-    return apiCall({
+    const response = await apiCall({
       operation: "pdf",
       request: () => axios.get(`/api/factures/${invoiceId}/pdf`, { responseType: "blob" }),
-      onSuccess: (response) => {
-        return URL.createObjectURL(new Blob([response.data], { type: "application/pdf" }));
-      },
       onError: async (err) => {
-      // 1) Erreurs réseau (aucune réponse HTTP)
-      if (!err.response) {
-        const msg =
-          err.code === "ECONNABORTED"
-            ? "Délai d’attente dépassé. Vérifiez votre connexion et réessayez."
-            : "Impossible de contacter le serveur. Vérifiez votre connexion Internet.";
+        // 1) Erreurs réseau (aucune réponse HTTP)
+        if (!err.response) {
+          const msg =
+            err.code === "ECONNABORTED"
+              ? "Délai d’attente dépassé. Vérifiez votre connexion et réessayez."
+              : "Impossible de contacter le serveur. Vérifiez votre connexion Internet.";
 
-        errors.value.pdf = msg;   // modale
-        notify("error", msg);     // toast
-        return "";
-      }
-
-      const status = err.response.status;
-      const contentType = (err.response.headers?.["content-type"] || "").toLowerCase();
-
-      // Helper: extraire un message JSON même si responseType=blob
-      const readJsonMessage = async () => {
-        if (!contentType.includes("application/json")) return null;
-
-        const text = await err.response.data.text();
-        try {
-          const payload = JSON.parse(text);
-          return payload?.message || null;
-        } catch {
-          return null;
+          errors.value.pdf = msg;   // modale
+          notify("error", msg);     // toast
+          return;
         }
-      };
 
-      // 2) Erreur métier "profil incomplet" (ou autre validation)
-      // Si vous ne voulez viser QUE le profil incomplet, vous pouvez aussi matcher sur le texte.
-      if (status === 422 || status === 403) {
+        const status = err.response.status;
+        const contentType = (err.response.headers?.["content-type"] || "").toLowerCase();
+
+        // Helper: extraire un message JSON même si responseType=blob
+        const readJsonMessage = async () => {
+          if (!contentType.includes("application/json")) return null;
+
+          const text = await err.response.data.text();
+          try {
+            const payload = JSON.parse(text);
+            return payload?.message || null;
+          } catch {
+            return null;
+          }
+        };
+
+        // 2) Erreur métier "profil incomplet" (ou autre validation)
+        if (status === 422 || status === 403) {
+          const msg =
+            (await readJsonMessage()) ||
+            "Votre profil est incomplet. Complétez vos informations dans les paramètres.";
+
+          errors.value.pdf = msg;   // modale
+          notify("error", msg);     // toast
+          return;
+        }
+
+        // 3) Autres erreurs HTTP (serveur, permissions, etc.)
         const msg =
           (await readJsonMessage()) ||
-          "Votre profil est incomplet. Complétez vos informations dans les paramètres.";
+          "Erreur technique lors de la génération du PDF. Réessayez dans quelques instants.";
 
-        errors.value.pdf = msg;   // modale
-        notify("error", msg);     // toast
-        return "";
-      }
-
-      // 3) Autres erreurs HTTP (serveur, permissions, etc.)
-      const msg =
-        (await readJsonMessage()) ||
-        "Erreur technique lors de la génération du PDF. Réessayez dans quelques instants.";
-
-      errors.value.pdf = msg;     // modale
-      notify("error", msg);       // toast
-      return "";
-    },
+        errors.value.pdf = msg;     // modale
+        notify("error", msg);       // toast
+      },
     });
+
+    // L'URL est construite APRÈS l'appel : apiCall retourne désormais la réponse,
+    // et non plus ce que retourne onSuccess.
+    if (!response) return "";
+
+    return URL.createObjectURL(new Blob([response.data], { type: "application/pdf" }));
   }
 
   async function paid(invoiceId) {
