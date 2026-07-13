@@ -39,6 +39,13 @@ export function creerApiCall({ errors, loading, relancerLesErreurs = false }) {
    */
   async function apiCall({ operation, request, onSuccess, onError }) {
     clearErrors(operation);
+    // Les erreurs de validation vivent sous une clé à part (renseignée par le
+    // traitement générique des 422, plus bas). Sans ce nettoyage, une erreur
+    // périmée survit à l'appel qui l'a produite et réapparaît dans une modale
+    // suivante. Un `onError` sur mesure remplace entièrement ce traitement
+    // générique (cf. getInvoicePdf) : il n'écrit jamais dans validationErrors,
+    // donc rien à y nettoyer pour cet appel.
+    if (!onError) clearErrors('validationErrors');
     setLoading(operation, true);
 
     try {

@@ -300,7 +300,6 @@ const messageErreur = computed(() =>
 
 function nettoyerErreurs() {
   clearErrors('add');
-  clearErrors('validationErrors');
 }
 
 function libelleMois(mois) {
@@ -339,10 +338,9 @@ function basculerTout() {
 async function creerLaFacture() {
   if (!idsSelectionnes.value.length) return;
 
-  // Indispensable avant chaque tentative : apiCall ne vide que la clé de
-  // l'opération ('add'), jamais 'validationErrors'. Sans ce nettoyage, un 422
-  // suivi d'une erreur réseau laisserait le bandeau afficher l'ancien message
-  // (prioritaire) pendant que le toast en annonce un autre.
+  // apiCall videra 'add' et 'validationErrors' de toute façon avant la requête ;
+  // ce nettoyage immédiat évite juste qu'un ancien message reste affiché dans
+  // le bandeau le temps que la nouvelle requête parte.
   nettoyerErreurs();
 
   const succes = await addInvoice({ prestations: [...idsSelectionnes.value] });
