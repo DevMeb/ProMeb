@@ -54,7 +54,12 @@
   }
   
   async function confirmDelete() {
-      await deleteInvoice(props.invoice.id);
-      close();
+      const succes = await deleteInvoice(props.invoice.id);
+
+      // On ne ferme QUE si la suppression a réussi : sinon l'utilisateur croirait
+      // sa facture supprimée alors qu'elle est toujours là.
+      if (succes) {
+          close();
+      }
   }
 </script>
