@@ -11,10 +11,8 @@ import { notify } from '@/utils';
  * @param {object} refs
  * @param {import('vue').Ref<object>} refs.errors   Les erreurs du store, par opération.
  * @param {import('vue').Ref<object>} refs.loading  Les états de chargement, par opération.
- * @param {boolean} [refs.relancerLesErreurs=false] Relance l'erreur après l'avoir
- *   traitée. Seul le store `auth` l'active : son `updateUser()` compte dessus.
  */
-export function creerApiCall({ errors, loading, relancerLesErreurs = false }) {
+export function creerApiCall({ errors, loading }) {
   function clearErrors(operation) {
     if (operation) {
       errors.value[operation] = null;
@@ -62,8 +60,6 @@ export function creerApiCall({ errors, loading, relancerLesErreurs = false }) {
         errors.value[operation] = err.response?.data?.message || "Une erreur est survenue.";
         notify('error', errors.value[operation]);
       }
-
-      if (relancerLesErreurs) throw err;
     } finally {
       setLoading(operation, false);
     }

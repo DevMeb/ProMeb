@@ -176,7 +176,9 @@
   
   // Soumission du formulaire
   const submitProfileUpdate = async () => {
-    await updateUser(userData.value);
+    const succes = await updateUser(userData.value);
+
+    if (!succes) return;   // l'erreur est déjà affichée (toast + errors.update)
   };
   </script>
   

@@ -124,32 +124,34 @@ describe('store auth — apiCall (via updateUser, la seule operation qui l\'util
     const { useAuthStore } = await import('@/stores/auth');
     const store = useAuthStore();
 
-    await expect(store.updateUser({ id: 1 })).rejects.toBeDefined();
+    await store.updateUser({ id: 1 });
 
     expect(store.loading.update).toBe(false);
   });
 
-  it('range un 422 dans validationErrors, SANS notifier — et relance quand meme', async () => {
+  it('range un 422 dans validationErrors, SANS notifier', async () => {
     axios.put.mockRejectedValue(erreurAxios(422, { errors: { email: ['Email invalide.'] } }));
     const { useAuthStore } = await import('@/stores/auth');
     const store = useAuthStore();
 
-    await expect(store.updateUser({ id: 1 })).rejects.toBeDefined();
+    const resultat = await store.updateUser({ id: 1 });
 
     expect(store.errors.validationErrors).toEqual({ email: ['Email invalide.'] });
     expect(notify).not.toHaveBeenCalled();
+    expect(resultat).toBeFalsy();
   });
 
-  it('DIVERGENCE : apiCall relance l\'erreur apres l\'avoir traitee', async () => {
-    // Son catch se termine par `throw err;` — les quatre autres stores ne
-    // relancent pas. Ses appelants peuvent donc l'attraper. Retirer ce throw
-    // les casserait en silence.
+  it('updateUser ne relance plus : il retourne une valeur falsy en cas d\'echec', async () => {
+    // auth relançait ses erreurs (throw) parce qu'apiCall ne retournait rien
+    // d'exploitable. Depuis l'extraction d'apiCall, il retourne la réponse :
+    // l'appelant teste la valeur, comme dans les quatre autres stores.
     axios.put.mockRejectedValue(erreurAxios(500, { message: 'Erreur serveur' }));
     const { useAuthStore } = await import('@/stores/auth');
     const store = useAuthStore();
 
-    await expect(store.updateUser({ id: 1 })).rejects.toBeDefined();
+    const resultat = await store.updateUser({ id: 1 });
 
+    expect(resultat).toBeFalsy();
     expect(store.errors.update).toBe('Erreur serveur');
     expect(notify).toHaveBeenCalledWith('error', 'Erreur serveur');
   });

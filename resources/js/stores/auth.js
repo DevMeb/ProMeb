@@ -13,14 +13,7 @@ export const useAuthStore = defineStore("auth", () => {
   const router = useRouter();
   const toast = useToast();
 
-  // relancerLesErreurs : ce store relance l'erreur après l'avoir traitée.
-  // C'est updateUser() — la seule opération de ce store qui passe par apiCall —
-  // qui en dépend. login() a son propre try/catch et ne passe pas par ici.
-  const { apiCall, clearErrors } = creerApiCall({
-    errors,
-    loading,
-    relancerLesErreurs: true,
-  });
+  const { apiCall, clearErrors } = creerApiCall({ errors, loading });
 
   const isAuthenticated = computed(() => !!user.value);
 
