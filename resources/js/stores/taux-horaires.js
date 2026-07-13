@@ -9,7 +9,7 @@ export const useTauxHorairesStore = defineStore('taux-horaires', () => {
   const errors = ref({});
   const loading = ref({});
 
-  const { apiCall, clearErrors, setLoading } = creerApiCall({ errors, loading });
+  const { apiCall, clearErrors } = creerApiCall({ errors, loading });
 
   /*
   const activeFilters = useStorage("prestation-filters", {

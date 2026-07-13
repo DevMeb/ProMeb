@@ -48,7 +48,7 @@ export const useClientsStore = defineStore('clients', () => {
   });
   */
 
-  const { apiCall, clearErrors, setLoading } = creerApiCall({ errors, loading });
+  const { apiCall, clearErrors } = creerApiCall({ errors, loading });
 
   async function fetchClients() {
     return apiCall({

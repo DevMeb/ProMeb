@@ -10,7 +10,7 @@ export const usePrestationsStore = defineStore('prestations', () => {
   const errors = ref({});
   const loading = ref({});
 
-  const { apiCall, clearErrors, setLoading } = creerApiCall({ errors, loading });
+  const { apiCall, clearErrors } = creerApiCall({ errors, loading });
 
   // Filtres pour les prestations (par exemple, filtrer par date et adresse)
   const activeFilters = ref({

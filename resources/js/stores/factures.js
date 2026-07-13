@@ -51,7 +51,7 @@ export const useInvoicesStore = defineStore('invoices', () => {
 
   const dashboardStore = useDashboardStore();
 
-  const { apiCall, clearErrors, setLoading } = creerApiCall({ errors, loading });
+  const { apiCall, clearErrors } = creerApiCall({ errors, loading });
 
   async function fetchInvoices() {
     return apiCall({

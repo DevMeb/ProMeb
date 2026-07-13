@@ -16,7 +16,7 @@ export const useAuthStore = defineStore("auth", () => {
   // relancerLesErreurs : ce store relance l'erreur après l'avoir traitée.
   // C'est updateUser() — la seule opération de ce store qui passe par apiCall —
   // qui en dépend. login() a son propre try/catch et ne passe pas par ici.
-  const { apiCall, clearErrors, setLoading } = creerApiCall({
+  const { apiCall, clearErrors } = creerApiCall({
     errors,
     loading,
     relancerLesErreurs: true,
