@@ -178,7 +178,11 @@
   const submitProfileUpdate = async () => {
     const succes = await updateUser(userData.value);
 
-    if (!succes) return;   // l'erreur est déjà affichée (toast + errors.update)
+    if (succes) {
+      // Le serveur peut normaliser des champs : on repart de ce qu'il a
+      // réellement enregistré, pas de la saisie brute encore dans le formulaire.
+      userData.value = { ...user.value };
+    }
   };
   </script>
   
