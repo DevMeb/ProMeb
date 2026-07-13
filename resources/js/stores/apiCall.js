@@ -11,10 +11,8 @@ import { notify } from '@/utils';
  * @param {object} refs
  * @param {import('vue').Ref<object>} refs.errors   Les erreurs du store, par opération.
  * @param {import('vue').Ref<object>} refs.loading  Les états de chargement, par opération.
- * @param {boolean} [refs.relancerLesErreurs=false] Relance l'erreur après l'avoir
- *   traitée. Seul le store `auth` l'active : son `updateUser()` compte dessus.
  */
-export function creerApiCall({ errors, loading, relancerLesErreurs = false }) {
+export function creerApiCall({ errors, loading }) {
   function clearErrors(operation) {
     if (operation) {
       errors.value[operation] = null;
@@ -39,6 +37,12 @@ export function creerApiCall({ errors, loading, relancerLesErreurs = false }) {
    */
   async function apiCall({ operation, request, onSuccess, onError }) {
     clearErrors(operation);
+    // Les erreurs de validation vivent sous une clé à part (renseignée par le
+    // traitement générique des 422, plus bas). Sans ce nettoyage, une erreur
+    // périmée survivait à l'appel qui l'avait produite et pouvait réapparaître
+    // dans une modale suivante — y compris pour un appel dont l'`onError` sur
+    // mesure ne traite pas les 422 lui-même. Toujours vider, donc.
+    clearErrors('validationErrors');
     setLoading(operation, true);
 
     try {
@@ -56,8 +60,6 @@ export function creerApiCall({ errors, loading, relancerLesErreurs = false }) {
         errors.value[operation] = err.response?.data?.message || "Une erreur est survenue.";
         notify('error', errors.value[operation]);
       }
-
-      if (relancerLesErreurs) throw err;
     } finally {
       setLoading(operation, false);
     }

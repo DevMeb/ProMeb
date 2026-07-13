@@ -298,6 +298,10 @@ const messageErreur = computed(() =>
   errors.value.validationErrors?.prestations?.[0] ?? errors.value.add ?? null
 );
 
+// apiCall ne vide 'add'/'validationErrors' qu'au DÉMARRAGE d'un appel réseau.
+// Ce nettoyage-ci couvre les transitions de la modale (ouverture, fermeture,
+// changement de client) : des moments où aucun appel n'a lieu, mais où un
+// message d'erreur périmé ne doit pas survivre à la modale qui l'a produit.
 function nettoyerErreurs() {
   clearErrors('add');
   clearErrors('validationErrors');
@@ -339,10 +343,11 @@ function basculerTout() {
 async function creerLaFacture() {
   if (!idsSelectionnes.value.length) return;
 
-  // Indispensable avant chaque tentative : apiCall ne vide que la clé de
-  // l'opération ('add'), jamais 'validationErrors'. Sans ce nettoyage, un 422
-  // suivi d'une erreur réseau laisserait le bandeau afficher l'ancien message
-  // (prioritaire) pendant que le toast en annonce un autre.
+  // apiCall videra 'add' et 'validationErrors' de toute façon au démarrage de
+  // la requête ; ce nettoyage immédiat n'est donc pas nécessaire pour l'appel
+  // qui suit. On le garde car nettoyerErreurs() a un second rôle ici : c'est
+  // la même fonction qui protège close() et le changement de client, où,
+  // eux, aucun appel n'a lieu.
   nettoyerErreurs();
 
   const succes = await addInvoice({ prestations: [...idsSelectionnes.value] });

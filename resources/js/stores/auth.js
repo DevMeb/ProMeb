@@ -13,14 +13,7 @@ export const useAuthStore = defineStore("auth", () => {
   const router = useRouter();
   const toast = useToast();
 
-  // relancerLesErreurs : ce store relance l'erreur après l'avoir traitée.
-  // C'est updateUser() — la seule opération de ce store qui passe par apiCall —
-  // qui en dépend. login() a son propre try/catch et ne passe pas par ici.
-  const { apiCall, clearErrors } = creerApiCall({
-    errors,
-    loading,
-    relancerLesErreurs: true,
-  });
+  const { apiCall, clearErrors } = creerApiCall({ errors, loading });
 
   const isAuthenticated = computed(() => !!user.value);
 
@@ -65,10 +58,10 @@ export const useAuthStore = defineStore("auth", () => {
     await router.push("/login");
   }
 
-  async function updateUser(user) {
+  async function updateUser(donnees) {
     return apiCall({
       operation: 'update',
-      request: () => axios.put(`/api/user/`, user),
+      request: () => axios.put(`/api/user/`, donnees),
       onSuccess: (response) => {
         user.value = response.data.user;
         notify('success', response.data.message);

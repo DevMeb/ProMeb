@@ -177,7 +177,9 @@ describe('store factures — apiCall (alignee sur la fabrique partagee)', () => 
     expect(resultat).toBe('');
     expect(store.errors.pdf).toBe('Votre profil est incomplet. Complétez vos informations dans les paramètres.');
     // La branche générique n'est jamais atteinte : pas de validationErrors.
-    expect(store.errors.validationErrors).toBeUndefined();
+    // apiCall vide désormais systématiquement validationErrors (mis à `null`)
+    // avant chaque appel, donc la clé existe mais ne porte aucune erreur.
+    expect(store.errors.validationErrors).toBeNull();
     expect(notify).toHaveBeenCalledWith('error', store.errors.pdf);
   });
 

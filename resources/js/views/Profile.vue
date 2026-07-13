@@ -176,7 +176,13 @@
   
   // Soumission du formulaire
   const submitProfileUpdate = async () => {
-    await updateUser(userData.value);
+    const succes = await updateUser(userData.value);
+
+    if (succes) {
+      // Le serveur peut normaliser des champs : on repart de ce qu'il a
+      // réellement enregistré, pas de la saisie brute encore dans le formulaire.
+      userData.value = { ...user.value };
+    }
   };
   </script>
   
