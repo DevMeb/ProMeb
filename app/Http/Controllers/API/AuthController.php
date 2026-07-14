@@ -39,6 +39,15 @@ class AuthController extends Controller
             // Illuminate\Routing\Middleware\ThrottleRequests::handleRequestUsingNamedLimiter).
             // RateLimiter::clear() ne fait, lui, aucun hachage : pour cibler la même
             // entrée de cache, il faut reproduire exactement cette transformation ici.
+            //
+            // ATTENTION : ce md5(THROTTLE_LIMITER . cle) reproduit un détail d'implémentation
+            // interne de Laravel, non contractuel (non documenté, non garanti stable entre
+            // versions). Si une future version de Laravel change ce hachage, cette remise à
+            // zéro échouera silencieusement en production (le compteur ne sera plus effacé,
+            // sans erreur ni log). Seul le test « une connexion reussie remet le compteur a
+            // zero » (tests/Feature/LoginThrottleTest.php) peut détecter cette régression :
+            // si ce test casse après une montée de version de Laravel, c'est ici qu'il faut
+            // regarder en premier.
             RateLimiter::clear(
                 md5(self::THROTTLE_LIMITER . self::cleThrottle($request))
             );
