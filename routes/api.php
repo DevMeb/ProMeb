@@ -106,6 +106,8 @@ Route::middleware('auth:sanctum')->group(function () {
 Route::prefix('auth')
     ->as('auth.')
     ->group(function () {
-        Route::post('/login', [AuthController::class, 'login'])->name('login');
+        Route::post('/login', [AuthController::class, 'login'])
+            ->name('login')
+            ->middleware('throttle:' . AuthController::THROTTLE_LIMITER);
         Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
     });
