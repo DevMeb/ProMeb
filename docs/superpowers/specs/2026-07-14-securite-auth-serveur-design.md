@@ -50,6 +50,17 @@ attaquant pourrait bloquer volontairement le compte d'autrui — déni de servic
 ciblé). Le couple email+IP cible la force brute sans ces effets de bord. Une
 connexion réussie remet le compteur à zéro.
 
+> **Note (revue finale, 2026-07-15) : ce compromis n'est pas tenu en production
+> aujourd'hui.** L'app est derrière le Nginx du VPS sans `trustProxies` configuré
+> côté Laravel ni transmission de `X-Forwarded-For` côté Nginx du container. Dans
+> cet état, `$request->ip()` renvoie l'IP du proxy — constante pour tous les
+> clients — et la clé `email + IP` dégénère de fait en `email` seul. L'anti-force-
+> brute par email reste pleinement effectif ; c'est uniquement la protection contre
+> le déni de service ciblé sur le compte d'autrui (le bénéfice du `+ IP`) qui n'est
+> pas atteinte tant que l'infra n'est pas configurée. Décision : accepté tel quel
+> pour l'instant. Guide de mise à niveau :
+> `docs/securite/throttle-vraie-ip-client.md`.
+
 **CORS : liste des origines pilotée par le `.env`.** Cohérent avec la façon dont
 `SESSION_DOMAIN` et `SANCTUM_STATEFUL_DOMAINS` sont déjà gérés. Une variable
 `FRONTEND_URL` par environnement, plutôt qu'une liste en dur dans le code.
