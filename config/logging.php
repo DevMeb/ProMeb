@@ -65,25 +65,26 @@ return [
             'replace_placeholders' => true,
         ],
 
-        // Logs pour les prestations
+        // Logs pour les prestations — délègue au canal par défaut de l'environnement
+        // (stderr en prod → docker logs/Dozzle, fichier en local, comportement inchangé)
         'prestation' => [
-            'driver' => 'single',
-            'path' => storage_path('logs/prestation.log'),
-            'level' => env('LOG_LEVEL', 'debug'),
+            'driver' => 'stack',
+            'channels' => explode(',', env('LOG_CHANNEL', 'single')),
+            'ignore_exceptions' => false,
         ],
 
-        // Logs pour les factures
+        // Logs pour les factures — délègue au canal par défaut de l'environnement
         'facture' => [
-            'driver' => 'single',
-            'path' => storage_path('logs/facture.log'),
-            'level' => env('LOG_LEVEL', 'debug'),
+            'driver' => 'stack',
+            'channels' => explode(',', env('LOG_CHANNEL', 'single')),
+            'ignore_exceptions' => false,
         ],
 
-        // Logs pour les factures
+        // Logs pour les clients — délègue au canal par défaut de l'environnement
         'client' => [
-            'driver' => 'single',
-            'path' => storage_path('logs/client.log'),
-            'level' => env('LOG_LEVEL', 'debug'),
+            'driver' => 'stack',
+            'channels' => explode(',', env('LOG_CHANNEL', 'single')),
+            'ignore_exceptions' => false,
         ],
 
         // Logs pour les factures
