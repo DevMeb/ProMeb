@@ -35,7 +35,11 @@
               <MenuButton class="relative flex rounded-full bg-gray-800 text-sm focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800 focus:outline-hidden">
                 <span class="absolute -inset-1.5" />
                 <span class="sr-only">Open user menu</span>
-                <img class="size-8 rounded-full" :src="user.avatar || defaultAvatar" alt="Avatar utilisateur" />
+                <span class="flex items-center gap-2 rounded-full bg-gray-800 px-3 py-1.5 text-sm text-white">
+                  <span class="sr-only">Menu utilisateur</span>
+                  <UserCircleIcon class="size-6 text-gray-300" aria-hidden="true" />
+                  <span class="font-medium">{{ user?.name }}</span>
+                </span>
               </MenuButton>
             </div>
             <transition enter-active-class="transition ease-out duration-100" enter-from-class="transform opacity-0 scale-95" enter-to-class="transform opacity-100 scale-100" leave-active-class="transition ease-in duration-75" leave-from-class="transform opacity-100 scale-100" leave-to-class="transform opacity-0 scale-95">
@@ -72,12 +76,14 @@
 <script setup>
 import { useRoute, RouterLink } from "vue-router";
 import { Disclosure, DisclosureButton, DisclosurePanel, Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/vue";
-import { Bars3Icon, XMarkIcon } from "@heroicons/vue/24/outline";
+import { Bars3Icon, XMarkIcon, UserCircleIcon } from "@heroicons/vue/24/outline";
+import { storeToRefs } from "pinia";
 import { useAuthStore } from "@/stores/auth"; // Importation du store Auth
 
 // Store d'authentification
 const authStore = useAuthStore();
-const { user, isAuthenticated, logout } = authStore;
+const { user, isAuthenticated } = storeToRefs(authStore);
+const { logout } = authStore;
 
 // Définition des liens de navigation
 const navigation = [
@@ -88,9 +94,6 @@ const navigation = [
   { name: "Factures", href: "/factures" },
   { name: "Mise à jour", href: "/pwa" },
 ];
-
-// Image par défaut si l'utilisateur n'a pas d'avatar
-const defaultAvatar = "https://i.pravatar.cc/300";
 
 // Vérifier si un lien est actif
 const route = useRoute();

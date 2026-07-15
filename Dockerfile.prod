@@ -47,6 +47,17 @@ RUN composer install --no-dev --optimize-autoloader --no-interaction --prefer-di
 RUN chown -R www-data:www-data storage bootstrap/cache \
     && chmod -R 775 storage bootstrap/cache
 
+# Fait remonter la sortie des workers (dont le canal de log `stderr` de Laravel)
+# vers stdout/stderr du container, pour qu'elle soit visible dans docker logs / Dozzle.
+# catch_workers_output est une directive de POOL ([www]), pas globale : l'en-tête
+# [www] explicite ci-dessous garantit que le réglage s'applique bien au bon pool,
+# indépendamment de l'ordre de chargement des fichiers .conf du répertoire (le
+# préfixe "zz-" ne fait que placer ce fichier tard dans le tri, il ne dit rien sur
+# le pool ciblé sans l'en-tête).
+# L'image php:8.4-fpm active déjà ce réglage par défaut : cette ligne est une
+# sécurité pour ne pas dépendre de ce défaut si une future version de l'image change.
+RUN printf '[www]\ncatch_workers_output = yes\n' > /usr/local/etc/php-fpm.d/zz-docker-logs.conf
+
 USER www-data
 
 CMD ["php-fpm"]
