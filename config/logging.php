@@ -67,24 +67,32 @@ return [
 
         // Logs pour les prestations — délègue au canal par défaut de l'environnement
         // (stderr en prod → docker logs/Dozzle, fichier en local, comportement inchangé)
+        // ignore_exceptions à true : ce canal n'est invoqué que depuis
+        // BaseService::handleExceptions, qui logge PUIS relance (throw $e). Si l'écriture
+        // du log échoue (cible indisponible, pipe cassé), une exception de logging ne doit
+        // jamais remplacer l'exception métier déjà gérée et empêcher le throw $e — sinon
+        // l'utilisateur reçoit un 500 au lieu du 422 attendu, précisément quand l'infra de
+        // log est déjà dégradée.
         'prestation' => [
             'driver' => 'stack',
             'channels' => explode(',', env('LOG_CHANNEL', 'single')),
-            'ignore_exceptions' => false,
+            'ignore_exceptions' => true,
         ],
 
         // Logs pour les factures — délègue au canal par défaut de l'environnement
+        // ignore_exceptions à true : même raison que le canal `prestation` ci-dessus.
         'facture' => [
             'driver' => 'stack',
             'channels' => explode(',', env('LOG_CHANNEL', 'single')),
-            'ignore_exceptions' => false,
+            'ignore_exceptions' => true,
         ],
 
         // Logs pour les clients — délègue au canal par défaut de l'environnement
+        // ignore_exceptions à true : même raison que le canal `prestation` ci-dessus.
         'client' => [
             'driver' => 'stack',
             'channels' => explode(',', env('LOG_CHANNEL', 'single')),
-            'ignore_exceptions' => false,
+            'ignore_exceptions' => true,
         ],
 
         // Logs pour les factures

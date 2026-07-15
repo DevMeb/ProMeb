@@ -3,7 +3,6 @@
 use App\Models\Facture;
 use App\Services\FactureService;
 use Illuminate\Support\Facades\Log;
-use Mockery\MockInterface;
 
 it('journalise un message de paiement (pas de suppression) quand paid echoue', function () {
     Log::spy();
