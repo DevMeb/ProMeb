@@ -8,6 +8,7 @@ use Illuminate\Contracts\Console\PromptsForMissingInput;
 
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\Rules\Password;
 
 class CreateUser extends Command implements PromptsForMissingInput
 {
@@ -42,7 +43,7 @@ class CreateUser extends Command implements PromptsForMissingInput
         $validator = Validator::make(compact('name', 'email', 'password'), [
             'name' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email',
-            'password' => 'required|string|min:2',
+            'password' => ['required', 'string', Password::min(12)],
         ]);
 
         if ($validator->fails()) {
