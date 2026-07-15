@@ -68,3 +68,15 @@ it('une connexion reussie remet le compteur a zero', function () {
             ->assertStatus(422);
     }
 });
+
+it('un email envoye en tableau ne fait pas planter le limiteur (422, pas 500)', function () {
+    // Le middleware `throttle:login` exécute la closure du limiteur - donc
+    // AuthController::cleThrottle() - AVANT la validation du contrôleur. Si
+    // `email` est un tableau, `(string) $request->input('email')` déclenchait
+    // un warning PHP converti en 500, et l'exception empêchait même `hit()`
+    // d'être appelé : la tentative n'était pas comptée (esquive du throttle).
+    $this->postJson('/api/auth/login', [
+        'email'    => ['a', 'b'],
+        'password' => 'mauvais',
+    ])->assertStatus(422);
+});

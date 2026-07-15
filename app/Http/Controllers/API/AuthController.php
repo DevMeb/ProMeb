@@ -21,10 +21,28 @@ class AuthController extends Controller
      * Clé de limitation du login : couple email + IP.
      * Source unique de vérité, utilisée par le limiteur (AppServiceProvider)
      * ET par la remise à zéro ci-dessous. Les deux DOIVENT rester identiques.
+     *
+     * Exécutée par le middleware `throttle:login` AVANT la validation du
+     * contrôleur : `email` peut donc arriver ici sous n'importe quelle forme
+     * (tableau, null, etc.), pas seulement une chaîne. Ne jamais faire
+     * `(string) $request->input('email')` sans vérifier le type d'abord —
+     * un tableau déclenche un `E_WARNING: Array to string conversion` promu
+     * en `ErrorException` (500), et comme l'exception part avant que le
+     * `Limit` ne soit retourné, `hit()` n'est jamais appelé : la tentative
+     * échappe au throttle.
+     *
+     * Partie IP : n'est fiable que si `bootstrap/app.php` déclare les
+     * proxies de confiance (`trustProxies`). Sans ça, en prod derrière le
+     * Nginx du VPS, `$request->ip()` renvoie l'IP du proxy (constante pour
+     * tous les clients) et la clé dégénère de fait en `email` seul — voir
+     * docs/securite/throttle-vraie-ip-client.md pour la mise à niveau.
      */
     public static function cleThrottle(Request $request): string
     {
-        return Str::lower((string) $request->input('email')) . '|' . $request->ip();
+        $email = $request->input('email');
+        $email = is_string($email) ? Str::lower($email) : '';
+
+        return $email . '|' . $request->ip();
     }
 
     public function login(Request $request) {
