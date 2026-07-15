@@ -47,6 +47,10 @@ RUN composer install --no-dev --optimize-autoloader --no-interaction --prefer-di
 RUN chown -R www-data:www-data storage bootstrap/cache \
     && chmod -R 775 storage bootstrap/cache
 
+# Fait remonter la sortie des workers (dont le canal de log `stderr` de Laravel)
+# vers stdout/stderr du container, pour qu'elle soit visible dans docker logs / Dozzle.
+RUN echo "catch_workers_output = yes" > /usr/local/etc/php-fpm.d/zz-docker-logs.conf
+
 USER www-data
 
 CMD ["php-fpm"]
