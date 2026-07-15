@@ -154,7 +154,7 @@ class FactureService extends BaseService
             ]);
 
             return $facture->refresh()->load('prestations.client', 'prestations.tauxHoraire');
-        }, "Erreur lors de la suppression de la facture (ID: $facture->id)", "facture");
+        }, "Erreur lors du paiement de la facture (ID: $facture->id)", "facture");
         
     }
 }
