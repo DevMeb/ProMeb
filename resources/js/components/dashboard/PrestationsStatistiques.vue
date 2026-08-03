@@ -6,8 +6,8 @@
       :value="dashboardData.prestations.length"
       description="Total des prestations"
       icon="📦"
-      gradient="from-indigo-500 to-indigo-600"
-      textColor="text-indigo-100"
+      gradient="from-cyan-500 to-cyan-600"
+      textColor="text-cyan-100"
       @click="showPrestationsModal = true"
     />
 
@@ -28,8 +28,8 @@
       :value="dashboardData.factures_paid.length"
       description="Factures régularisées"
       icon="📑"
-      gradient="from-green-500 to-green-600"
-      textColor="text-green-100"
+      gradient="from-emerald-500 to-emerald-600"
+      textColor="text-emerald-100"
       @click="showFacturesBilledModal = true"
     />
 
@@ -39,8 +39,8 @@
       :value="dashboardData.factures_unpaid.length"
       description="Factures en attente de facturation"
       icon="⏳"
-      gradient="from-red-400 to-red-700"
-      textColor="text-orange-100"
+      gradient="from-rose-500 to-rose-600"
+      textColor="text-rose-100"
       @click="showFacturesUnbilledModal = true"
     />
   </div>

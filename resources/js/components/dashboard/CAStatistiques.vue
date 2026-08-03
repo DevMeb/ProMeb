@@ -10,7 +10,7 @@
       badgeColor="text-red-500"
       description="Revenus confirmés"
       icon="💶"
-      gradient="from-green-600 to-green-700"
+      gradient="from-emerald-600 to-emerald-700"
     />
 
     <!-- CA Attendu -->
@@ -19,7 +19,7 @@
       :value="caAttendu"
       description="Revenus prévisionnels"
       icon="📈"
-      gradient="from-amber-500 to-amber-600"
+      gradient="from-sky-500 to-sky-600"
     />
 
     <!-- Différence -->
@@ -28,7 +28,7 @@
       :value="difference"
       description="Différence CA réel/prévisionnel"
       icon="⚖️"
-      :gradient="difference >= 0 ? 'from-green-600 to-green-700' : 'from-red-500 to-red-600'"
+      :gradient="difference >= 0 ? 'from-emerald-600 to-emerald-700' : 'from-rose-500 to-rose-600'"
       :isDifference="true"
     />
   </div>
